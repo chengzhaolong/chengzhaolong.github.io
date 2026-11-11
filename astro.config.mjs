@@ -7,6 +7,7 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://zlcheng.pages.dev',
   integrations: [mdx(), sitemap()],
+  prefetch: { prefetchAll: true, defaultStrategy: 'viewport' },
   markdown: {
     shikiConfig: { theme: 'github-dark-dimmed', wrap: true },
   },

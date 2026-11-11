@@ -880,11 +880,18 @@ a.badge:hover {
 
 .figure__frame {
   position: relative;
+  display: block;
   overflow: hidden;
   border-radius: var(--radius);
   background: #101014;
   border: 1px solid var(--line);
   aspect-ratio: 16 / 10;
+}
+
+.pub-group,
+.section[id],
+.media-band[id] {
+  scroll-margin-top: 5.25rem;
 }
 
 .media-band .figure__frame,

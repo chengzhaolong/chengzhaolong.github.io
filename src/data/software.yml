@@ -13,6 +13,7 @@
   version: v0.x
   status: 内部研发 / 持续迭代
   license: 〔许可方式待定：内部使用 / 开源协议〕
+  spec_line: FEM–MPM · 显式积分 · CUDA 多卡
   features:
     - title: 大变形与极端畸变
       text: 物质点承载材料历史，避免网格畸变导致的单元失效；切屑分离与材料堆积在同一个离散框架内自然发生。
@@ -55,6 +56,7 @@
   version: 〔v0.x〕
   status: 〔内测 / 演示版，待填〕
   license: 〔许可与商用条款待定〕
+  spec_line: 几何–工艺–求解–后处理 · 参数批量提交
   features:
     - title: 几何与材料
       text: 导入工件与刀具几何，建立材料本构（JC 类塑性、温度相关参数）与摩擦模型。

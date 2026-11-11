@@ -23,7 +23,7 @@ const bioParagraphs = profile.intro_en.split('\n\n');
     </div>
     <div class="container page-head__inner">
       <p class="eyebrow eyebrow--media">Computational Mechanics · FEM–MPM · GPU</p>
-      <h1 class="page-head__title" style="font-size:clamp(2.2rem,5vw,3.6rem)">
+      <h1 class="page-head__title" style="font-size:clamp(1.9rem,3.4vw,2.5rem)">
         {profile.name_en}
       </h1>
       <p class="page-head__lede" style="font-size:1.1rem">
@@ -118,20 +118,23 @@ const bioParagraphs = profile.intro_en.split('\n\n');
     </div>
   </section>
 
-  <section class="section--tight" style="padding-bottom:var(--section-y)">
+  <section style="padding-block:0">
     <div class="container">
-      <div class="cta">
-        <div>
-          <span class="eyebrow">Contact</span>
-          <h2 style="margin-top:.7rem;font-size:var(--fs-h2)">Open to collaborations and case studies</h2>
-          <p class="muted" style="margin-top:.6rem;max-width:56ch">
-            If you work on cutting processes, extreme deformation or GPU-accelerated solid mechanics,
-            feel free to get in touch with a short description of your case.
-          </p>
-        </div>
-        <div class="cluster">
-          <a class="btn" href={`mailto:${profile.email}`}>{profile.email}</a>
-        </div>
+      <div class="contact-strip">
+        <span class="contact-strip__label">Contact</span>
+        <a href={`mailto:${profile.email}`}>{profile.email}</a>
+        <span class="contact-strip__sep" aria-hidden="true">·</span>
+        <a href="/publications">Publications</a>
+        {
+          profile.links?.cv && (
+            <>
+              <span class="contact-strip__sep" aria-hidden="true">
+                ·
+              </span>
+              <a href={profile.links.cv}>CV (PDF)</a>
+            </>
+          )
+        }
       </div>
     </div>
   </section>

@@ -5,20 +5,7 @@ import FigureCard from '../components/FigureCard.astro';
 
 const profile = (await getEntry('profile', 'main'))!.data;
 
-const timeline = [
-  {
-    when: '〔20XX〕— 至今',
-    what: '博士研究生（直博）· 计算力学',
-    where: profile.affiliation,
-    desc: '研究方向：大变形热力耦合、FEM–MPM 耦合与高性能计算。',
-  },
-  {
-    when: '〔20XX〕—〔20XX〕',
-    what: '本科 · 〔专业〕',
-    where: '〔学校〕',
-    desc: '〔可写：毕业论文题目、参与的科研训练、竞赛与奖学金〕',
-  },
-];
+const timeline = profile.timeline;
 
 const tools = [
   { k: '自研', v: 'cuspic（FEM–MPM / GPU）、Cusper CuttingLab' },
@@ -32,12 +19,11 @@ const tools = [
 <Base title="关于" description={`${profile.name}，${profile.title}。${profile.tagline_zh}`}>
   <header class="page-head">
     <div class="container">
-      <span class="eyebrow">About</span>
-      <h1 class="page-head__title">{profile.name}</h1>
-      <p class="mono" style="margin-top:.5rem;color:var(--ink-3);font-size:.82rem">
-        {profile.name_en} · {profile.title_en}
+      <span class="eyebrow">About · {profile.name}</span>
+      <h1 class="page-head__title">简介与简历</h1>
+      <p class="mono" style="margin-top:.6rem;color:var(--ink-3);font-size:.82rem">
+        {profile.name_en} · {profile.title_en} · {profile.affiliation}
       </p>
-      <p class="lead page-head__lede">{profile.tagline_zh}</p>
     </div>
   </header>
 

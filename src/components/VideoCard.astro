@@ -14,6 +14,8 @@ interface Props {
   autoplay?: boolean;
   placeholder?: 'a' | 'b' | 'c';
   placeholderLabel?: string;
+  /** 画面比例，默认 16 / 9；宽幅可传 "21 / 9" */
+  ratio?: string;
 }
 
 const {
@@ -27,6 +29,7 @@ const {
   autoplay = false,
   placeholder = 'c',
   placeholderLabel = '替换：仿真动画（mp4，720p，<3 MB）',
+  ratio = '16 / 9',
 } = Astro.props;
 
 const phClass = placeholder === 'b' ? 'media-placeholder--b' : placeholder === 'c' ? 'media-placeholder--c' : '';
@@ -38,6 +41,7 @@ const phClass = placeholder === 'b' ? 'media-placeholder--b' : placeholder === '
       src ? (
         <video
           class="video-card__video"
+          style={`aspect-ratio:${ratio}`}
           poster={poster}
           muted
           loop
@@ -55,7 +59,7 @@ const phClass = placeholder === 'b' ? 'media-placeholder--b' : placeholder === '
           class={`media-placeholder ${phClass}`}
           role="img"
           aria-label={alt}
-          style="aspect-ratio:16/9"
+          style={`aspect-ratio:${ratio}`}
         >
           <span class="media-placeholder__grid" aria-hidden="true"></span>
           <span class="media-placeholder__label">

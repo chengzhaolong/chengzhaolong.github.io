@@ -71,6 +71,8 @@ const software = defineCollection({
     version: z.string().optional(),
     status: z.string().optional(),
     license: z.string().optional(),
+    /** 卡片底部的一行技术规格（首页/总览卡用） */
+    spec_line: z.string().optional(),
     features: z.array(z.object({ title: z.string(), text: z.string() })).default([]),
     specs: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
     links: z
@@ -103,9 +105,19 @@ const profile = defineCollection({
     intro_zh: z.string(),
     intro_en: z.string(),
     interests: z.array(z.string()).default([]),
-    stats: z
-      .array(z.object({ num: z.string(), unit: z.string().default(''), label: z.string() }))
+    /** 教育/任职经历，首页简历摘要与 /about 共用 */
+    timeline: z
+      .array(
+        z.object({
+          when: z.string(),
+          what: z.string(),
+          where: z.string(),
+          desc: z.string().optional(),
+        })
+      )
       .default([]),
+    /** 首页算例区的实测指标 */
+    metrics: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
     links: z
       .object({
         scholar: z.string().optional(),

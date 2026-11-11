@@ -23,8 +23,8 @@
   # 邮箱（建议用图片或表单方式防爬，见 README）
   email: chengchaolong@example.com
 
-  # 首屏一句话
-  tagline_zh: 把大变形热力耦合切削过程，算准，也算快。
+  # 首屏一句话（同时也是 meta description 的一部分，写"做什么"而不是口号）
+  tagline_zh: 用有限元与物质点法耦合求解大变形、强热力耦合的金属切削过程，并做到 GPU 上跑得动工程尺度的算例。
   tagline_en: Large-deformation thermo-mechanical cutting — solved accurately and fast.
 
   intro_zh: |-
@@ -41,17 +41,27 @@
     - 接触与摩擦
     - 材料本构与断裂
 
-  # 首页三个数字（当前都是可核实的事实，可换成论文数等）
-  stats:
-    - num: "01"
-      unit: 套
-      label: 自研求解器 cuspic
-    - num: "01"
-      unit: 套
-      label: 金属切削仿真软件 Cusper CuttingLab
-    - num: "04"
-      unit: 个
-      label: 研究方向（含耦合算法与并行实现）
+  # 教育/任职经历：首页「简历摘要」与 /about 页共用，一处维护
+  timeline:
+    - when: 〔20XX〕— 至今
+      what: 博士研究生（直博）· 计算力学
+      where: 〔学校 · 学院 · 实验室〕
+      desc: 大变形热力耦合、FEM–MPM 耦合与高性能计算。
+    - when: 〔20XX〕—〔20XX〕
+      what: 本科 · 〔专业〕
+      where: 〔学校〕
+      desc: 〔可写：毕业论文题目、科研训练、竞赛与奖学金〕
+
+  # 首页「算例」区的实测指标（等宽字体横排，4 项以内最好看）
+  metrics:
+    - k: 网格规模
+      v: 〔2.1 M〕
+    - k: 粒子数
+      v: 〔8.4 M〕
+    - k: GPU 加速比
+      v: 〔×17.6〕
+    - k: 单算例耗时
+      v: 〔≈ 3.5 h〕
 
   # 只填你有的，留空则不显示
   links:

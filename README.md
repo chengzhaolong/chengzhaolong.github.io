@@ -34,7 +34,7 @@
 │  ├─ content.config.ts      # 内容集合的 schema（字段校验）
 │  ├─ content/research/      # 研究方向：一个方向一个 .mdx
 │  ├─ data/
-│  │  ├─ profile.yml         # 个人信息（姓名/单位/邮箱/简介/统计数字）
+│  │  ├─ profile.yml         # 个人信息（姓名/单位/邮箱/简介/教育经历/算例指标）
 │  │  ├─ publications.yml    # 论文列表
 │  │  └─ software.yml        # 软件条目（cuspic / cuttinglab）
 │  ├─ components/            # Nav / Footer / FigureCard / VideoCard / PubItem …
@@ -79,8 +79,22 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 | `tagline_zh` / `tagline_en` | 首屏一句话 |
 | `intro_zh` / `intro_en` | 简介段落；用 `|-` 多行，空行分段 |
 | `interests` | 关键词，首页与 about 自动渲染 |
-| `stats` | 首页三个数字（`num` / `unit` / `label`） |
+| `timeline` | 教育/任职经历（`when` / `what` / `where` / `desc`），首页「简历摘要」与 `/about` 共用 |
+| `metrics` | 首页「算例」区的实测指标（`k` / `v`，4 项以内），如网格规模、GPU 加速比；没有实测数据就留空或删掉整段 |
 | `links` | `scholar` / `orcid` / `github` / `researchgate` / `bilibili` / `cv`，**留空则不显示** |
+
+#### 首页结构（`src/pages/index.astro`）
+
+顺序固定为 6 段，改文案直接改页面里的字符串，改数据改 YAML/MDX：
+
+1. **首屏**：只放身份 + 一句话 + 四个文本链接；`profile.name` 是唯一的 `h1`。背景图 `/media/hero-contour.svg` 右下角的图注是「这张图是什么」。
+2. **简介 + 简历摘要**：左栏 `intro_zh` + `interests`，右栏 `timeline[0]` 与一条手工摘要（在 `index.astro` 里改）。
+3. **研究方向**：自动读取 `research/*.mdx`，渲染为行列表（编号 / 标题 / `summary`）。
+4. **算例**：深色区，1 个视频 + 3 张图 + `metrics` 指标条。
+5. **自研工具**：深色区，自动读取 `software.yml`；卡片底部一行 `spec_line`。
+6. **论文**：取 3 条（`highlight: true` 优先）。
+
+结语不是大 CTA，而是页面底部一行「联系」条；页脚只出现一次姓名。
 
 ### 4.2 加一篇论文 — `src/data/publications.yml`
 
@@ -114,6 +128,7 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 
 - `kicker` / `tagline` / `summary`：卡片与详情页首屏文案
 - `version` / `status` / `license`：版本、状态、许可（会以徽章显示）
+- `spec_line`：首页卡片底部那一行等宽字体的技术规格，一句话，别超过 30 个字符
 - `features[]`：`title` + `text`，详情页两列卡片，首页只取前 3 个 `title`
 - `specs[]`：`k` + `v`，详情页右侧「技术规格」表
 - `links[]`：`label` / `href` / `variant`（`primary` 实心、`ghost` 描边）

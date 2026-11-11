@@ -420,11 +420,12 @@ a.badge:hover {
 
 .brand__latin {
   font-family: var(--f-mono);
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 400;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-3);
+  opacity: 0.75;
 }
 
 .nav {
@@ -573,13 +574,13 @@ a.badge:hover {
   height: 2px;
 }
 
-/* ---------- 8. hero ---------- */
+/* ---------- 8. hero（收敛版：姓名退后，工作在前） ---------- */
 .hero {
   position: relative;
   display: flex;
   align-items: flex-end;
-  min-height: min(88vh, 780px);
-  padding-block: clamp(5rem, 12vh, 8rem) clamp(2.5rem, 6vh, 4.5rem);
+  min-height: clamp(500px, 58vh, 620px);
+  padding-block: clamp(5rem, 10vh, 7rem) clamp(2.5rem, 5vh, 3.5rem);
   background: var(--media-bg);
   color: var(--media-ink);
   overflow: hidden;
@@ -598,6 +599,7 @@ a.badge:hover {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: 68% 55%;
   opacity: 0.55;
 }
 
@@ -613,7 +615,7 @@ a.badge:hover {
       rgb(10 10 13 / 35%) 72%,
       rgb(10 10 13 / 55%) 100%
     ),
-    radial-gradient(120% 80% at 85% 10%, rgb(33 145 140 / 18%), transparent 60%);
+    radial-gradient(120% 80% at 85% 10%, rgb(33 145 140 / 10%), transparent 60%);
 }
 
 .hero__inner {
@@ -630,12 +632,12 @@ a.badge:hover {
 }
 
 .hero__title {
-  margin-top: 1.15rem;
+  margin-top: 1.1rem;
   font-family: var(--f-display);
-  font-size: clamp(2.6rem, 6.2vw, 4.75rem);
-  font-weight: 600;
-  line-height: 1.02;
-  letter-spacing: -0.022em;
+  font-size: clamp(2rem, 3.6vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.012em;
   color: #fff;
   text-wrap: balance;
 }
@@ -645,49 +647,61 @@ a.badge:hover {
   color: var(--accent-warm-bright);
 }
 
-.hero__lede {
-  margin-top: 1.35rem;
-  max-width: 46ch;
-  font-size: clamp(1rem, 1.6vw, 1.14rem);
-  line-height: 1.72;
+/* 头衔 / 单位：紧随姓名的一行小字 */
+.hero__affil {
+  margin-top: 0.55rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
   color: #d4d4d8;
 }
 
-.hero__latin {
-  display: block;
-  margin-top: 1.75rem;
-  font-family: var(--f-mono);
-  font-size: 0.78rem;
-  line-height: 1.9;
-  letter-spacing: 0.06em;
-  color: var(--media-ink-2);
-  max-width: 54ch;
+.hero__lede {
+  margin-top: 1.5rem;
+  max-width: min(46ch, 100%);
+  font-size: clamp(0.98rem, 1.3vw, 1.06rem);
+  line-height: 1.78;
+  color: #c9c9d1;
 }
 
-.hero__actions {
+/* 首屏文本链接行（替代三个按钮） */
+.link-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem;
-  margin-top: 2rem;
+  align-items: baseline;
+  gap: 0.35rem 0.6rem;
+  margin-top: 1.75rem;
+  font-size: 0.92rem;
 }
 
-.hero__scroll {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: clamp(2rem, 6vh, 3.5rem);
-  font-family: var(--f-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--media-ink-2);
+.link-row a {
+  color: #e4e4e7;
   text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgb(255 255 255 / 22%);
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 
-.hero__scroll span {
-  width: 1px;
-  height: 1.75rem;
-  background: linear-gradient(to bottom, var(--media-ink-2), transparent);
+.link-row a:hover {
+  color: var(--accent-warm-bright);
+  border-bottom-color: currentColor;
+}
+
+.link-row__sep {
+  color: #52525b;
+  user-select: none;
+}
+
+/* 背景图图注：让首屏的图成为"工作证据"而非装饰 */
+.hero__note {
+  position: absolute;
+  right: max(1.25rem, calc((100% - var(--container)) / 2));
+  bottom: clamp(1rem, 3vh, 2rem);
+  max-width: 34ch;
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  line-height: 1.7;
+  text-align: right;
+  color: #7c7c88;
 }
 
 /* ---------- 9. media band（深色"图版"区） ---------- */
@@ -707,6 +721,11 @@ a.badge:hover {
   height: 1px;
   background: var(--grad-data);
   opacity: 0.85;
+}
+
+/* 两段深色区相邻时，用一条细线分段，避免糊成一块 */
+.media-band + .media-band::before {
+  opacity: 0.3;
 }
 
 .media-band::after {
@@ -837,6 +856,23 @@ a.badge:hover {
 
 .card--media .card__cta {
   color: var(--accent-warm-bright);
+}
+
+/* 卡片底部的技术规格一行（等宽字体，压低装饰感） */
+.card__spec {
+  display: block;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--line);
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+}
+
+.card--media .card__spec {
+  border-top-color: rgb(255 255 255 / 10%);
+  color: var(--media-ink-2);
 }
 
 .card-grid {
@@ -1054,35 +1090,7 @@ a:focus-visible .figure__zoom {
   color: #e9e9ee;
 }
 
-/* ---------- 12. stats / info list ---------- */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.5rem;
-  border-top: 1px solid var(--line);
-  padding-top: 1.5rem;
-}
-
-.stats__num {
-  font-family: var(--f-display);
-  font-size: clamp(1.75rem, 3vw, 2.4rem);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-.stats__num span {
-  font-size: 0.55em;
-  color: var(--ink-3);
-}
-
-.stats__label {
-  margin-top: 0.45rem;
-  font-size: var(--fs-xs);
-  line-height: 1.5;
-  color: var(--ink-2);
-}
-
+/* ---------- 12. info list ---------- */
 .info-list {
   display: grid;
   gap: 0;
@@ -1109,6 +1117,211 @@ a:focus-visible .figure__zoom {
 .info-list dd {
   margin: 0;
   font-size: var(--fs-sm);
+}
+
+/* ---------- 12b. 首页简历摘要（cv-list） ---------- */
+.cv-list {
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+.cv-list > div {
+  display: grid;
+  grid-template-columns: 4.25rem minmax(0, 1fr);
+  gap: 0.35rem 1rem;
+  padding-block: 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.cv-list dt {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  padding-top: 0.2rem;
+}
+
+.cv-list dd {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.62;
+  color: var(--ink);
+}
+
+.cv-list dd span {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  color: var(--ink-3);
+}
+
+/* ---------- 12c. 研究方向行列表（idx-list） ---------- */
+.idx-list {
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--line);
+}
+
+.idx-list__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(8rem, 0.85fr) minmax(0, 1.7fr) 1.5rem;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.35rem 0.25rem 1.35rem 0;
+  border-top: 1px solid var(--line);
+  text-decoration: none;
+  transition: padding-left 0.25s var(--ease), background 0.25s var(--ease);
+}
+
+.idx-list__item::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: var(--grad-data);
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+}
+
+.idx-list__item:hover {
+  padding-left: 0.9rem;
+  background: rgb(33 145 140 / 3.5%);
+}
+
+.idx-list__item:hover::before {
+  opacity: 1;
+}
+
+.idx-list__num {
+  font-family: var(--f-mono);
+  font-size: 0.76rem;
+  color: var(--ink-3);
+}
+
+.idx-list__title {
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.idx-list__text {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+.idx-list__arrow {
+  justify-self: end;
+  color: var(--ink-3);
+  transition: transform 0.25s var(--ease), color 0.25s var(--ease);
+}
+
+.idx-list__item:hover .idx-list__arrow {
+  transform: translateX(4px);
+  color: var(--accent);
+}
+
+/* ---------- 12d. 算例指标条（metric-strip，深色区用） ---------- */
+.metric-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  padding-top: 1.1rem;
+  border-top: 1px solid rgb(255 255 255 / 8%);
+}
+
+.metric-strip > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.metric-strip dd {
+  margin: 0;
+}
+
+.metric-strip__k {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--media-ink-2);
+}
+
+.metric-strip__v {
+  font-family: var(--f-mono);
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  font-variant-numeric: tabular-nums;
+  color: var(--media-ink);
+}
+
+/* ---------- 12e. 页尾联系条（替代大 CTA） ---------- */
+.contact-strip {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1.1rem;
+  padding-block: clamp(2rem, 4vw, 2.75rem);
+  font-size: 0.92rem;
+  color: var(--ink-3);
+}
+
+.contact-strip::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: var(--grad-data);
+  opacity: 0.45;
+}
+
+.contact-strip__label {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.contact-strip a {
+  color: var(--ink-2);
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--line-strong);
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.contact-strip a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.contact-strip__sep {
+  color: var(--line-strong);
+  user-select: none;
+}
+
+/* 低调文本链接（替代按钮） */
+.link-quiet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--ink-2);
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--line-strong);
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.link-quiet:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 /* ---------- 13. publications ---------- */
@@ -1607,14 +1820,15 @@ body.is-locked {
 }
 
 /* ---------- 20. 入场动效 ---------- */
-[data-reveal] {
+/* 只有 JS 生效（html.js）时才隐藏，避免禁用 JS 时整页空白 */
+.js [data-reveal] {
   opacity: 0;
   transform: translateY(14px);
   transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
   transition-delay: var(--d, 0s);
 }
 
-[data-reveal].is-in {
+.js [data-reveal].is-in {
   opacity: 1;
   transform: none;
 }
@@ -1740,19 +1954,6 @@ button.badge:hover {
 .card--media .feature-inline li {
   border-color: var(--media-line);
   color: var(--media-ink-2);
-}
-
-.cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.75rem;
-  align-items: center;
-  justify-content: space-between;
-  padding: clamp(1.75rem, 4vw, 2.75rem);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--bg-elev);
-  box-shadow: var(--shadow-1);
 }
 
 .feature {
@@ -2069,8 +2270,35 @@ button.badge:hover {
     grid-column: span 12;
   }
 
+  .idx-list__item {
+    grid-template-columns: 2.25rem minmax(0, 1fr) 1.25rem;
+    gap: 0.3rem 0.9rem;
+    align-items: start;
+    padding-block: 1.15rem;
+  }
+
+  .idx-list__num {
+    grid-row: 1 / 3;
+    padding-top: 0.15rem;
+  }
+
+  .idx-list__title,
+  .idx-list__text {
+    grid-column: 2;
+  }
+
+  .idx-list__arrow {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+
   .hero {
-    min-height: 74vh;
+    min-height: clamp(460px, 56vh, 560px);
+  }
+
+  .hero__note {
+    display: none;
   }
 }
 
@@ -2085,12 +2313,20 @@ button.badge:hover {
   }
 
   .hero__title {
-    font-size: clamp(2.1rem, 9vw, 2.75rem);
+    font-size: clamp(1.9rem, 7.5vw, 2.25rem);
   }
 
-  .stats {
+  .metric-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cv-list > div {
     grid-template-columns: minmax(0, 1fr);
-    gap: 1.1rem;
+    gap: 0.15rem;
+  }
+
+  .brand__latin {
+    display: none;
   }
 
   .info-list > div {
@@ -2133,7 +2369,6 @@ button.badge:hover {
 @media print {
   .site-header,
   .site-footer,
-  .hero__actions,
   .figure__zoom,
   .lightbox {
     display: none !important;

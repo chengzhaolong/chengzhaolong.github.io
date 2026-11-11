@@ -63,6 +63,10 @@ const personLd = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- 入场动效只在 JS 可用时启用：禁用 JS 时内容必须可见 -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
     <title>{pageTitle}</title>
     <meta name="description" content={desc} />
     <link rel="canonical" href={canonical} />

@@ -9,6 +9,8 @@ interface Props {
     summary: string;
     version?: string;
     status?: string;
+    /** 卡片底部的一行技术规格，例如 "FEM–MPM · 显式积分 · CUDA 多卡" */
+    spec_line?: string;
     features: { title: string; text: string }[];
   };
   href: string;
@@ -31,6 +33,8 @@ const { item, href, tone = 'light' } = Astro.props;
   <ul class="feature-inline">
     {item.features.slice(0, 3).map((f) => <li>{f.title}</li>)}
   </ul>
+
+  {item.spec_line && <span class="card__spec">{item.spec_line}</span>}
 
   <span class="card__cta">了解详情</span>
 </a>

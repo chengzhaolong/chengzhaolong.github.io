@@ -6,6 +6,8 @@ const profile = entry?.data;
 if (!profile) throw new Error('Footer 需要 profile 数据');
 
 const year = new Date().getFullYear();
+const isEn = Astro.url.pathname.startsWith('/en');
+const displayName = isEn ? profile.name_en : profile.name;
 
 const contacts = [
   { label: '邮箱', value: profile.email, href: `mailto:${profile.email}` },
@@ -20,10 +22,7 @@ const contacts = [
   <div class="container">
     <div class="site-footer__top">
       <div>
-        <p class="site-footer__name">{profile.name} · {profile.name_en}</p>
-        <p class="site-footer__lede">
-          {profile.tagline_zh}
-        </p>
+        <p class="site-footer__name">{displayName}</p>
         <p class="site-footer__lede mono" style="font-size:0.8rem;color:#6f6f7a">
           {profile.affiliation}
         </p>
@@ -59,7 +58,7 @@ const contacts = [
     </div>
 
     <div class="site-footer__bottom">
-      <span>© {year} {profile.name_en}. All rights reserved.</span>
+      <span>© {year} · 内容、图表与代码版权归作者所有</span>
       <span class="accent-rule" aria-hidden="true"></span>
       <span>Built with Astro · 静态输出，无追踪脚本</span>
     </div>

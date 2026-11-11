@@ -1,0 +1,108 @@
+---
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource-variable/source-serif-4/wght.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import '../styles/global.css';
+
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import Lightbox from '../components/Lightbox.astro';
+import Motion from '../components/Motion.astro';
+import { getEntry } from 'astro:content';
+
+interface Props {
+  /** 页面标题，会自动拼成「标题 · 姓名」 */
+  title?: string;
+  description?: string;
+  lang?: string;
+  /** OG 图，默认 /og-image.png */
+  image?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  lang = 'zh-CN',
+  image = '/og-image.png',
+  noindex = false,
+} = Astro.props;
+
+const entry = await getEntry('profile', 'main');
+if (!entry) {
+  throw new Error('缺少 src/data/profile.yml（collection: profile，条目 id: main）');
+}
+const profile = entry.data;
+
+const pageTitle = title
+  ? `${title} · ${profile.name}`
+  : `${profile.name} · ${profile.title}`;
+const desc = description ?? `${profile.tagline_zh}${profile.title}，研究方向：${profile.interests.join('、')}。`;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(image, Astro.site).href;
+const zhHref = new URL('/', Astro.site).href;
+const enHref = new URL('/en/', Astro.site).href;
+
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  alternateName: profile.name_en,
+  jobTitle: profile.title,
+  affiliation: { '@type': 'Organization', name: profile.affiliation },
+  url: canonical,
+  email: profile.email ? `mailto:${profile.email}` : undefined,
+  knowsAbout: profile.interests,
+  sameAs: Object.values(profile.links ?? {}).filter(Boolean),
+};
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#0a0a0d" />
+
+    <link rel="alternate" hreflang="zh-CN" href={zhHref} />
+    <link rel="alternate" hreflang="en" href={enHref} />
+    <link rel="alternate" hreflang="x-default" href={zhHref} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={`${profile.name} · ${profile.name_en}`} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'zh_CN'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+    <slot name="head" />
+    <noscript>
+      <style>
+        [data-reveal] {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      </style>
+    </noscript>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到正文</a>
+    <Nav />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <Lightbox />
+    <Motion />
+  </body>
+</html>

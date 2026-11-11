@@ -1,0 +1,63 @@
+# ==========================================================
+# 个人信息 —— 改这一个文件，全站随之更新
+# 带 〔 〕 的地方是需要你替换的占位内容
+# 全部替换完后，把 demo 改成 false（会隐藏「示例数据」提示）
+# ==========================================================
+
+- id: main
+
+  demo: true
+
+  name: 成朝龙
+  name_en: Chaolong Cheng
+  latin: CHAOLONG CHENG
+
+  title: 计算力学方向 直博生
+  title_en: Ph.D. Candidate in Computational Mechanics
+
+  # 单位 / 实验室
+  affiliation: 〔学校 · 学院 · 实验室〕
+  affiliation_en: 〔University · School · Lab〕
+  location: 中国
+
+  # 邮箱（建议用图片或表单方式防爬，见 README）
+  email: chengchaolong@example.com
+
+  # 首屏一句话
+  tagline_zh: 把大变形热力耦合切削过程，算准，也算快。
+  tagline_en: Large-deformation thermo-mechanical cutting — solved accurately and fast.
+
+  intro_zh: |-
+    我是一名计算力学方向直博生。研究围绕大变形、强非线性、强热力耦合的金属切削过程展开：用有限元（FEM）描述工件与刀具的连续变形和热传导，用物质点法（MPM）处理切屑分离与极端变形，通过 FEM–MPM 耦合算法与 GPU 并行，把工业尺度的切削仿真做到可用的精度与速度。为此我开发了求解器 cuspic 与仿真软件 Cusper CuttingLab。
+
+  intro_en: |-
+    I am a Ph.D. candidate in computational mechanics. My research targets metal cutting processes dominated by large deformation, strong non-linearity and thermo-mechanical coupling: the finite element method resolves the continuum response of workpiece and tool, the material point method handles chip separation and extreme distortion, and a FEM–MPM coupling scheme together with GPU parallelism makes industrial-scale cutting simulation both accurate and affordable. I build and maintain the cuspic solver and the Cusper CuttingLab application.
+
+  interests:
+    - 大变形热力耦合
+    - FEM–MPM 耦合
+    - 金属切削加工仿真
+    - 高性能计算 / GPU 并行
+    - 接触与摩擦
+    - 材料本构与断裂
+
+  # 首页三个数字（当前都是可核实的事实，可换成论文数等）
+  stats:
+    - num: "01"
+      unit: 套
+      label: 自研求解器 cuspic
+    - num: "01"
+      unit: 套
+      label: 金属切削仿真软件 Cusper CuttingLab
+    - num: "04"
+      unit: 个
+      label: 研究方向（含耦合算法与并行实现）
+
+  # 只填你有的，留空则不显示
+  links:
+    scholar: ''
+    orcid: ''
+    github: ''
+    researchgate: ''
+    bilibili: ''
+    cv: ''

@@ -1,0 +1,105 @@
+---
+interface Props {
+  pub: {
+    id: string;
+    title: string;
+    title_zh?: string;
+    authors: string[];
+    venue: string;
+    venue_short?: string;
+    year: number;
+    type: string;
+    highlight: boolean;
+    status?: string;
+    links: { pdf?: string; doi?: string; code?: string; data?: string };
+    bibtex?: string;
+  };
+  index: number;
+  /** 本人英文名，会被自动加粗 */
+  me?: string;
+  showBibtex?: boolean;
+}
+
+const { pub, index, me = 'Chaolong Cheng', showBibtex = true } = Astro.props;
+
+const typeLabel = { journal: '期刊', conference: '会议', preprint: '预印本' }[pub.type] ?? '论文';
+
+const esc = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+const authorsHtml = pub.authors
+  .map((a) => (a.trim() === me ? `<b>${esc(a)}</b>` : esc(a)))
+  .join('<span aria-hidden="true">, </span>');
+
+const doiHref = pub.links?.doi
+  ? pub.links.doi.startsWith('http')
+    ? pub.links.doi
+    : `https://doi.org/${pub.links.doi}`
+  : undefined;
+
+const badges = [
+  pub.links?.pdf && { label: 'PDF', href: pub.links.pdf },
+  doiHref && { label: 'DOI', href: doiHref },
+  pub.links?.code && { label: 'Code', href: pub.links.code },
+  pub.links?.data && { label: 'Data', href: pub.links.data },
+].filter(Boolean) as { label: string; href: string }[];
+---
+
+<li class:list={['pub', { 'pub--highlight': pub.highlight }]} id={`pub-${pub.id}`}>
+  <span class="pub__index">{String(index).padStart(2, '0')}</span>
+  <div class="pub__body">
+    <p class="pub__title">
+      {pub.title}
+      {pub.title_zh && <span class="pub__title-zh">{pub.title_zh}</span>}
+    </p>
+
+    <p class="pub__authors" set:html={authorsHtml} />
+
+    <p class="pub__venue">
+      <span class="badge">{typeLabel}</span>
+      <span class="pub__venue-text">
+        <em>{pub.venue}</em>{pub.venue_short && ` (${pub.venue_short})`}, {pub.year}
+      </span>
+    </p>
+
+    <div class="pub__foot">
+      {badges.map((b) => <a class="badge" href={b.href} target="_blank" rel="noopener">{b.label} ↗</a>)}
+      {showBibtex && pub.bibtex && (
+        <button class="badge badge--copy" type="button" data-bibtex={pub.bibtex}>
+          复制 BibTeX
+        </button>
+      )}
+      {pub.status && <span class="badge badge--dot badge--new">{pub.status}</span>}
+    </div>
+  </div>
+</li>
+
+<script>
+  // BibTeX 一键复制（同一页面多个条目共用一份监听）
+  document.addEventListener('click', async (event) => {
+    const btn = (event.target as HTMLElement).closest<HTMLElement>('[data-bibtex]');
+    if (!btn) return;
+    const text = btn.getAttribute('data-bibtex') ?? '';
+    const original = btn.textContent ?? '';
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = '已复制 ✓';
+    } catch {
+      // 非 HTTPS 或权限受限时的兜底
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      // 旧浏览器兜底；execCommand 已废弃但仍是唯一广泛可用的同步方案
+      (document as unknown as { execCommand(cmd: string): void }).execCommand('copy');
+      ta.remove();
+      btn.textContent = '已复制 ✓';
+    }
+    window.setTimeout(() => {
+      btn.textContent = original;
+    }, 1600);
+  });
+</script>
+

@@ -1,0 +1,36 @@
+---
+interface Props {
+  item: {
+    id: string;
+    name: string;
+    name_zh: string;
+    kicker: string;
+    tagline: string;
+    summary: string;
+    version?: string;
+    status?: string;
+    features: { title: string; text: string }[];
+  };
+  href: string;
+  /** 是否使用深色卡片（深色媒体区里用） */
+  tone?: 'light' | 'media';
+}
+
+const { item, href, tone = 'light' } = Astro.props;
+---
+
+<a
+  class:list={['card', 'card--accent', { 'card--media': tone === 'media' }]}
+  href={href}
+  data-reveal
+>
+  <span class="card__meta">{item.kicker}{item.version && ` · ${item.version}`}</span>
+  <span class="card__title">{item.name}</span>
+  <span class="card__text">{item.tagline}</span>
+
+  <ul class="feature-inline">
+    {item.features.slice(0, 3).map((f) => <li>{f.title}</li>)}
+  </ul>
+
+  <span class="card__cta">了解详情</span>
+</a>

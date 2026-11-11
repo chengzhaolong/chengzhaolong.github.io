@@ -1,0 +1,86 @@
+# ==========================================================
+# 软件 —— 两个条目：cuspic（求解器）与 Cusper CuttingLab（软件）
+# 带 〔 〕 的是待填占位
+# ==========================================================
+
+- id: cuspic
+  name: cuspic
+  name_zh: cuspic 求解器
+  kicker: Solver
+  tagline: 面向大变形热力耦合的 FEM–MPM 并行求解器
+  summary: |-
+    cuspic 是我自研的计算力学求解器核心。它以有限元背景网格承载连续介质的应力平衡与热传导，以物质点离散材料并追踪其历史，通过 FEM–MPM 耦合把「刀具–工件接触、切屑分离、极端塑性变形」这几类难点放进同一个时间推进框架里，并用 GPU 并行把单次切削仿真压到可迭代的时间尺度。
+  version: v0.x
+  status: 内部研发 / 持续迭代
+  license: 〔许可方式待定：内部使用 / 开源协议〕
+  features:
+    - title: 大变形与极端畸变
+      text: 物质点承载材料历史，避免网格畸变导致的单元失效；切屑分离与材料堆积在同一个离散框架内自然发生。
+    - title: 热力耦合
+      text: 塑性功生热与热传导进入同一求解循环，支持切削温度场、刀具温升与热软化效应的联合分析。
+    - title: FEM–MPM 耦合
+      text: 结构化背景网格负责高效的空间搜索与场变量插值，边界与接触区域用有限元描述，兼顾精度与稳定性。
+    - title: GPU 并行
+      text: 粒子循环、网格映射与接触检测并行化，配合稀疏数据结构与多卡扩展，支撑工程尺度的算例规模。
+    - title: 可复现算例
+      text: 内置验证算例，输出格式与主流后处理工具（VTK / ParaView）对接。
+  specs:
+    - k: 核心方法
+      v: FEM–MPM 耦合，显式时间积分
+    - k: 物理场
+      v: 位移 / 应力 / 等效塑性应变 / 温度
+    - k: 并行方式
+      v: GPU（CUDA），支持多卡
+    - k: 实现语言
+      v: 〔C++ / CUDA，待填〕
+    - k: 输出格式
+      v: 〔VTK / HDF5 / 自定义，待填〕
+    - k: 运行平台
+      v: 〔Linux / Windows，待填〕
+  links:
+    - label: 申请试用 / 技术交流
+      href: mailto:chengchaolong@example.com
+      variant: primary
+    - label: 架构与算例
+      href: /software/cuspic
+      variant: ghost
+
+- id: cuttinglab
+  name: Cusper CuttingLab
+  name_zh: Cusper CuttingLab
+  kicker: Application
+  tagline: 金属切削加工仿真的一体化软件
+  summary: |-
+    Cusper CuttingLab 是建立在 cuspic 之上的图形化仿真软件，目标是把「几何与材料准备 → 工艺参数设置 → 求解 → 结果分析」这条链做成不写代码也能跑通的流程。面向切削工艺研究与小批量工艺试算，把参数扫描和结果对比从前处理脚本里解放出来。
+  version: 〔v0.x〕
+  status: 〔内测 / 演示版，待填〕
+  license: 〔许可与商用条款待定〕
+  features:
+    - title: 几何与材料
+      text: 导入工件与刀具几何，建立材料本构（JC 类塑性、温度相关参数）与摩擦模型。
+    - title: 工艺参数
+      text: 切削速度、进给量、切深、刀尖几何与冷却条件集中设置，支持参数组合批量提交。
+    - title: 一键求解
+      text: 内部调用 cuspic，自动完成网格与粒子布置、时间步控制与任务调度。
+    - title: 结果后处理
+      text: 应力 / 应变 / 温度云图、切屑形态演化、切削力与温度曲线，支持导出图与数据。
+  specs:
+    - k: 底层求解器
+      v: cuspic（FEM–MPM）
+    - k: 运行平台
+      v: 〔Windows / Linux，待填〕
+    - k: 典型输出
+      v: 云图 / 视频 / 力–位移曲线 / 温度曲线
+    - k: 硬件建议
+      v: 〔NVIDIA GPU + 显存建议，待填〕
+    - k: 获取方式
+      v: 邮件申请试用
+    - k: 文档
+      v: 〔使用手册 / 教程视频，待补〕
+  links:
+    - label: 邮件申请试用
+      href: mailto:chengchaolong@example.com
+      variant: primary
+    - label: 功能与工作流
+      href: /software/cuttinglab
+      variant: ghost

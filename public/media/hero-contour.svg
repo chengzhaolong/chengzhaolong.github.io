@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="切削过程温度场示意图">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08080b" />
+      <stop offset="0.55" stop-color="#0d0e13" />
+      <stop offset="1" stop-color="#14151c" />
+    </linearGradient>
+    <filter id="soft" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="78" />
+    </filter>
+    <filter id="soft2" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="26" />
+    </filter>
+    <linearGradient id="tool" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#f2f2f5" stop-opacity="0.9" />
+      <stop offset="1" stop-color="#6f7080" stop-opacity="0.45" />
+    </linearGradient>
+    <pattern id="particles" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="1.1" fill="#ffffff" fill-opacity="0.16" />
+      <circle cx="17" cy="12" r="0.9" fill="#ffffff" fill-opacity="0.1" />
+      <circle cx="9" cy="21" r="1" fill="#ffffff" fill-opacity="0.12" />
+    </pattern>
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0a0d" stop-opacity="0" />
+      <stop offset="1" stop-color="#0a0a0d" stop-opacity="0.95" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)" />
+
+  <g filter="url(#soft)" opacity="0.8">
+    <ellipse cx="470" cy="430" rx="430" ry="250" fill="#3d0b57" />
+    <ellipse cx="720" cy="505" rx="350" ry="205" fill="#353f8b" />
+    <ellipse cx="960" cy="565" rx="280" ry="160" fill="#1f8f8a" />
+    <ellipse cx="1130" cy="515" rx="196" ry="118" fill="#57b95f" />
+    <ellipse cx="1252" cy="462" rx="120" ry="74" fill="#e6d21f" />
+  </g>
+
+  <g filter="url(#soft2)" opacity="0.55">
+    <ellipse cx="1180" cy="470" rx="70" ry="42" fill="#fde725" />
+    <ellipse cx="960" cy="560" rx="120" ry="60" fill="#1ae4b6" opacity="0.5" />
+  </g>
+
+  <rect width="1600" height="900" fill="url(#particles)" opacity="0.55" />
+
+  <g stroke="#ffffff" stroke-opacity="0.045" stroke-width="1">
+    <path d="M0 180H1600M0 360H1600M0 540H1600M0 720H1600" />
+    <path d="M200 0V900M400 0V900M600 0V900M800 0V900M1000 0V900M1200 0V900M1400 0V900" />
+  </g>
+
+  <path d="M0 640H1600V900H0Z" fill="#101017" opacity="0.9" />
+  <path d="M0 640H1600" stroke="#5b5c6b" stroke-width="2" opacity="0.7" />
+  <path d="M0 700H1600" stroke="#2a2a34" stroke-width="1" />
+
+  <path
+    d="M905 640C940 556 1030 494 1148 486C1272 478 1352 532 1372 604C1384 650 1352 676 1318 664"
+    fill="none"
+    stroke="#faba39"
+    stroke-width="7"
+    stroke-linecap="round"
+    opacity="0.72"
+  />
+  <path
+    d="M905 640C940 556 1030 494 1148 486C1272 478 1352 532 1372 604C1384 650 1352 676 1318 664"
+    fill="none"
+    stroke="#fde725"
+    stroke-width="2"
+    stroke-linecap="round"
+    opacity="0.9"
+  />
+
+  <g opacity="0.62">
+    <path d="M690 96H862L818 566H690Z" fill="url(#tool)" />
+    <path d="M690 96H862L818 566H690Z" fill="none" stroke="#f4f4f5" stroke-opacity="0.45" stroke-width="2" />
+    <path d="M818 566L690 566" stroke="#fde725" stroke-width="3" stroke-linecap="round" />
+  </g>
+
+  <rect width="1600" height="900" fill="url(#fade)" opacity="0.55" />
+</svg>

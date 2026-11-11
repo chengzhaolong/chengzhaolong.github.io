@@ -1,0 +1,76 @@
+---
+interface Props {
+  /** mp4 路径（public/media/videos/…）；留空则只显示 poster 占位 */
+  src?: string;
+  webm?: string;
+  /** 首帧图；不给则用占位云图 */
+  poster?: string;
+  alt: string;
+  caption?: string;
+  meta?: string;
+  /** 左上角角标，如「仿真 / 切削」 */
+  badge?: string;
+  /** 自动循环播放（hero 用）；默认 false，显示控制器 */
+  autoplay?: boolean;
+  placeholder?: 'a' | 'b' | 'c';
+  placeholderLabel?: string;
+}
+
+const {
+  src,
+  webm,
+  poster,
+  alt,
+  caption,
+  meta,
+  badge,
+  autoplay = false,
+  placeholder = 'c',
+  placeholderLabel = '替换：仿真动画（mp4，720p，<3 MB）',
+} = Astro.props;
+
+const phClass = placeholder === 'b' ? 'media-placeholder--b' : placeholder === 'c' ? 'media-placeholder--c' : '';
+---
+
+<figure class="figure" data-reveal>
+  <div class="video-card">
+    {
+      src ? (
+        <video
+          class="video-card__video"
+          poster={poster}
+          muted
+          loop
+          playsinline
+          preload={autoplay ? 'metadata' : 'none'}
+          autoplay={autoplay}
+          controls={!autoplay}
+          aria-label={alt}
+        >
+          {webm && <source src={webm} type="video/webm" />}
+          <source src={src} type="video/mp4" />
+        </video>
+      ) : (
+        <div
+          class={`media-placeholder ${phClass}`}
+          role="img"
+          aria-label={alt}
+          style="aspect-ratio:16/9"
+        >
+          <span class="media-placeholder__grid" aria-hidden="true"></span>
+          <span class="media-placeholder__label">
+            <b>待替换</b>
+            {placeholderLabel}
+          </span>
+        </div>
+      )
+    }
+    {badge && <span class="video-card__badge">{badge}</span>}
+  </div>
+  {(caption || meta) && (
+    <figcaption class="figure__cap">
+      {meta && <span class="mono">{meta}</span>}
+      {caption && <span>{caption}</span>}
+    </figcaption>
+  )}
+</figure>

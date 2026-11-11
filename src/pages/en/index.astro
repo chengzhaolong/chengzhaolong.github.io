@@ -1,0 +1,138 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, getEntry } from 'astro:content';
+
+const profile = (await getEntry('profile', 'main'))!.data;
+const research = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
+const pubs = (await getCollection('publications'))
+  .sort((a, b) => b.data.year - a.data.year)
+  .slice(0, 5);
+const software = await getCollection('software');
+
+const bioParagraphs = profile.intro_en.split('\n\n');
+---
+
+<Base
+  lang="en"
+  title="Chaolong Cheng · Computational Mechanics"
+  description="Ph.D. candidate in computational mechanics working on large-deformation thermo-mechanical coupling, FEM–MPM coupling, metal cutting simulation and GPU computing."
+>
+  <header class="page-head page-head--media">
+    <div class="hero__media">
+      <img src="/media/hero-contour.svg" alt="" width="1600" height="900" />
+    </div>
+    <div class="container page-head__inner">
+      <p class="eyebrow eyebrow--media">Computational Mechanics · FEM–MPM · GPU</p>
+      <h1 class="page-head__title" style="font-size:clamp(2.2rem,5vw,3.6rem)">
+        {profile.name_en}
+      </h1>
+      <p class="page-head__lede" style="font-size:1.1rem">
+        {profile.title_en} · {profile.affiliation_en}
+      </p>
+      <div class="cluster" style="margin-top:1.25rem">
+        {profile.interests.slice(0, 4).map((i) => <span class="badge badge--media">{i}</span>)}
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container--narrow">
+      <span class="eyebrow">About</span>
+      <div class="prose" style="margin-top:1rem">
+        {bioParagraphs.map((p) => <p>{p}</p>)}
+      </div>
+
+      <div class="cluster" style="margin-top:1.75rem">
+        <a class="btn" href={`mailto:${profile.email}`}>Email</a>
+        {profile.links?.scholar && <a class="btn btn--ghost" href={profile.links.scholar}>Google Scholar</a>}
+        {profile.links?.github && <a class="btn btn--ghost" href={profile.links.github}>GitHub</a>}
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight section--line">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <span class="eyebrow">Research</span>
+          <h2 style="margin-top:.6rem">Research directions</h2>
+        </div>
+      </div>
+
+      <div class="card-grid card-grid--2">
+        {research.map((r) => (
+          <article class="feature" data-reveal>
+            <h3>{r.data.title_en}</h3>
+            <p>{r.data.summary_en}</p>
+            <p class="mono" style="margin-top:.6rem;font-size:.72rem;color:var(--ink-3)">
+              {r.data.tags.join(' · ')}
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <span class="eyebrow">Software</span>
+          <h2 style="margin-top:.6rem">Software</h2>
+        </div>
+      </div>
+      <div class="card-grid card-grid--2">
+        {software.map((s) => (
+          <a class="card card--accent" href={`/software/${s.id}`} data-reveal>
+            <span class="card__meta">{s.data.kicker}</span>
+            <span class="card__title">{s.data.name}</span>
+            <span class="card__text">{s.data.tagline}</span>
+            <span class="card__cta">Details</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="media-band">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <span class="eyebrow eyebrow--media">Publications</span>
+          <h2 style="margin-top:.6rem">Selected publications</h2>
+          <p>Full list (with BibTeX) on the Chinese publications page.</p>
+        </div>
+        <a class="btn btn--media-ghost" href="/publications">All publications →</a>
+      </div>
+
+      <ul class="en-pubs">
+        {pubs.map((p) => (
+          <li>
+            <p class="en-pubs__title">{p.data.title}</p>
+            <p class="en-pubs__meta">
+              {p.data.authors.join(', ')} · <em>{p.data.venue_short ?? p.data.venue}</em>, {p.data.year}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section--tight" style="padding-bottom:var(--section-y)">
+    <div class="container">
+      <div class="cta">
+        <div>
+          <span class="eyebrow">Contact</span>
+          <h2 style="margin-top:.7rem;font-size:var(--fs-h2)">Open to collaborations and case studies</h2>
+          <p class="muted" style="margin-top:.6rem;max-width:56ch">
+            If you work on cutting processes, extreme deformation or GPU-accelerated solid mechanics,
+            feel free to get in touch with a short description of your case.
+          </p>
+        </div>
+        <div class="cluster">
+          <a class="btn" href={`mailto:${profile.email}`}>{profile.email}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

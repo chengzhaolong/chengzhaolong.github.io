@@ -1,0 +1,95 @@
+# ==========================================================
+# 论文列表 —— 页面按 year 倒序自动分组
+# 加一篇论文 = 复制一段，改字段；删掉示例后把 profile.yml 的 demo 改为 false
+# 字段说明：
+#   title       英文原题（必填，学术规范：不翻译题名）
+#   title_zh    中文译名（可选，列表里作为副标题）
+#   authors     作者数组，本人姓名写 "Chaolong Cheng" 会被自动加粗
+#   venue       期刊 / 会议全称
+#   type        journal | conference | preprint
+#   highlight   true = 首页「最新论文」优先展示
+#   links       pdf / doi / code / data，留空则不显示徽章
+#   bibtex      原样字符串，页面上可一键复制
+# ==========================================================
+
+- id: cheng2025-femmpm-cutting
+  title: A coupled FEM–MPM framework for large-deformation thermo-mechanical simulation of metal cutting
+  title_zh: 面向金属切削大变形热力耦合仿真的 FEM–MPM 耦合框架
+  authors:
+    - Chaolong Cheng
+    - 〔合作者〕
+    - 〔通讯作者〕
+  venue: Computer Methods in Applied Mechanics and Engineering
+  venue_short: CMAME
+  year: 2025
+  type: journal
+  highlight: true
+  status: 示例条目
+  links:
+    doi: https://doi.org/10.0000/placeholder
+    pdf: ''
+    code: ''
+  bibtex: |
+    @article{cheng2025coupled,
+      title   = {A coupled {FEM--MPM} framework for large-deformation
+                 thermo-mechanical simulation of metal cutting},
+      author  = {Cheng, Chaolong and Others, A.},
+      journal = {Computer Methods in Applied Mechanics and Engineering},
+      year    = {2025},
+      doi     = {10.0000/placeholder}
+    }
+  tags:
+    - FEM–MPM
+    - 热力耦合
+    - 切削
+
+- id: cheng2024-gpu
+  title: GPU-accelerated material point method for chip formation with frictional contact
+  title_zh: 考虑摩擦接触的切屑形成 GPU 加速物质点法
+  authors:
+    - Chaolong Cheng
+    - 〔合作者〕
+  venue: 〔会议名称〕
+  venue_short: Conference
+  year: 2024
+  type: conference
+  highlight: false
+  status: 示例条目
+  links:
+    pdf: ''
+  bibtex: |
+    @inproceedings{cheng2024gpu,
+      title     = {GPU-accelerated material point method for chip formation
+                   with frictional contact},
+      author    = {Cheng, Chaolong and Others, A.},
+      booktitle = {〔Conference Name〕},
+      year      = {2024}
+    }
+  tags:
+    - GPU
+    - MPM
+    - 接触
+
+- id: cheng2023-thermomech
+  title: A staggered thermo-mechanical coupling scheme for extreme deformation in cutting simulation
+  title_zh: 切削仿真极端变形下的交错式热力耦合格式
+  authors:
+    - Chaolong Cheng
+    - 〔合作者〕
+    - 〔通讯作者〕
+  venue: 〔期刊名称〕
+  year: 2023
+  type: preprint
+  highlight: false
+  status: 示例条目
+  links: {}
+  bibtex: |
+    @misc{cheng2023staggered,
+      title  = {A staggered thermo-mechanical coupling scheme for extreme
+                deformation in cutting simulation},
+      author = {Cheng, Chaolong and Others, A.},
+      year   = {2023}
+    }
+  tags:
+    - 热力耦合
+    - 数值格式

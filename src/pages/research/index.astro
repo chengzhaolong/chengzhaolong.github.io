@@ -1,0 +1,96 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import FigureCard from '../../components/FigureCard.astro';
+
+const research = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
+const software = await getCollection('software');
+---
+
+<Base
+  title="研究方向"
+  description="大变形热力耦合、FEM–MPM 耦合、金属切削加工仿真与 GPU 高性能计算：问题定义、数值方法与代表性结果。"
+>
+  <header class="page-head">
+    <div class="container">
+      <span class="eyebrow">Research</span>
+      <h1 class="page-head__title">研究方向</h1>
+      <p class="lead page-head__lede">
+        四件事，一条主线：把大变形、强热力耦合的切削过程算准，把算准的东西算快，最后做成工艺上能用的软件。
+      </p>
+      <div class="cluster" style="margin-top:1.25rem">
+        {research.map((r) => <a class="badge" href={`/research/${r.id}`}>{r.data.title}</a>)}
+      </div>
+    </div>
+  </header>
+
+  <section class="section--tight">
+    <div class="container">
+      <div class="stack-lg">
+        {
+          research.map((r, i) => (
+            <article class:list={['split', 'split--top', { 'split--media-first': i % 2 === 1 }]} id={r.id}>
+              <div data-reveal>
+                <span class="card__meta">
+                  {String(i + 1).padStart(2, '0')} · {r.data.tags[0] ?? 'Research'}
+                </span>
+                <h2 style="margin-top:.5rem">
+                  <a href={`/research/${r.id}`} style="text-decoration:none">
+                    {r.data.title}
+                  </a>
+                </h2>
+                <p class="muted mono" style="margin-top:.35rem;font-size:.8rem">
+                  {r.data.title_en}
+                </p>
+                <p class="lead" style="margin-top:1rem">{r.data.summary}</p>
+                <div class="cluster" style="margin-top:1.25rem">
+                  {r.data.tags.map((t) => <span class="badge">{t}</span>)}
+                </div>
+                <div style="margin-top:1.5rem">
+                  <a class="btn btn--ghost" href={`/research/${r.id}`}>阅读全文 →</a>
+                </div>
+              </div>
+              <div data-reveal style="--d:.08s">
+                <FigureCard
+                  alt={`${r.data.title}：结果示意图`}
+                  caption={r.data.figure_caption ?? `${r.data.title}的代表性结果，待替换为你的图。`}
+                  meta={`Fig. ${i + 1} · 待替换`}
+                  placeholder={r.data.placeholder}
+                  placeholderLabel={`替换：${r.data.title}结果图`}
+                />
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="media-band">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <span class="eyebrow eyebrow--media">From research to software</span>
+          <h2 style="margin-top:.65rem">方法最终要变成能跑的东西</h2>
+          <p>上述方向的算法实现都收敛到 cuspic，再由 Cusper CuttingLab 组装成可用流程。</p>
+        </div>
+        <a class="btn btn--media-ghost" href="/software">查看软件 →</a>
+      </div>
+
+      <div class="media-grid">
+        {
+          software.map((s) => (
+            <div class="span-6">
+              <a class="card card--media card--accent" href={`/software/${s.id}`} data-reveal>
+                <span class="card__meta">{s.data.kicker}{s.data.version && ` · ${s.data.version}`}</span>
+                <span class="card__title">{s.data.name}</span>
+                <span class="card__text">{s.data.tagline}</span>
+                <span class="card__cta">详情</span>
+              </a>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,282 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection, getEntry } from 'astro:content';
+import FigureCard from '../components/FigureCard.astro';
+import VideoCard from '../components/VideoCard.astro';
+import SoftwareCard from '../components/SoftwareCard.astro';
+import PubItem from '../components/PubItem.astro';
+
+const profile = (await getEntry('profile', 'main'))!.data;
+const research = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
+const software = await getCollection('software');
+const pubs = (await getCollection('publications')).sort((a, b) => b.data.year - a.data.year);
+const featured = [...pubs.filter((p) => p.data.highlight), ...pubs.filter((p) => !p.data.highlight)].slice(0, 2);
+
+const entries = [
+  {
+    href: '/research',
+    meta: 'Research',
+    title: '研究方向',
+    text: '大变形热力耦合、FEM–MPM 耦合、金属切削加工、GPU 并行计算——问题、方法与结果。',
+  },
+  {
+    href: '/software',
+    meta: 'Software',
+    title: '软件',
+    text: '自研求解器 cuspic 与金属切削仿真软件 Cusper CuttingLab：能力、性能与获取方式。',
+  },
+  {
+    href: '/publications',
+    meta: 'Publications',
+    title: '论文',
+    text: '按年份整理的论文列表，含 PDF、DOI、代码链接与一键复制的 BibTeX。',
+  },
+];
+---
+
+<Base>
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero__media">
+      <img src="/media/hero-contour.svg" alt="" width="1600" height="900" fetchpriority="high" />
+    </div>
+
+    <div class="hero__inner">
+      <p class="hero__eyebrow">Computational Mechanics · FEM–MPM · GPU</p>
+      <h1 class="hero__title">
+        {profile.name}
+        <br />
+        <span style="font-size:0.62em;color:#e4e4e7">{profile.tagline_zh}</span>
+      </h1>
+      <p class="hero__lede">
+        {profile.title} · {profile.affiliation}
+      </p>
+      <span class="hero__latin">
+        Large-deformation thermo-mechanical coupling · FEM–MPM coupling · high-performance
+        computing · solver <em>cuspic</em> &amp; <em>Cusper CuttingLab</em>
+      </span>
+
+      <div class="hero__actions">
+        <a class="btn btn--media" href="/research">研究方向</a>
+        <a class="btn btn--media-ghost" href="/software">软件</a>
+        <a class="btn btn--media-ghost" href="/publications">论文</a>
+      </div>
+
+      <a class="hero__scroll" href="#intro">
+        向下滚动
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ INTRO ============ -->
+  <section class="section" id="intro">
+    <div class="container">
+      <div class="split split--top">
+        <div data-reveal>
+          <span class="eyebrow">About</span>
+          <h2 style="margin-top:.7rem;font-size:var(--fs-h1)">把极端变形算清楚，<br />再把算得快当回事。</h2>
+          <p class="lead" style="margin-top:1.25rem">{profile.intro_zh}</p>
+          <div class="cluster" style="margin-top:1.5rem">
+            {profile.interests.map((i) => <span class="badge">{i}</span>)}
+          </div>
+          <div style="margin-top:1.75rem">
+            <a class="btn btn--ghost" href="/about">完整介绍 →</a>
+          </div>
+        </div>
+
+        <aside class="focus-card" data-reveal style="--d:.08s">
+          <p class="card__meta">Research focus</p>
+          <ol class="focus-list">
+            {research.map((r, i) => (
+              <li>
+                <a href={`/research/${r.id}`}>
+                  <span class="mono">{String(i + 1).padStart(2, '0')}</span>
+                  {r.data.title}
+                </a>
+              </li>
+            ))}
+          </ol>
+          <p class="card__meta" style="margin-top:1.5rem">Tooling</p>
+          <ul class="focus-list">
+            {software.map((s) => (
+              <li>
+                <a href={`/software/${s.id}`}>
+                  <span class="mono">▸</span>
+                  {s.data.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      </div>
+
+      <div class="stats" style="margin-top:clamp(2.5rem,5vw,4rem)">
+        {profile.stats.map((s) => (
+          <div>
+            <p class="stats__num">
+              {s.num}
+              <span>{s.unit}</span>
+            </p>
+            <p class="stats__label">{s.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 三个入口 ============ -->
+  <section class="section--tight" style="padding-bottom:var(--section-y)">
+    <div class="container">
+      <div class="card-grid card-grid--3">
+        {entries.map((e) => (
+          <a class="card card--accent" href={e.href} data-reveal>
+            <span class="card__meta">{e.meta}</span>
+            <span class="card__title">{e.title}</span>
+            <span class="card__text">{e.text}</span>
+            <span class="card__cta">进入</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 结果即证据（深色媒体区） ============ -->
+  <section class="media-band">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <span class="eyebrow eyebrow--media">Showcase</span>
+          <h2 style="margin-top:.65rem">结果即证据</h2>
+          <p>切屑形态、温度场、塑性应变与切削力——求解器能做什么，看这几张图。</p>
+        </div>
+        <a class="btn btn--media-ghost" href="/research/cutting">切削算例 →</a>
+      </div>
+
+      <div class="media-grid">
+        <div class="span-8">
+          <VideoCard
+            alt="金属切削过程仿真动画：切屑形成与温度演化"
+            badge="Simulation"
+            caption="正交切削：切屑形成与温度演化。替换为你的循环短片（720p / 5–10 s / 3 MB 以内）。"
+            meta="Animation · 待替换"
+            placeholder="c"
+            placeholderLabel="替换：切削仿真循环短片（mp4）"
+          />
+        </div>
+        <div class="span-4">
+          <FigureCard
+            alt="切削温度场云图"
+            caption="温度场分布，最高温出现在刀–屑接触区。"
+            meta="Temperature · 待替换"
+            placeholder="b"
+            placeholderLabel="替换：温度场云图"
+            ratio="4 / 5"
+          />
+        </div>
+        <div class="span-6">
+          <FigureCard
+            alt="等效塑性应变云图"
+            caption="等效塑性应变：主剪切带的局部化与切屑分离。"
+            meta="PEEQ · 待替换"
+            placeholder="a"
+            placeholderLabel="替换：等效塑性应变云图"
+          />
+        </div>
+        <div class="span-6">
+          <FigureCard
+            alt="切削力与温度随时间变化曲线"
+            caption="切削力与最高温度的时间曲线，稳态段用于工艺对比。"
+            meta="Force / Temperature · 待替换"
+            placeholder="c"
+            placeholderLabel="替换：力–时间 / 温度–时间曲线"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 研究方向 ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <span class="eyebrow">Research</span>
+          <h2 style="margin-top:.65rem">四个方向，一条主线</h2>
+          <p>从物理建模到数值方法，再到并行实现，最后落到工艺可用的软件。</p>
+        </div>
+        <a class="btn btn--ghost" href="/research">全部方向 →</a>
+      </div>
+
+      <div class="card-grid card-grid--4">
+        {research.map((r, i) => (
+          <a class="card card--accent" href={`/research/${r.id}`} data-reveal style={`--d:${i * 0.06}s`}>
+            <span class="card__meta">{String(i + 1).padStart(2, '0')} · Research</span>
+            <span class="card__title">{r.data.title}</span>
+            <span class="card__text">{r.data.summary}</span>
+            <span class="card__cta">阅读</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 软件（深色区） ============ -->
+  <section class="media-band">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <span class="eyebrow eyebrow--media">Software</span>
+          <h2 style="margin-top:.65rem">求解器与软件</h2>
+          <p>底层是 cuspic，上层是 Cusper CuttingLab：一个管精度与速度，一个管流程与可用性。</p>
+        </div>
+        <a class="btn btn--media-ghost" href="/software">软件总览 →</a>
+      </div>
+
+      <div class="card-grid card-grid--2">
+        {software.map((s) => (
+          <SoftwareCard item={{ ...s.data, id: s.id }} href={`/software/${s.id}`} tone="media" />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 论文 ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <span class="eyebrow">Publications</span>
+          <h2 style="margin-top:.65rem">代表性论文</h2>
+          <p>完整列表含 BibTeX、DOI 与代码链接。</p>
+        </div>
+        <a class="btn btn--ghost" href="/publications">全部论文 →</a>
+      </div>
+
+      <ul class="pub-list">
+        {featured.map((p, i) => (
+          <PubItem pub={{ ...p.data, id: p.id }} index={i + 1} />
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 联系 ============ -->
+  <section class="section--tight" style="padding-bottom:var(--section-y)">
+    <div class="container">
+      <div class="cta">
+        <div>
+          <span class="eyebrow">Contact</span>
+          <h2 style="margin-top:.7rem;font-size:var(--fs-h2)">想讨论算例、合作或申请软件试用？</h2>
+          <p class="muted" style="margin-top:.6rem;max-width:52ch">
+            邮件是最好的方式。附上算例描述（材料、工况、关注量），我会尽量给出可执行的建议。
+          </p>
+        </div>
+        <div class="cluster">
+          <a class="btn" href={`mailto:${profile.email}`}>发邮件</a>
+          <a class="btn btn--ghost" href="/software/cuttinglab">申请 CuttingLab 试用</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

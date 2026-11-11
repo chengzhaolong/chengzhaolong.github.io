@@ -1,0 +1,122 @@
+import { defineCollection } from 'astro:content';
+import { file, glob } from 'astro/loaders';
+import { z } from 'astro/zod';
+
+/**
+ * 研究方向：一篇一个 mdx 文件，正文写中文，frontmatter 里给英文摘要，
+ * 供 /en/ 简短版复用。新增方向 = 在 src/content/research 加一个文件。
+ */
+const research = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/research' }),
+  schema: z.object({
+    title: z.string(),
+    /** 英文标题，用于 /en/ 列表 */
+    title_en: z.string(),
+    /** 卡片上的一两句话概述（中文） */
+    summary: z.string(),
+    /** 一两句英文概述，用于 /en/ */
+    summary_en: z.string(),
+    /** 排序，越小越靠前 */
+    order: z.number().default(99),
+    tags: z.array(z.string()).default([]),
+    /** 卡片/详情页顶图；留空则显示占位云图 */
+    figure: z.string().optional(),
+    figure_alt: z.string().optional(),
+    figure_caption: z.string().optional(),
+    /** 占位云图配色，a / b / c */
+    placeholder: z.enum(['a', 'b', 'c']).default('a'),
+    /** 关联软件 id（cuspic / cuttinglab） */
+    software: z.array(z.string()).default([]),
+  }),
+});
+
+/** 论文：改 src/data/publications.yml 即可，页面自动按年份分组 */
+const publications = defineCollection({
+  loader: file('./src/data/publications.yml'),
+  schema: z.object({
+    title: z.string(),
+    /** 中文译名，可选；列表里作为副标题显示 */
+    title_zh: z.string().optional(),
+    authors: z.array(z.string()),
+    venue: z.string(),
+    venue_short: z.string().optional(),
+    year: z.number(),
+    type: z.enum(['journal', 'conference', 'preprint']).default('journal'),
+    /** 置顶：首页「最新论文」优先取这些 */
+    highlight: z.boolean().default(false),
+    /** 例如 "in press" / "under review" */
+    status: z.string().optional(),
+    links: z
+      .object({
+        pdf: z.string().optional(),
+        doi: z.string().optional(),
+        code: z.string().optional(),
+        data: z.string().optional(),
+      })
+      .default({}),
+    bibtex: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+  }),
+});
+
+/** 软件：cuspic 求解器 + Cusper CuttingLab */
+const software = defineCollection({
+  loader: file('./src/data/software.yml'),
+  schema: z.object({
+    name: z.string(),
+    name_zh: z.string(),
+    kicker: z.string(),
+    tagline: z.string(),
+    summary: z.string(),
+    version: z.string().optional(),
+    status: z.string().optional(),
+    license: z.string().optional(),
+    features: z.array(z.object({ title: z.string(), text: z.string() })).default([]),
+    specs: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
+    links: z
+      .array(
+        z.object({
+          label: z.string(),
+          href: z.string(),
+          variant: z.enum(['primary', 'ghost']).default('ghost'),
+        })
+      )
+      .default([]),
+  }),
+});
+
+const profile = defineCollection({
+  loader: file('./src/data/profile.yml'),
+  schema: z.object({
+    demo: z.boolean().default(false),
+    name: z.string(),
+    name_en: z.string(),
+    latin: z.string(),
+    title: z.string(),
+    title_en: z.string(),
+    affiliation: z.string(),
+    affiliation_en: z.string(),
+    location: z.string(),
+    email: z.string(),
+    tagline_zh: z.string(),
+    tagline_en: z.string(),
+    intro_zh: z.string(),
+    intro_en: z.string(),
+    interests: z.array(z.string()).default([]),
+    stats: z
+      .array(z.object({ num: z.string(), unit: z.string().default(''), label: z.string() }))
+      .default([]),
+    links: z
+      .object({
+        scholar: z.string().optional(),
+        orcid: z.string().optional(),
+        github: z.string().optional(),
+        researchgate: z.string().optional(),
+        bilibili: z.string().optional(),
+        cv: z.string().optional(),
+      })
+      .default({}),
+  }),
+});
+
+export const collections = { research, publications, software, profile };

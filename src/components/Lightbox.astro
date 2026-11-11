@@ -1,0 +1,48 @@
+---
+// 原生 <dialog> 图片放大：点任意 [data-zoom] 元素即可打开，零依赖
+---
+
+<dialog class="lightbox" id="lightbox" aria-label="图片放大">
+  <button class="lightbox__close" type="button" data-close aria-label="关闭">✕</button>
+  <img class="lightbox__img" alt="" data-lightbox-img />
+  <div class="lightbox__cap">
+    <span data-lightbox-cap></span>
+    <span class="mono" data-lightbox-meta></span>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.getElementById('lightbox') as HTMLDialogElement | null;
+  const img = dialog?.querySelector<HTMLImageElement>('[data-lightbox-img]');
+  const cap = dialog?.querySelector<HTMLElement>('[data-lightbox-cap]');
+  const meta = dialog?.querySelector<HTMLElement>('[data-lightbox-meta]');
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const trigger = target.closest<HTMLElement>('[data-zoom]');
+    if (trigger && dialog && img) {
+      e.preventDefault();
+      const src = trigger.dataset.zoom || trigger.querySelector('img')?.src;
+      if (!src) return;
+      img.src = src;
+      img.alt = trigger.dataset.zoomAlt || trigger.querySelector('img')?.alt || '';
+      if (cap) cap.textContent = trigger.dataset.zoomCaption || '';
+      if (meta) meta.textContent = trigger.dataset.zoomMeta || '';
+      dialog.showModal();
+      document.body.classList.add('is-locked');
+      return;
+    }
+    if (target.closest('[data-close]') && dialog) {
+      dialog.close();
+    }
+  });
+
+  dialog?.addEventListener('close', () => {
+    document.body.classList.remove('is-locked');
+  });
+
+  // 点背景关闭
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+</script>

@@ -1,0 +1,156 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import PubItem from '../../components/PubItem.astro';
+
+export async function getStaticPaths() {
+  const items = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
+  return items.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, prev: items[i - 1], next: items[i + 1] },
+  }));
+}
+
+const { entry, prev, next } = Astro.props;
+const { data } = entry;
+const { Content, headings } = await render(entry);
+
+const pubs = (await getCollection('publications')).sort((a, b) => b.data.year - a.data.year);
+const related = pubs.filter((p) => p.data.tags.some((t) => data.tags.includes(t)));
+const software = await getCollection('software');
+const relatedSoftware = software.filter((s) => data.software.includes(s.id));
+
+const toc = headings.filter((h) => h.depth === 2);
+---
+
+<Base title={data.title} description={data.summary}>
+  <header class="page-head page-head--media">
+    <div class="hero__media">
+      <img src="/media/hero-contour.svg" alt="" width="1600" height="900" />
+    </div>
+    <div class="container page-head__inner">
+      <nav class="crumb" aria-label="面包屑">
+        <a href="/">首页</a>
+        <span aria-hidden="true">/</span>
+        <a href="/research">研究方向</a>
+      </nav>
+      <h1 class="page-head__title">{data.title}</h1>
+      <p class="mono" style="margin-top:.5rem;color:#a1a1aa;font-size:.82rem">{data.title_en}</p>
+      <p class="page-head__lede">{data.summary}</p>
+      <div class="cluster" style="margin-top:1.25rem">
+        {data.tags.map((t) => <span class="badge badge--media">{t}</span>)}
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="detail-grid">
+        <article class="prose" data-reveal>
+          <Content />
+        </article>
+
+        <aside class="detail-aside">
+          {
+            toc.length > 1 && (
+              <div class="aside-block">
+                <p class="card__meta">On this page</p>
+                <ul class="aside-toc">
+                  {toc.map((h) => (
+                    <li>
+                      <a href={`#${h.slug}`}>{h.text}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+
+          {
+            relatedSoftware.length > 0 && (
+              <div class="aside-block">
+                <p class="card__meta">相关软件</p>
+                <ul class="focus-list">
+                  {relatedSoftware.map((s) => (
+                    <li>
+                      <a href={`/software/${s.id}`}>
+                        <span class="mono">▸</span>
+                        {s.data.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+
+          <div class="aside-block">
+            <p class="card__meta">目录</p>
+            <ul class="focus-list">
+              {
+                (await getCollection('research'))
+                  .sort((a, b) => a.data.order - b.data.order)
+                  .map((r) => (
+                    <li>
+                      <a href={`/research/${r.id}`} aria-current={r.id === entry.id ? 'page' : undefined}>
+                        <span class="mono">{r.id === entry.id ? '●' : '○'}</span>
+                        {r.data.title}
+                      </a>
+                    </li>
+                  ))
+              }
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  {
+    related.length > 0 && (
+      <section class="section--tight section--line">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-head__text">
+              <span class="eyebrow">Related</span>
+              <h2 style="margin-top:.6rem">相关论文</h2>
+            </div>
+            <a class="btn btn--ghost" href="/publications">全部论文 →</a>
+          </div>
+          <ul class="pub-list">
+            {related.map((p, i) => (
+              <PubItem pub={{ ...p.data, id: p.id }} index={i + 1} showBibtex={false} />
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section--tight">
+    <div class="container">
+      <div class="pager">
+        {
+          prev ? (
+            <a class="pager__item" href={`/research/${prev.id}`}>
+              <span class="card__meta">← 上一个方向</span>
+              <span class="pager__title">{prev.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          next ? (
+            <a class="pager__item pager__item--next" href={`/research/${next.id}`}>
+              <span class="card__meta">下一个方向 →</span>
+              <span class="pager__title">{next.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )
+        }
+      </div>
+    </div>
+  </section>
+</Base>

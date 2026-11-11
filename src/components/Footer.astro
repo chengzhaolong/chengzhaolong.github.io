@@ -1,0 +1,67 @@
+---
+import { getEntry } from 'astro:content';
+
+const entry = await getEntry('profile', 'main');
+const profile = entry?.data;
+if (!profile) throw new Error('Footer 需要 profile 数据');
+
+const year = new Date().getFullYear();
+
+const contacts = [
+  { label: '邮箱', value: profile.email, href: `mailto:${profile.email}` },
+  { label: 'Google Scholar', value: '论文主页', href: profile.links?.scholar },
+  { label: 'ORCID', value: 'ORCID iD', href: profile.links?.orcid },
+  { label: 'GitHub', value: '代码', href: profile.links?.github },
+  { label: 'Bilibili', value: '仿真视频', href: profile.links?.bilibili },
+].filter((c) => c.href);
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__top">
+      <div>
+        <p class="site-footer__name">{profile.name} · {profile.name_en}</p>
+        <p class="site-footer__lede">
+          {profile.tagline_zh}
+        </p>
+        <p class="site-footer__lede mono" style="font-size:0.8rem;color:#6f6f7a">
+          {profile.affiliation}
+        </p>
+      </div>
+
+      <div class="site-footer__cols">
+        <div class="site-footer__col">
+          <h3>导航</h3>
+          <ul>
+            <li><a href="/research">研究方向</a></li>
+            <li><a href="/software">软件</a></li>
+            <li><a href="/publications">论文</a></li>
+            <li><a href="/about">关于</a></li>
+            <li><a href="/en/" hreflang="en">English</a></li>
+          </ul>
+        </div>
+        <div class="site-footer__col">
+          <h3>联系</h3>
+          <ul>
+            {
+              contacts.map((c) => (
+                <li>
+                  <a href={c.href}>{c.label}</a>
+                </li>
+              ))
+            }
+            {profile.links?.cv && (
+              <li><a href={profile.links.cv}>CV（PDF）</a></li>
+            )}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <span>© {year} {profile.name_en}. All rights reserved.</span>
+      <span class="accent-rule" aria-hidden="true"></span>
+      <span>Built with Astro · 静态输出，无追踪脚本</span>
+    </div>
+  </div>
+</footer>

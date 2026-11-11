@@ -1,0 +1,171 @@
+---
+import Base from '../layouts/Base.astro';
+import { getEntry } from 'astro:content';
+import FigureCard from '../components/FigureCard.astro';
+
+const profile = (await getEntry('profile', 'main'))!.data;
+
+const timeline = [
+  {
+    when: '〔20XX〕— 至今',
+    what: '博士研究生（直博）· 计算力学',
+    where: profile.affiliation,
+    desc: '研究方向：大变形热力耦合、FEM–MPM 耦合与高性能计算。',
+  },
+  {
+    when: '〔20XX〕—〔20XX〕',
+    what: '本科 · 〔专业〕',
+    where: '〔学校〕',
+    desc: '〔可写：毕业论文题目、参与的科研训练、竞赛与奖学金〕',
+  },
+];
+
+const tools = [
+  { k: '自研', v: 'cuspic（FEM–MPM / GPU）、Cusper CuttingLab' },
+  { k: '语言', v: 'C++ / CUDA、Python、Fortran〔按实际填〕' },
+  { k: '并行', v: 'CUDA、MPI、OpenMP' },
+  { k: '前后处理', v: 'ParaView、VTK、Python 数据栈' },
+  { k: '写作', v: 'LaTeX、Markdown' },
+];
+---
+
+<Base title="关于" description={`${profile.name}，${profile.title}。${profile.tagline_zh}`}>
+  <header class="page-head">
+    <div class="container">
+      <span class="eyebrow">About</span>
+      <h1 class="page-head__title">{profile.name}</h1>
+      <p class="mono" style="margin-top:.5rem;color:var(--ink-3);font-size:.82rem">
+        {profile.name_en} · {profile.title_en}
+      </p>
+      <p class="lead page-head__lede">{profile.tagline_zh}</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="split split--top">
+        <div class="prose" data-reveal>
+          {profile.intro_zh.split('\n\n').map((p) => <p>{p}</p>)}
+          <h2>我在做什么</h2>
+          <p>
+            简单说，是把「切削过程」当成一个数值问题来解：建模（本构、摩擦、失效）、离散（FEM + MPM 分区）、
+            耦合（力学与热学交错推进）、加速（GPU 并行），最后把这些拼成一个能跑工程算例、也能被同行复现的软件。
+          </p>
+          <p>
+            我关心的不只是算例能不能收敛，还有：换一个切削速度结果是否稳定、失败算例能不能快速定位、
+            别人拿到算例能不能重复出同样的曲线。
+          </p>
+
+          <h2>教育经历</h2>
+          <ol class="timeline" style="margin-top:1.25rem">
+            {timeline.map((t) => (
+              <li class="timeline__item">
+                <span class="timeline__when">{t.when}</span>
+                <p class="timeline__what">{t.what}</p>
+                <p class="timeline__where">{t.where}</p>
+                <p class="timeline__desc">{t.desc}</p>
+              </li>
+            ))}
+          </ol>
+
+          <h2>工具与技能</h2>
+          <div class="table-wrap" style="margin-top:1.25rem">
+            <table class="data">
+              <tbody>
+                {tools.map((t) => (
+                  <tr>
+                    <th scope="row" style="width:6rem;background:transparent;white-space:normal">{t.k}</th>
+                    <td>{t.v}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h2>研究之外</h2>
+          <p>
+            喜欢把计算结果做成能看懂的图与动画（本站的媒体区就是为此存在的）；
+            也在整理切削仿真的常见坑与对策，希望后来的人少走一点弯路。
+          </p>
+        </div>
+
+        <aside class="stack-lg">
+          <div data-reveal>
+            <FigureCard
+              alt={`${profile.name}的照片`}
+              caption="替换：个人照片（建议 3:4，长边 1200 px 以内，压缩后 < 200 KB）。"
+              meta="Portrait · 待替换"
+              placeholder="a"
+              placeholderLabel="替换：个人照片"
+              ratio="4 / 5"
+            />
+          </div>
+
+          <div data-reveal style="--d:.08s">
+            <dl class="info-list">
+              <div>
+                <dt>单位</dt>
+                <dd>{profile.affiliation}</dd>
+              </div>
+              <div>
+                <dt>地点</dt>
+                <dd>{profile.location}</dd>
+              </div>
+              <div>
+                <dt>邮箱</dt>
+                <dd><a href={`mailto:${profile.email}`}>{profile.email}</a></dd>
+              </div>
+              <div>
+                <dt>方向</dt>
+                <dd>{profile.interests.slice(0, 3).join('、')}</dd>
+              </div>
+            </dl>
+
+            <div class="cluster" style="margin-top:1.25rem">
+              {profile.links?.cv && <a class="btn btn--ghost" href={profile.links.cv}>下载 CV（PDF）</a>}
+              <a class="btn" href={`mailto:${profile.email}`}>联系我</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="media-band">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <span class="eyebrow eyebrow--media">Continue</span>
+          <h2 style="margin-top:.65rem">从哪看起</h2>
+          <p>如果你只想知道我在做什么，看研究方向；如果你想知道东西能不能用，看软件。</p>
+        </div>
+      </div>
+      <div class="media-grid">
+        <div class="span-4">
+          <a class="card card--media card--accent" href="/research">
+            <span class="card__meta">Research</span>
+            <span class="card__title">研究方向</span>
+            <span class="card__text">四个方向的详细说明与代表性结果。</span>
+            <span class="card__cta">进入</span>
+          </a>
+        </div>
+        <div class="span-4">
+          <a class="card card--media card--accent" href="/software">
+            <span class="card__meta">Software</span>
+            <span class="card__title">软件</span>
+            <span class="card__text">cuspic 与 Cusper CuttingLab 的能力与获取方式。</span>
+            <span class="card__cta">进入</span>
+          </a>
+        </div>
+        <div class="span-4">
+          <a class="card card--media card--accent" href="/publications">
+            <span class="card__meta">Publications</span>
+            <span class="card__title">论文</span>
+            <span class="card__text">带 BibTeX 与 PDF / DOI 链接的完整列表。</span>
+            <span class="card__cta">进入</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

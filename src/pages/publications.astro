@@ -1,0 +1,84 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection, getEntry } from 'astro:content';
+import PubItem from '../components/PubItem.astro';
+
+const profile = (await getEntry('profile', 'main'))!.data;
+const pubs = (await getCollection('publications')).sort(
+  (a, b) => b.data.year - a.data.year || Number(b.data.highlight) - Number(a.data.highlight)
+);
+
+const years = [...new Set(pubs.map((p) => p.data.year))].sort((a, b) => b - a);
+const counts = {
+  journal: pubs.filter((p) => p.data.type === 'journal').length,
+  conference: pubs.filter((p) => p.data.type === 'conference').length,
+  preprint: pubs.filter((p) => p.data.type === 'preprint').length,
+};
+
+// 连续编号（跨年份）
+let n = 0;
+const numbered = pubs.map((p) => ({ pub: p, index: ++n }));
+---
+
+<Base
+  title="论文"
+  description={`${profile.name}的论文列表：大变形热力耦合、FEM–MPM 耦合与 GPU 并行计算方向的研究成果。`}
+>
+  <header class="page-head">
+    <div class="container">
+      <span class="eyebrow">Publications</span>
+      <h1 class="page-head__title">论文</h1>
+      <p class="lead page-head__lede">
+        按年份倒序排列。每一条都给出 BibTeX；有 PDF / DOI / 代码的会直接给出链接。
+      </p>
+
+      <div class="pub-summary">
+        <span class="badge badge--dot">共 {pubs.length} 篇</span>
+        <span class="badge">期刊 {counts.journal}</span>
+        <span class="badge">会议 {counts.conference}</span>
+        <span class="badge">预印本 {counts.preprint}</span>
+      </div>
+
+      <div class="cluster" style="margin-top:1rem">
+        {years.map((y) => <a class="badge" href={`#year-${y}`}>{y}</a>)}
+      </div>
+
+      {
+        profile.demo && (
+          <p class="notice" style="margin-top:1.5rem;max-width:62ch">
+            当前显示的是<strong>示例论文条目</strong>。把 <code>src/data/publications.yml</code> 换成你的真实论文，
+            再把 <code>src/data/profile.yml</code> 里的 <code>demo</code> 改为 <code>false</code>，这条提示会自动消失。
+          </p>
+        )
+      }
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      {
+        years.map((year) => {
+          const group = numbered.filter((item) => item.pub.data.year === year);
+          return (
+            <div class="pub-group" id={`year-${year}`}>
+              <div class="pub-year">
+                <span class="pub-year__num">{year}</span>
+                <span class="pub-year__line" aria-hidden="true" />
+                <span class="card__meta">{group.length} 篇</span>
+              </div>
+              <ul class="pub-list">
+                {group.map(({ pub, index }) => (
+                  <PubItem pub={{ ...pub.data, id: pub.id }} index={index} me={profile.name_en} />
+                ))}
+              </ul>
+            </div>
+          );
+        })
+      }
+
+      <p class="muted" style="margin-top:3rem;font-size:var(--fs-sm)">
+        找不到想要的？直接<a href={`mailto:${profile.email}`}>发邮件</a>索取预印本或算例细节。
+      </p>
+    </div>
+  </section>
+</Base>

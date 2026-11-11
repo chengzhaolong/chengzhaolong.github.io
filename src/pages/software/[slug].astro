@@ -1,0 +1,253 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, getEntry } from 'astro:content';
+import FigureCard from '../../components/FigureCard.astro';
+import VideoCard from '../../components/VideoCard.astro';
+
+export async function getStaticPaths() {
+  const items = await getCollection('software');
+  return items.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const s = entry.data;
+const profile = (await getEntry('profile', 'main'))!.data;
+const email = profile.email;
+
+// 性能对比（示例数据：替换为你的实测加速比）
+const perf = [
+  { label: 'CPU · 1 线程', value: 1, text: '1.0×' },
+  { label: 'CPU · 16 线程', value: 11, text: '11×' },
+  { label: 'GPU · 单卡', value: 78, text: '78×' },
+  { label: 'GPU · 4 卡', value: 260, text: '260×' },
+];
+const perfMax = Math.max(...perf.map((p) => p.value));
+
+const workflow = [
+  { when: 'Step 1', what: '几何与材料', desc: '导入工件与刀具几何，选择本构与摩擦模型，设定初始温度场。' },
+  { when: 'Step 2', what: '工艺参数', desc: '切削速度、进给量、切深、刀尖几何与冷却条件；可保存为参数组批量提交。' },
+  { when: 'Step 3', what: '离散与求解', desc: '自动布置背景网格与物质点，调用 cuspic 求解，失败算例给出定位信息。' },
+  { when: 'Step 4', what: '结果分析', desc: '云图、切屑形态演化、力与温度曲线；支持导出图片与数据表。' },
+  { when: 'Step 5', what: '对比与报告', desc: '多组参数结果并列比较，生成可交付的图表与说明。' },
+];
+---
+
+<Base title={s.name} description={s.tagline}>
+  <header class="page-head page-head--media">
+    <div class="hero__media">
+      <img src="/media/hero-contour.svg" alt="" width="1600" height="900" />
+    </div>
+    <div class="container page-head__inner">
+      <nav class="crumb" aria-label="面包屑">
+        <a href="/">首页</a>
+        <span aria-hidden="true">/</span>
+        <a href="/software">软件</a>
+      </nav>
+      <p class="eyebrow eyebrow--media" style="margin-top:1.25rem">{s.kicker}{s.version && ` · ${s.version}`}</p>
+      <h1 class="page-head__title">{s.name}</h1>
+      <p class="page-head__lede">{s.tagline}</p>
+      <div class="cluster" style="margin-top:1.25rem">
+        {s.status && <span class="badge badge--media badge--dot">{s.status}</span>}
+        {s.license && <span class="badge badge--media">{s.license}</span>}
+      </div>
+      <div class="cluster" style="margin-top:1.5rem">
+        {s.links.map((l) => (
+          <a
+            class:list={['btn', l.variant === 'primary' ? 'btn--media' : 'btn--media-ghost']}
+            href={l.href}
+          >
+            {l.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="split split--top">
+        <div class="prose" data-reveal>
+          <h2 style="margin-top:0">概述</h2>
+          <p>{s.summary}</p>
+        </div>
+
+        <div data-reveal style="--d:.08s">
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col">技术规格</th>
+                  <th scope="col">说明</th>
+                </tr>
+              </thead>
+              <tbody>
+                {s.specs.map((row) => (
+                  <tr>
+                    <th scope="row" style="background:transparent;white-space:normal">{row.k}</th>
+                    <td class="num">{row.v}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs)">
+            标注〔待填〕的条目为待补充信息，修改 <code class="mono">src/data/software.yml</code> 即可更新本表。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight section--line">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <span class="eyebrow">Capabilities</span>
+          <h2 style="margin-top:.6rem">能做什么</h2>
+        </div>
+      </div>
+      <div class="card-grid card-grid--2">
+        {s.features.map((f) => (
+          <div class="feature" data-reveal>
+            <h3>{f.title}</h3>
+            <p>{f.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="media-band">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-head__text">
+          <span class="eyebrow eyebrow--media">Gallery</span>
+          <h2 style="margin-top:.65rem">界面与结果</h2>
+          <p>截图和动画待补充：文件放入 <code class="mono">public/media/</code> 后填上 src 即可自动显示。</p>
+        </div>
+      </div>
+      <div class="media-grid">
+        <div class="span-8">
+          <VideoCard
+            alt={`${s.name} 操作或结果演示动画`}
+            badge="Demo"
+            caption="操作流程或结果演化动画（占位）。"
+            meta="Demo · 待替换"
+            placeholder="c"
+            placeholderLabel="替换：操作 / 结果演示 mp4"
+          />
+        </div>
+        <div class="span-4">
+          <FigureCard
+            alt={`${s.name} 界面截图`}
+            caption="主界面截图（占位）。"
+            meta="UI · 待替换"
+            placeholder="b"
+            placeholderLabel="替换：界面截图"
+            ratio="4 / 5"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    entry.id === 'cuspic' ? (
+      <section class="section">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-head__text">
+              <span class="eyebrow">Performance</span>
+              <h2 style="margin-top:.6rem">性能</h2>
+              <p>
+                下面是<strong>示例数据</strong>，仅用于展示呈现方式；请替换为你实测的加速比（同一算例、同一精度）。
+              </p>
+            </div>
+            <span class="badge badge--dot badge--new">示例数据</span>
+          </div>
+
+          <div class="bars" data-reveal>
+            {perf.map((p) => (
+              <div class="bar">
+                <span class="bar__label">{p.label}</span>
+                <span class="bar__track">
+                  <span class="bar__fill" style={`width:${Math.max(4, (p.value / perfMax) * 100)}%`} />
+                </span>
+                <span class="bar__value">{p.text}</span>
+              </div>
+            ))}
+          </div>
+
+          <div class="table-wrap" style="margin-top:2rem">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col">算例</th>
+                  <th scope="col">规模</th>
+                  <th scope="col">硬件</th>
+                  <th scope="col">耗时</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>二维正交切削</td>
+                  <td class="num">20 万粒子 / 100 万节点</td>
+                  <td class="num">1× GPU</td>
+                  <td class="num">〔待填〕</td>
+                </tr>
+                <tr>
+                  <td>三维车削（局部）</td>
+                  <td class="num">120 万粒子 / 600 万节点</td>
+                  <td class="num">4× GPU</td>
+                  <td class="num">〔待填〕</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    ) : (
+      <section class="section">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-head__text">
+              <span class="eyebrow">Workflow</span>
+              <h2 style="margin-top:.6rem">工作流</h2>
+              <p>从几何到报告，一条不需要写代码的路径。</p>
+            </div>
+          </div>
+
+          <ol class="timeline">
+            {workflow.map((w) => (
+              <li class="timeline__item" data-reveal>
+                <span class="timeline__when">{w.when}</span>
+                <p class="timeline__what">{w.what}</p>
+                <p class="timeline__desc">{w.desc}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section--tight" id="access">
+    <div class="container">
+      <div class="cta">
+        <div>
+          <span class="eyebrow">Access</span>
+          <h2 style="margin-top:.7rem;font-size:var(--fs-h2)">
+            {entry.id === 'cuspic' ? '讨论算例或合作' : '申请 Cusper CuttingLab 试用'}
+          </h2>
+          <p class="muted" style="margin-top:.6rem;max-width:54ch">
+            邮件里说明：材料与工件、切削工况、想得到的结论（力 / 温度 / 切屑形态 / 残余应力），以及可用硬件。
+          </p>
+        </div>
+        <div class="cluster">
+          <a class="btn" href={`mailto:${email}`}>发邮件</a>
+          <a class="btn btn--ghost" href="/software">返回软件总览</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

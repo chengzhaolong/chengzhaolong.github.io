@@ -1,0 +1,46 @@
+---
+interface Props {
+  id?: string;
+  eyebrow?: string;
+  title?: string;
+  lede?: string;
+  /** light = 浅色正文区；media = 深色"图版"区 */
+  tone?: 'light' | 'media';
+  tight?: boolean;
+  /** 标题右侧操作区（如「全部论文 →」） */
+  align?: 'between' | 'start';
+}
+
+const {
+  id,
+  eyebrow,
+  title,
+  lede,
+  tone = 'light',
+  tight = false,
+  align = 'between',
+} = Astro.props;
+
+const hasHead = Boolean(eyebrow || title || lede);
+---
+
+<section
+  class:list={['section', { 'media-band': tone === 'media', 'section--tight': tight }]}
+  id={id}
+>
+  <div class="container">
+    {
+      hasHead && (
+        <div class="section-head" style={align === 'start' ? 'justify-content:flex-start' : undefined}>
+          <div class="section-head__text">
+            {eyebrow && <span class:list={['eyebrow', { 'eyebrow--media': tone === 'media' }]}>{eyebrow}</span>}
+            {title && <h2 style="margin-top:0.65rem">{title}</h2>}
+            {lede && <p>{lede}</p>}
+          </div>
+          <slot name="actions" />
+        </div>
+      )
+    }
+    <slot />
+  </div>
+</section>

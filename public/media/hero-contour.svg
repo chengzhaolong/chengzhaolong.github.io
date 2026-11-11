@@ -48,32 +48,42 @@
     <path d="M200 0V900M400 0V900M600 0V900M800 0V900M1000 0V900M1200 0V900M1400 0V900" />
   </g>
 
-  <path d="M0 640H1600V900H0Z" fill="#101017" opacity="0.9" />
-  <path d="M0 640H1600" stroke="#5b5c6b" stroke-width="2" opacity="0.7" />
-  <path d="M0 700H1600" stroke="#2a2a34" stroke-width="1" />
+  <!-- 工件：顶部表面提亮，避免变成一条死黑 -->
+  <path d="M0 640H1600V900H0Z" fill="#191a22" />
+  <path d="M0 640H1600V736H0Z" fill="#23252f" opacity="0.9" />
+  <path d="M0 640H1600" stroke="#8a8b9c" stroke-width="2" opacity="0.75" />
+  <path d="M0 716H1600" stroke="#3a3b47" stroke-width="1" />
 
+  <!-- 切屑：从刀尖起卷出 -->
   <path
-    d="M905 640C940 556 1030 494 1148 486C1272 478 1352 532 1372 604C1384 650 1352 676 1318 664"
+    d="M826 640C872 552 986 492 1112 500C1232 508 1322 566 1352 640C1362 664 1344 680 1322 674"
     fill="none"
     stroke="#faba39"
-    stroke-width="7"
+    stroke-width="8"
     stroke-linecap="round"
-    opacity="0.72"
+    opacity="0.66"
   />
   <path
-    d="M905 640C940 556 1030 494 1148 486C1272 478 1352 532 1372 604C1384 650 1352 676 1318 664"
+    d="M826 640C872 552 986 492 1112 500C1232 508 1322 566 1352 640C1362 664 1344 680 1322 674"
     fill="none"
     stroke="#fde725"
     stroke-width="2"
     stroke-linecap="round"
-    opacity="0.9"
+    opacity="0.92"
   />
 
-  <g opacity="0.62">
-    <path d="M690 96H862L818 566H690Z" fill="url(#tool)" />
-    <path d="M690 96H862L818 566H690Z" fill="none" stroke="#f4f4f5" stroke-opacity="0.45" stroke-width="2" />
-    <path d="M818 566L690 566" stroke="#fde725" stroke-width="3" stroke-linecap="round" />
+  <!-- 刀–屑接触区高温 -->
+  <ellipse cx="846" cy="636" rx="86" ry="34" fill="#fde725" opacity="0.35" filter="url(#soft2)" />
+
+  <!-- 剪切面 -->
+  <path d="M836 636L1052 452" stroke="#faba39" stroke-width="2" stroke-dasharray="10 12" opacity="0.4" />
+
+  <!-- 刀具 -->
+  <g opacity="0.7">
+    <path d="M690 96H862L836 640H690Z" fill="url(#tool)" />
+    <path d="M690 96H862L836 640H690Z" fill="none" stroke="#f4f4f5" stroke-opacity="0.45" stroke-width="2" />
+    <path d="M836 640H690" stroke="#fde725" stroke-width="3" stroke-linecap="round" />
   </g>
 
-  <rect width="1600" height="900" fill="url(#fade)" opacity="0.55" />
+  <rect width="1600" height="900" fill="url(#fade)" opacity="0.5" />
 </svg>

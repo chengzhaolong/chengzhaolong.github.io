@@ -1,19 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection, getEntry } from 'astro:content';
-import FigureCard from '../components/FigureCard.astro';
 import VideoCard from '../components/VideoCard.astro';
 import SoftwareCard from '../components/SoftwareCard.astro';
 import PubItem from '../components/PubItem.astro';
 
 const profile = (await getEntry('profile', 'main'))!.data;
-const research = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
 const software = await getCollection('software');
 const pubs = (await getCollection('publications')).sort((a, b) => b.data.year - a.data.year);
 const featured = [...pubs.filter((p) => p.data.highlight), ...pubs.filter((p) => !p.data.highlight)].slice(0, 3);
 
-const now = profile.timeline[0];
 const contactHref = `mailto:${profile.email}`;
+const portrait = profile.photo ?? '/media/portrait.svg';
 ---
 
 <Base
@@ -21,33 +19,37 @@ const contactHref = `mailto:${profile.email}`;
     .slice(0, 4)
     .join('、')}。`}
 >
-  <!-- ============ 首屏：姓名退后，工作在前 ============ -->
+  <!-- ============ 首屏：姓名退后，照片与工作在前 ============ -->
   <section class="hero">
     <div class="hero__media">
       <img src="/media/hero-contour.svg" alt="" width="1600" height="900" fetchpriority="high" />
     </div>
 
     <div class="hero__inner">
-      <p class="hero__eyebrow">FEM–MPM · 切削仿真 · GPU</p>
-      <h1 class="hero__title">{profile.name}</h1>
-      <p class="hero__affil">{profile.title} · {profile.affiliation}</p>
-      <p class="hero__lede">{profile.tagline_zh}</p>
+      <div class="hero__text">
+        <p class="hero__eyebrow">FEM–MPM · 切削仿真 · GPU</p>
+        <h1 class="hero__title">{profile.name}</h1>
+        <p class="hero__affil">{profile.title} · {profile.affiliation}</p>
+        <p class="hero__lede">{profile.tagline_zh}</p>
 
-      <p class="link-row">
-        <a href="/research">研究方向</a>
-        <span class="link-row__sep" aria-hidden="true">·</span>
-        <a href="/software">软件</a>
-        <span class="link-row__sep" aria-hidden="true">·</span>
-        <a href="/publications">论文</a>
-        <span class="link-row__sep" aria-hidden="true">·</span>
-        <a href={contactHref}>邮箱</a>
-      </p>
+        <p class="link-row">
+          <a href="/research">研究方向</a>
+          <span class="link-row__sep" aria-hidden="true">·</span>
+          <a href="/software">软件</a>
+          <span class="link-row__sep" aria-hidden="true">·</span>
+          <a href="/publications">论文</a>
+          <span class="link-row__sep" aria-hidden="true">·</span>
+          <a href={contactHref}>邮箱</a>
+        </p>
+      </div>
+
+      <a class="hero__portrait" href="/about" aria-label={`关于 ${profile.name}：简介与简历`}>
+        <img src={portrait} alt={`${profile.name}的照片`} width="600" height="800" />
+      </a>
     </div>
-
-    <p class="hero__note">cuspic 正交切削算例 · 切屑形成与温度场（待替换为真实结果帧）</p>
   </section>
 
-  <!-- ============ 简介 + 简历摘要 ============ -->
+  <!-- ============ 简介 + 算例（视频代替简历摘要） ============ -->
   <section class="section" id="intro">
     <div class="container">
       <div class="split split--top">
@@ -62,136 +64,36 @@ const contactHref = `mailto:${profile.email}`;
           </p>
         </div>
 
-        <aside data-reveal style="--d:.08s">
-          <p class="card__meta" style="display:block;margin-bottom:.9rem">简历摘要</p>
-          <dl class="cv-list">
-            <div>
-              <dt>现在</dt>
-              <dd>
-                {now.what}
-                <span>{now.where} · {now.when}</span>
-              </dd>
-            </div>
-            <div>
-              <dt>在做</dt>
-              <dd>
-                cuspic —— FEM–MPM / GPU 求解器
-                <span>Cusper CuttingLab —— 金属切削仿真软件</span>
-              </dd>
-            </div>
-            <div>
-              <dt>关注</dt>
-              <dd>
-                接触与摩擦 · 材料本构与断裂
-                <span>可复现的验证算例</span>
-              </dd>
-            </div>
-          </dl>
-        </aside>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 研究方向（行列表） ============ -->
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-head__text">
-          <span class="eyebrow">研究方向</span>
-          <h2 style="margin-top:.65rem">在解的问题</h2>
-          <p>从物理建模到数值方法，再到并行实现，最后落到能用的软件。</p>
-        </div>
-        <a class="btn btn--ghost" href="/research">全部方向 →</a>
-      </div>
-
-      <ul class="idx-list">
-        {research.map((r, i) => (
-          <li>
-            <a
-              class="idx-list__item"
-              href={`/research/${r.id}`}
-              data-reveal
-              style={`--d:${i * 0.05}s`}
-            >
-              <span class="idx-list__num">{String(i + 1).padStart(2, '0')}</span>
-              <span class="idx-list__title">{r.data.title}</span>
-              <span class="idx-list__text">{r.data.summary.replace(/。\s*$/, '')}</span>
-              <span class="idx-list__arrow" aria-hidden="true">→</span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
-
-  <!-- ============ 算例（深色，重点展示） ============ -->
-  <section class="media-band" id="cases">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-head__text">
-          <span class="eyebrow eyebrow--media">算例</span>
-          <h2 style="margin-top:.65rem">三个代表性算例</h2>
-          <p>切屑形成、温度场与力–时间曲线。下面四块媒体待替换为实测结果。</p>
-        </div>
-        <a class="btn btn--media-ghost" href="/research/cutting">切削方向 →</a>
-      </div>
-
-      <div class="media-grid">
-        <div class="span-12">
+        <div class="case-mini" data-reveal style="--d:.08s">
+          <span class="eyebrow">算例</span>
           <VideoCard
-            alt="金属切削过程仿真动画：切屑形成与温度演化"
-            badge="Simulation"
-            caption="正交切削：切屑形成与温度演化。替换为你的循环短片（720p / 5–10 s / 3 MB 以内）。"
-            meta="Animation · 待替换"
+            alt="正交切削过程仿真动画：切屑形成与温度演化"
+            badge="cuspic"
+            caption="正交切削：切屑形成、卷曲与温度演化。"
+            meta="Simulation · 待替换"
             placeholder="c"
-            placeholderLabel="替换：切削仿真循环短片（mp4）"
-            ratio="21 / 9"
+            placeholderLabel="替换：切削仿真循环短片（mp4 / 5–10 s / 3 MB 以内）"
+            ratio="16 / 9"
           />
-        </div>
-        <div class="span-4">
-          <FigureCard
-            alt="切削温度场云图"
-            caption="温度场分布，最高温出现在刀–屑接触区。"
-            meta="Temperature · 待替换"
-            placeholder="b"
-            placeholderLabel="替换：温度场云图"
-            ratio="1 / 1"
-          />
-        </div>
-        <div class="span-4">
-          <FigureCard
-            alt="等效塑性应变云图"
-            caption="等效塑性应变：主剪切带的局部化与切屑分离。"
-            meta="PEEQ · 待替换"
-            placeholder="a"
-            placeholderLabel="替换：等效塑性应变云图"
-            ratio="1 / 1"
-          />
-        </div>
-        <div class="span-4">
-          <FigureCard
-            alt="切削力与温度随时间变化曲线"
-            caption="切削力与最高温度的时间曲线，稳态段用于工艺对比。"
-            meta="Force / Temperature · 待替换"
-            placeholder="c"
-            placeholderLabel="替换：力–时间 / 温度–时间曲线"
-            ratio="1 / 1"
-          />
+
+          {
+            profile.metrics.length > 0 && (
+              <dl class="metric-strip">
+                {profile.metrics.map((m) => (
+                  <div>
+                    <dt class="metric-strip__k">{m.k}</dt>
+                    <dd class="metric-strip__v">{m.v}</dd>
+                  </div>
+                ))}
+              </dl>
+            )
+          }
+
+          <p class="case-mini__link">
+            <a class="link-quiet" href="/software/cuspic">了解 cuspic 求解器 →</a>
+          </p>
         </div>
       </div>
-
-      {
-        profile.metrics.length > 0 && (
-          <dl class="metric-strip">
-            {profile.metrics.map((m) => (
-              <div>
-                <dt class="metric-strip__k">{m.k}</dt>
-                <dd class="metric-strip__v">{m.v}</dd>
-              </div>
-            ))}
-          </dl>
-        )
-      }
     </div>
   </section>
 

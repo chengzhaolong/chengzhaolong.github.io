@@ -99,6 +99,8 @@ const profile = defineCollection({
     affiliation: z.string(),
     affiliation_en: z.string(),
     location: z.string(),
+    /** 首屏小照片（3:4 竖图）；不给则用 /media/portrait.svg 占位 */
+    photo: z.string().optional(),
     email: z.string(),
     tagline_zh: z.string(),
     tagline_en: z.string(),

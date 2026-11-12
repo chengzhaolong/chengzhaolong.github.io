@@ -34,7 +34,7 @@
 │  ├─ content.config.ts      # 内容集合的 schema（字段校验）
 │  ├─ content/research/      # 研究方向：一个方向一个 .mdx
 │  ├─ data/
-│  │  ├─ profile.yml         # 个人信息（姓名/单位/邮箱/简介/教育经历/算例指标）
+│  │  ├─ profile.yml         # 个人信息（姓名/单位/邮箱/照片/简介/教育经历/算例指标）
 │  │  ├─ publications.yml    # 论文列表
 │  │  └─ software.yml        # 软件条目（cuspic / cuttinglab）
 │  ├─ components/            # Nav / Footer / FigureCard / VideoCard / PubItem …
@@ -76,25 +76,25 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 | `title` / `title_en` | 身份，如「计算力学方向 直博生」 |
 | `affiliation` / `affiliation_en` | 单位 / 学院 / 实验室（带〔〕的是占位，务必替换） |
 | `email` | 全站的联系入口都用它 |
+| `photo` | 首屏右上角的小照片，默认 `/media/portrait.svg`（占位）；换成自己的照片后改成 `/media/portrait.jpg` |
 | `tagline_zh` / `tagline_en` | 首屏一句话 |
 | `intro_zh` / `intro_en` | 简介段落；用 `|-` 多行，空行分段 |
 | `interests` | 关键词，首页与 about 自动渲染 |
-| `timeline` | 教育/任职经历（`when` / `what` / `where` / `desc`），首页「简历摘要」与 `/about` 共用 |
-| `metrics` | 首页「算例」区的实测指标（`k` / `v`，4 项以内），如网格规模、GPU 加速比；没有实测数据就留空或删掉整段 |
+| `timeline` | 教育/任职经历（`when` / `what` / `where` / `desc`），只用于 `/about` 的时间线 |
+| `metrics` | 首页「算例」小面板的实测指标（`k` / `v`），如网格规模、GPU 加速比；没有实测数据就留空或删掉整段 |
 | `links` | `scholar` / `orcid` / `github` / `researchgate` / `bilibili` / `cv`，**留空则不显示** |
 
 #### 首页结构（`src/pages/index.astro`）
 
-顺序固定为 6 段，改文案直接改页面里的字符串，改数据改 YAML/MDX：
+顺序固定为 5 段，改文案直接改页面里的字符串，改数据改 YAML/MDX：
 
-1. **首屏**：只放身份 + 一句话 + 四个文本链接；`profile.name` 是唯一的 `h1`。背景图 `/media/hero-contour.svg` 右下角的图注是「这张图是什么」。
-2. **简介 + 简历摘要**：左栏 `intro_zh` + `interests`，右栏 `timeline[0]` 与一条手工摘要（在 `index.astro` 里改）。
-3. **研究方向**：自动读取 `research/*.mdx`，渲染为行列表（编号 / 标题 / `summary`）。
-4. **算例**：深色区，1 个视频 + 3 张图 + `metrics` 指标条。
-5. **自研工具**：深色区，自动读取 `software.yml`；卡片底部一行 `spec_line`。
-6. **论文**：取 3 条（`highlight: true` 优先）。
+1. **首屏（矮）**：`eyebrow` + 姓名 + 身份/单位 + 一句话 + 四个文本链接；右侧是 `profile.photo` 的小照片（点击进 `/about`）。`profile.name` 是唯一的 `h1`。
+2. **简介 + 算例**：左栏 `intro_zh` + `interests` + 「完整介绍与简历 →」；右栏一个算例短片（`VideoCard`，16:9），下面一行 `metrics` 指标，最后一行小字「了解 cuspic 求解器 →」。
+3. **自研工具**：深色区，自动读取 `software.yml`；卡片底部一行 `spec_line`。
+4. **论文**：取 3 条（`highlight: true` 优先）。
+5. **联系**：页面底部一行「联系」条；页脚只出现一次姓名。
 
-结语不是大 CTA，而是页面底部一行「联系」条；页脚只出现一次姓名。
+研究方向不再在首页展开（只保留首屏与导航入口），`/research` 各页照旧。
 
 ### 4.2 加一篇论文 — `src/data/publications.yml`
 
@@ -237,9 +237,9 @@ import peeq from '../assets/figures/peeq.png';
 占位内容在页面上都有明确标注（「待替换」/〔 〕），按下面顺序替换即可：
 
 - [ ] `profile.yml`：单位、邮箱、`links`（Scholar / ORCID / GitHub / B站）
-- [ ] 个人照片 → `public/media/portrait.jpg`，然后 `about.astro` 里 `FigureCard` 填 `src` 并删掉 `placeholderLabel`
+- [ ] 个人照片 → 放到 `public/media/portrait.jpg`（3:4 竖图，长边 1200 px 以内），把 `profile.yml` 的 `photo` 改成 `/media/portrait.jpg`
 - [ ] `publications.yml`：换成真实论文（含 BibTeX）
-- [ ] 首页媒体区：切屑动画 mp4 + 温度场 / 塑性应变 / 力曲线 3 张图
+- [ ] 首页算例短片：`index.astro` 里 `VideoCard` 填 `src`（mp4，5–10 s，3 MB 以内），并删掉 `placeholderLabel`；`metrics` 换成实测值
 - [ ] 4 个研究方向：把各页 `FigureCard` 的 `src` 填上真实结果图；`profile.yml` / MDX 里〔待填〕的技术参数补齐
 - [ ] `software.yml`：版本、许可、平台、输出格式
 - [ ] `software/[slug].astro` 里 `perf` 数组换成实测加速比，算例表里的「耗时」补上

@@ -9,39 +9,45 @@
   demo: true
 
   name: 成朝龙
-  name_en: Chaolong Cheng
-  latin: CHAOLONG CHENG
+  name_en: Zhaolong Cheng
+  latin: ZHAOLONG CHENG
 
-  title: 计算力学方向 直博生
+  title: 计算力学博士研究生
   title_en: Ph.D. Candidate in Computational Mechanics
 
   # 单位 / 实验室
-  affiliation: 〔学校 · 学院 · 实验室〕
+  affiliation: 〔大连理工大学 · 力学与航空航天学院〕
   affiliation_en: 〔University · School · Lab〕
   location: 中国
 
+  # 首屏小照片（3:4 竖图）。换成自己的照片后，把这里改成 /media/portrait.jpg
+  photo: /media/portrait.svg
+
   # 邮箱（建议用图片或表单方式防爬，见 README）
-  email: chengchaolong@example.com
+  email: chengzhaolong@mail.dlut.edu.cn
 
   # 首屏一句话（同时也是 meta description 的一部分，写"做什么"而不是口号）
-  tagline_zh: 用有限元与物质点法耦合求解大变形、强热力耦合的金属切削过程，并做到 GPU 上跑得动工程尺度的算例。
+  tagline_zh: 大变形非线性热力耦合求解器算法研究及软件开发
   tagline_en: Large-deformation thermo-mechanical cutting — solved accurately and fast.
 
   intro_zh: |-
-    我是一名计算力学方向直博生。研究围绕大变形、强非线性、强热力耦合的金属切削过程展开：用有限元（FEM）描述工件与刀具的连续变形和热传导，用物质点法（MPM）处理切屑分离与极端变形，通过 FEM–MPM 耦合算法与 GPU 并行，把工业尺度的切削仿真做到可用的精度与速度。为此我开发了求解器 cuspic 与仿真软件 Cusper CuttingLab。
+    我对工业CAE求解器算法及软件研发感兴趣, 希望和大家一起交流学习。
+    我的研究方向是热力耦合有限元-无网格法耦合算法、热力接触算法及其高性能计算实现。
+    我开发了CUSPIC (Coupled Unified Solver with PIC-FEM)高性能热力耦合非线性PIC-FEM显式动力求解器。
+    针对金属切削仿真的Cusper CuttingLab软件, 用于金属切削加工仿真。
 
   intro_en: |-
     I am a Ph.D. candidate in computational mechanics. My research targets metal cutting processes dominated by large deformation, strong non-linearity and thermo-mechanical coupling: the finite element method resolves the continuum response of workpiece and tool, the material point method handles chip separation and extreme distortion, and a FEM–MPM coupling scheme together with GPU parallelism makes industrial-scale cutting simulation both accurate and affordable. I build and maintain the cuspic solver and the Cusper CuttingLab application.
 
   interests:
     - 大变形热力耦合
-    - FEM–MPM 耦合
+    - FEM–MPM耦合
+    - 高性能计算 / GPU并行计算
+    - 热力接触与摩擦
+    - 热流固耦合问题
     - 金属切削加工仿真
-    - 高性能计算 / GPU 并行
-    - 接触与摩擦
-    - 材料本构与断裂
 
-  # 教育/任职经历：首页「简历摘要」与 /about 页共用，一处维护
+  # 教育/任职经历：只用于 /about 的时间线，一处维护
   timeline:
     - when: 〔20XX〕— 至今
       what: 博士研究生（直博）· 计算力学
@@ -52,7 +58,7 @@
       where: 〔学校〕
       desc: 〔可写：毕业论文题目、科研训练、竞赛与奖学金〕
 
-  # 首页「算例」区的实测指标（等宽字体横排，4 项以内最好看）
+  # 首页「算例」小面板的实测指标（等宽字体横排，4 项以内最好看）
   metrics:
     - k: 网格规模
       v: 〔2.1 M〕

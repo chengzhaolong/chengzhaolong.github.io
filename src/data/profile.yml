@@ -21,7 +21,7 @@
   location: 中国
 
   # 首屏小照片（3:4 竖图）。换成自己的照片后，把这里改成 /media/portrait.jpg
-  photo: /media/portrait.svg
+  photo: /media/portrait.jpg
 
   # 邮箱（建议用图片或表单方式防爬，见 README）
   email: chengzhaolong@mail.dlut.edu.cn
@@ -33,8 +33,8 @@
   intro_zh: |-
     我对工业CAE求解器算法及软件研发感兴趣, 希望和大家一起交流学习。
     我的研究方向是热力耦合有限元-无网格法耦合算法、热力接触算法及其高性能计算实现。
-    我开发了CUSPIC (Coupled Unified Solver with PIC-FEM)高性能热力耦合非线性PIC-FEM显式动力求解器。
-    针对金属切削仿真的Cusper CuttingLab软件, 用于金属切削加工仿真。
+    我开发了CUSPIC (Coupled Unified Solver with PIC-FEM)高性能PIC-FEM显式动力求解器和
+    CUSPER-CuttingLab软件, 用于机械加工工艺物理仿真的快速建模和高效后处理，能够基于CUSPIC使用消费级GPU对大型金属切削问题进行高效仿真。
 
   intro_en: |-
     I am a Ph.D. candidate in computational mechanics. My research targets metal cutting processes dominated by large deformation, strong non-linearity and thermo-mechanical coupling: the finite element method resolves the continuum response of workpiece and tool, the material point method handles chip separation and extreme distortion, and a FEM–MPM coupling scheme together with GPU parallelism makes industrial-scale cutting simulation both accurate and affordable. I build and maintain the cuspic solver and the Cusper CuttingLab application.

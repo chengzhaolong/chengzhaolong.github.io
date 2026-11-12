@@ -34,10 +34,11 @@ if (!entry) {
 }
 const profile = entry.data;
 
-const pageTitle = title
-  ? `${title} · ${profile.name}`
-  : `${profile.name} · ${profile.title}`;
-const desc = description ?? `${profile.tagline_zh}${profile.title}，研究方向：${profile.interests.join('、')}。`;
+const siteName = lang === 'en' ? profile.name_en : profile.name;
+const suffix = profile.site_suffix || profile.title;
+const pageTitle = title ? `${title} · ${siteName}` : `${siteName} · ${suffix}`;
+const desc =
+  description ?? `${profile.tagline_zh}。${profile.interests.join('、')}。`;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL(image, Astro.site).href;

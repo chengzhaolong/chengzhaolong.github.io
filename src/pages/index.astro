@@ -15,8 +15,8 @@ const portrait = profile.photo ?? '/media/portrait.svg';
 ---
 
 <Base
-  description={`${profile.name}，${profile.title}，${profile.affiliation}。研究方向：${profile.interests
-    .slice(0, 4)
+  description={`${profile.name}：${profile.tagline_zh}。CUSPIC 求解器与 CUSPER CuttingLab 作者，${profile.interests
+    .slice(0, 3)
     .join('、')}。`}
 >
   <!-- ============ 首屏：姓名退后，照片与工作在前 ============ -->
@@ -29,11 +29,11 @@ const portrait = profile.photo ?? '/media/portrait.svg';
       <div class="hero__text">
         <p class="hero__eyebrow">热力耦合 · 高性能 · 非线性 · CAE求解器</p>
         <h1 class="hero__title">{profile.name}</h1>
-        <p class="hero__affil">{profile.title} · {profile.affiliation}</p>
+        <p class="hero__affil">{profile.role_short ?? profile.title} · {profile.affiliation}</p>
         <p class="hero__lede">{profile.tagline_zh}</p>
 
         <p class="link-row">
-          <a href="/research">研究方向</a>
+          <a href="/notes">笔记</a>
           <span class="link-row__sep" aria-hidden="true">·</span>
           <a href="/software">软件</a>
           <span class="link-row__sep" aria-hidden="true">·</span>

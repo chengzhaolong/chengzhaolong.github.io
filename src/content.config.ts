@@ -3,30 +3,19 @@ import { file, glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 /**
- * 研究方向：一篇一个 mdx 文件，正文写中文，frontmatter 里给英文摘要，
- * 供 /en/ 简短版复用。新增方向 = 在 src/content/research 加一个文件。
+ * 笔记（技术写作）：一篇一个 mdx，放在 src/content/notes/。
+ * 文件名即 URL：/notes/<文件名>。写完一篇放进目录就会自动出现在列表里。
  */
-const research = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/research' }),
+const notes = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/notes' }),
   schema: z.object({
     title: z.string(),
-    /** 英文标题，用于 /en/ 列表 */
-    title_en: z.string(),
-    /** 卡片上的一两句话概述（中文） */
+    /** 一句话说明这篇回答什么问题（列表页与 meta description 都取它） */
     summary: z.string(),
-    /** 一两句英文概述，用于 /en/ */
-    summary_en: z.string(),
-    /** 排序，越小越靠前 */
-    order: z.number().default(99),
+    date: z.coerce.date(),
     tags: z.array(z.string()).default([]),
-    /** 卡片/详情页顶图；留空则显示占位云图 */
-    figure: z.string().optional(),
-    figure_alt: z.string().optional(),
-    figure_caption: z.string().optional(),
-    /** 占位云图配色，a / b / c */
-    placeholder: z.enum(['a', 'b', 'c']).default('a'),
-    /** 关联软件 id（cuspic / cuttinglab） */
-    software: z.array(z.string()).default([]),
+    /** 草稿：不进列表、不生成路由 */
+    draft: z.boolean().default(false),
   }),
 });
 
@@ -96,6 +85,11 @@ const profile = defineCollection({
     latin: z.string(),
     title: z.string(),
     title_en: z.string(),
+    /** 首屏身份行用的短标签（写作品/工具，不写头衔）；不填则用 title */
+    role_short: z.string().optional(),
+    role_short_en: z.string().optional(),
+    /** 浏览器标题后缀，写技术定位而不是头衔；不填则退回 title */
+    site_suffix: z.string().optional(),
     affiliation: z.string(),
     affiliation_en: z.string(),
     location: z.string(),
@@ -133,4 +127,4 @@ const profile = defineCollection({
   }),
 });
 
-export const collections = { research, publications, software, profile };
+export const collections = { notes, publications, software, profile };

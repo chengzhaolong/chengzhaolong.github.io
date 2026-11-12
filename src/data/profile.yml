@@ -15,10 +15,17 @@
   title: 计算力学博士研究生
   title_en: Ph.D. Candidate in Computational Mechanics
 
+  # 首屏身份行（写作品，不写头衔）
+  role_short: CUSPIC 作者
+  role_short_en: CUSPIC author
+
+  # 浏览器标题后缀（写技术定位）
+  site_suffix: CUSPIC · 切削仿真
+
   # 单位 / 实验室
-  affiliation: 〔大连理工大学 · 力学与航空航天学院〕
-  affiliation_en: 〔University · School · Lab〕
-  location: 中国
+  affiliation: 大连理工大学
+  affiliation_en: Dalian University of Technology
+  location: 中国 · 大连
 
   # 首屏小照片（3:4 竖图）。换成自己的照片后，把这里改成 /media/portrait.jpg
   photo: /media/portrait.jpg

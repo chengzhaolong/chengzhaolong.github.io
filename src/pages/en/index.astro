@@ -3,7 +3,9 @@ import Base from '../../layouts/Base.astro';
 import { getCollection, getEntry } from 'astro:content';
 
 const profile = (await getEntry('profile', 'main'))!.data;
-const research = (await getCollection('research')).sort((a, b) => a.data.order - b.data.order);
+const notes = (await getCollection('notes'))
+  .filter((n) => !n.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 const pubs = (await getCollection('publications'))
   .sort((a, b) => b.data.year - a.data.year)
   .slice(0, 5);
@@ -14,8 +16,8 @@ const bioParagraphs = profile.intro_en.split('\n\n');
 
 <Base
   lang="en"
-  title="Chaolong Cheng · Computational Mechanics"
-  description="Ph.D. candidate in computational mechanics working on large-deformation thermo-mechanical coupling, FEM–MPM coupling, metal cutting simulation and GPU computing."
+  title="CUSPIC · FEM–MPM cutting simulation"
+  description="Author of CUSPIC, a GPU-accelerated FEM–MPM solver for large-deformation thermo-mechanical metal cutting simulation."
 >
   <header class="page-head page-head--media">
     <div class="hero__media">
@@ -27,7 +29,7 @@ const bioParagraphs = profile.intro_en.split('\n\n');
         {profile.name_en}
       </h1>
       <p class="page-head__lede" style="font-size:1.1rem">
-        {profile.title_en} · {profile.affiliation_en}
+        {profile.role_short_en ?? profile.title_en} · {profile.affiliation_en}
       </p>
       <div class="cluster" style="margin-top:1.25rem">
         {profile.interests.slice(0, 4).map((i) => <span class="badge badge--media">{i}</span>)}
@@ -50,28 +52,35 @@ const bioParagraphs = profile.intro_en.split('\n\n');
     </div>
   </section>
 
+  {
+    notes.length > 0 && (
   <section class="section--tight section--line">
     <div class="container">
       <div class="section-head">
         <div class="section-head__text">
-          <span class="eyebrow">Research</span>
-          <h2 style="margin-top:.6rem">Research directions</h2>
+          <span class="eyebrow">Notes</span>
+          <h2 style="margin-top:.6rem">Technical notes</h2>
+          <p>Design trade-offs, failed attempts and the numbers behind the papers. Written in Chinese.</p>
         </div>
+        <a class="btn btn--ghost" href="/notes">All notes →</a>
       </div>
 
       <div class="card-grid card-grid--2">
-        {research.map((r) => (
-          <article class="feature" data-reveal>
-            <h3>{r.data.title_en}</h3>
-            <p>{r.data.summary_en}</p>
-            <p class="mono" style="margin-top:.6rem;font-size:.72rem;color:var(--ink-3)">
-              {r.data.tags.join(' · ')}
-            </p>
-          </article>
-        ))}
+        {
+          notes.map((n) => (
+            <a class="card card--accent" href={`/notes/${n.id}`} data-reveal>
+              <span class="card__meta">{n.data.date.toISOString().slice(0, 10)}</span>
+              <span class="card__title">{n.data.title}</span>
+              <span class="card__text">{n.data.summary}</span>
+              <span class="card__cta">Read</span>
+            </a>
+          ))
+        }
       </div>
     </div>
   </section>
+    )
+  }
 
   <section class="section--tight">
     <div class="container">

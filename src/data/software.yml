@@ -40,7 +40,7 @@
       v: 〔Linux / Windows，待填〕
   links:
     - label: 申请试用 / 技术交流
-      href: mailto:chengchaolong@example.com
+      href: mailto:chengzhaolong@mail.dlut.edu.cn
       variant: primary
     - label: 架构与算例
       href: /software/cuspic
@@ -81,7 +81,7 @@
       v: 〔使用手册 / 教程视频，待补〕
   links:
     - label: 邮件申请试用
-      href: mailto:chengchaolong@example.com
+      href: mailto:chengzhaolong@mail.dlut.edu.cn
       variant: primary
     - label: 功能与工作流
       href: /software/cuttinglab

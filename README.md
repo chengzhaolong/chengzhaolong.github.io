@@ -14,7 +14,7 @@
 | 项 | 选择 | 说明 |
 | --- | --- | --- |
 | 框架 | **Astro 7**（static，TS strict） | 零 JS 默认，岛式脚本只在需要时加载 |
-| 内容 | Content Collections + `file()` / `glob()` loader | 论文、软件是 YAML；研究方向是 MDX |
+| 内容 | Content Collections + `file()` / `glob()` loader | 论文、软件、个人信息是 YAML；笔记是 MDX |
 | 样式 | 原生 CSS + CSS 变量（`src/styles/global.css`） | 无 Tailwind，改 token 即换风格 |
 | 字体 | `@fontsource-variable` 自托管（Inter / Source Serif 4 / JetBrains Mono） | 拉丁子集按 `unicode-range` 懒加载；中文走系统字体栈 |
 | 图片 | `astro:assets`（sharp） | 真实图片可自动生成多尺寸 srcset |
@@ -32,7 +32,7 @@
 ├─ scripts/make-og.mjs       # svg → png
 ├─ src/
 │  ├─ content.config.ts      # 内容集合的 schema（字段校验）
-│  ├─ content/research/      # 研究方向：一个方向一个 .mdx
+│  ├─ content/notes/         # 笔记：一篇一个 .mdx（文件名即 URL）
 │  ├─ data/
 │  │  ├─ profile.yml         # 个人信息（姓名/单位/邮箱/照片/简介/教育经历/算例指标）
 │  │  ├─ publications.yml    # 论文列表
@@ -43,7 +43,7 @@
 │  │  ├─ index.astro         # 首页
 │  │  ├─ about.astro
 │  │  ├─ publications.astro
-│  │  ├─ research/index.astro + [slug].astro
+│  │  ├─ notes/index.astro + [slug].astro
 │  │  ├─ software/index.astro + [slug].astro
 │  │  ├─ en/index.astro      # 英文单页
 │  │  └─ 404.astro
@@ -73,10 +73,12 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 | --- | --- |
 | `demo` | `true` 时论文页会显示「示例数据」提示。全部换成真实内容后改为 `false` |
 | `name` / `name_en` / `latin` | 中文名 / 英文名 / 全大写英文名（页脚、导航用） |
-| `title` / `title_en` | 身份，如「计算力学方向 直博生」 |
+| `title` / `title_en` | 学术身份，用于结构化数据（JSON-LD 的 `jobTitle`）与 `/about` |
+| `role_short` | 首屏身份行的短标签，写作品不写头衔，如「CUSPIC 作者」；不填则用 `title` |
+| `site_suffix` | 浏览器标题后缀，如「CUSPIC · 切削仿真」；不填则用 `title` |
 | `affiliation` / `affiliation_en` | 单位 / 学院 / 实验室（带〔〕的是占位，务必替换） |
 | `email` | 全站的联系入口都用它 |
-| `photo` | 首屏右上角的小照片，默认 `/media/portrait.svg`（占位）；换成自己的照片后改成 `/media/portrait.jpg` |
+| `photo` | 首屏的小照片（3:4 竖图），放在 `public/media/` 下，填 `/media/portrait.jpg` |
 | `tagline_zh` / `tagline_en` | 首屏一句话 |
 | `intro_zh` / `intro_en` | 简介段落；用 `|-` 多行，空行分段 |
 | `interests` | 关键词，首页与 about 自动渲染 |
@@ -94,7 +96,7 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 4. **论文**：取 3 条（`highlight: true` 优先）。
 5. **联系**：页面底部一行「联系」条；页脚只出现一次姓名。
 
-研究方向不再在首页展开（只保留首屏与导航入口），`/research` 各页照旧。
+「研究」模块已下线：首页只留首屏与导航入口，方法层面的长文统一写进 `/notes`（笔记）。
 
 ### 4.2 加一篇论文 — `src/data/publications.yml`
 
@@ -114,11 +116,11 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
   links: { pdf: '', doi: '', code: '', data: '' }   # 留空不显示徽章
   bibtex: |
     @article{...}
-  tags: [FEM–MPM, 切削]        # 用于「研究方向」页的相关论文联动
+  tags: [FEM–MPM, 切削]        # 便于检索，也与笔记/软件的标签呼应
 ```
 
 要点：
-- `tags` 与研究方向的 `tags` 有交集时，该论文会自动出现在对应研究方向的「相关论文」里。
+- `tags` 只是检索用：首页、`/publications` 按年份分组展示，不做联动跳转。
 - `bibtex` 会渲染成「复制 BibTeX」按钮；不要的话删掉该字段即可。
 - `doi` 可以只写 `10.xxxx/xxxxx`，页面会自动补 `https://doi.org/`。
 
@@ -151,22 +153,30 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 详情页路由由 id 决定：`/software/cuspic`、`/software/cuttinglab`。
 若要加第三个软件，直接在 YAML 末尾追加一个条目即可，列表与详情页会自动生成。
 
-### 4.4 研究方向 — `src/content/research/*.mdx`
+### 4.4 写笔记 — `src/content/notes/*.mdx`
 
-frontmatter：
+笔记 = 技术写作，回答「为什么这么做、试过什么、数对不对」。**写一篇 = 新建一个 `.mdx`**，
+文件名就是 URL（`gpu-particle-loop.mdx` → `/notes/gpu-particle-loop`），不用改任何页面代码。
 
-```yaml
-title: 大变形热力耦合          # 中文标题（必填）
-title_en: Large-deformation thermo-mechanical coupling   # 英文标题
-summary: 一句话概述（首页卡片）
-summary_en: 一句话英文概述（/en/ 用）
-order: 1                      # 排序
-tags: [热力耦合, 大变形]       # 与论文 tags 联动
-placeholder: a                # 占位云图配色：a / b / c
-software: [cuspic]            # 关联软件 id
+```mdx
+---
+title: 接触界面：嵌入拉格朗日表面，还是点–面罚函数？
+summary: 一句话说明这篇回答什么问题（列表页与 meta description 都取它）
+date: 2026-03-01
+tags: [MPM, 接触算法]
+draft: false          # true = 不进列表、不生成路由
+---
+
+正文用普通 Markdown；`##` 二级标题会自动进入右侧目录。
 ```
 
-正文就是普通 Markdown。要插图，在正文里用组件（MDX 需要先 `import`）：
+- 列表页 `/notes` 顶部是已发布文章，下面是页面里 `planned` 数组维护的「在写」选题；
+  某条写完后，把对应条目从 `planned` 删掉即可。
+- `src/content/notes/draft-template.mdx` 是一份 `draft: true` 的模板，复制改名再写内容；
+  它不会出现在站点上。
+- 中文首页保持精简：只在首屏链接行留「笔记」入口；`/en/` 会自动列出最新笔记（无笔记时整块不渲染）。
+
+要插图，在正文里用组件（MDX 需要先 `import`）：
 
 ```mdx
 import FigureCard from '../../components/FigureCard.astro';
@@ -255,7 +265,7 @@ import peeq from '../assets/figures/peeq.png';
 - [ ] 个人照片 → 放到 `public/media/portrait.jpg`（3:4 竖图，长边 1200 px 以内），把 `profile.yml` 的 `photo` 改成 `/media/portrait.jpg`
 - [ ] `publications.yml`：换成真实论文（含 BibTeX）
 - [ ] 首页算例短片：`index.astro` 里 `VideoCard` 填 `src`（mp4，5–10 s，3 MB 以内），并删掉 `placeholderLabel`；`metrics` 换成实测值
-- [ ] 4 个研究方向：把各页 `FigureCard` 的 `src` 填上真实结果图；`profile.yml` / MDX 里〔待填〕的技术参数补齐
+- [ ] 技术笔记：把 `/notes` 里「在写」的四条逐个写成 `src/content/notes/*.mdx`，写完从 `planned` 删掉
 - [ ] `software.yml`：版本、许可、平台、输出格式
 - [ ] `software/[slug].astro` 里 `perf` 数组换成实测加速比，算例表里的「耗时」补上
 - [ ] `public/og-image.svg` 的文案（改完跑 `npm run og`）

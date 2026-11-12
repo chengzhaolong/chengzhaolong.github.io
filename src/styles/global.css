@@ -812,6 +812,13 @@ a.badge:hover {
   color: inherit;
 }
 
+/* 不可点击的信息卡（如「在写」选题）：不响应 hover */
+.card--static:hover {
+  border-color: var(--line);
+  box-shadow: none;
+  transform: none;
+}
+
 .card__title {
   font-family: var(--f-display);
   font-size: var(--fs-h3);

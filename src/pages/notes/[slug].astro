@@ -1,0 +1,115 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('notes'))
+    .filter((n) => !n.data.draft)
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  return posts.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, newer: posts[i - 1], older: posts[i + 1] },
+  }));
+}
+
+const { entry, newer, older } = Astro.props;
+const { data } = entry;
+const { Content, headings } = await render(entry);
+
+const fmt = (d: Date) => d.toISOString().slice(0, 10);
+const toc = headings.filter((h) => h.depth === 2);
+const postCount = (await getCollection('notes')).filter((n) => !n.data.draft).length;
+---
+
+<Base title={`${data.title} · 笔记`} description={data.summary}>
+  <header class="page-head">
+    <div class="container">
+      <nav class="crumb" aria-label="面包屑">
+        <a href="/">首页</a>
+        <span aria-hidden="true">/</span>
+        <a href="/notes">笔记</a>
+      </nav>
+      <h1 class="page-head__title">{data.title}</h1>
+      <p class="mono" style="margin-top:.6rem;color:var(--ink-3);font-size:.8rem">{fmt(data.date)}</p>
+      <p class="lead page-head__lede">{data.summary}</p>
+      <div class="cluster" style="margin-top:1.25rem">
+        {data.tags.map((t) => <span class="badge">{t}</span>)}
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="detail-grid">
+        <article class="prose" data-reveal>
+          <Content />
+        </article>
+
+        <aside class="detail-aside">
+          {
+            toc.length > 1 && (
+              <div class="aside-block">
+                <p class="card__meta">On this page</p>
+                <ul class="aside-toc">
+                  {toc.map((h) => (
+                    <li>
+                      <a href={`#${h.slug}`}>{h.text}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+
+          <div class="aside-block">
+            <p class="card__meta">全部笔记</p>
+            <ul class="focus-list">
+              <li>
+                <a href="/notes">
+                  <span class="mono">▸</span>笔记列表（{postCount} 篇）
+                </a>
+              </li>
+              <li>
+                <a href="/publications">
+                  <span class="mono">▸</span>论文与专利
+                </a>
+              </li>
+              <li>
+                <a href="/software">
+                  <span class="mono">▸</span>CUSPIC / CuttingLab
+                </a>
+              </li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="container">
+      <div class="pager">
+        {
+          newer ? (
+            <a class="pager__item" href={`/notes/${newer.id}`}>
+              <span class="card__meta">← 更新的一篇</span>
+              <span class="pager__title">{newer.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          older ? (
+            <a class="pager__item pager__item--next" href={`/notes/${older.id}`}>
+              <span class="card__meta">更早的一篇 →</span>
+              <span class="pager__title">{older.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )
+        }
+      </div>
+    </div>
+  </section>
+</Base>

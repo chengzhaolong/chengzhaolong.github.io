@@ -41,7 +41,7 @@ const publications = defineCollection({
     venue: z.string(),
     venue_short: z.string().optional(),
     year: z.number(),
-    type: z.enum(['journal', 'conference', 'preprint']).default('journal'),
+    type: z.enum(['journal', 'conference', 'preprint', 'patent']).default('journal'),
     /** 置顶：首页「最新论文」优先取这些 */
     highlight: z.boolean().default(false),
     /** 例如 "in press" / "under review" */

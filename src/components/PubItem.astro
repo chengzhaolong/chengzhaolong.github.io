@@ -22,7 +22,7 @@ interface Props {
 
 const { pub, index, me = 'Chaolong Cheng', showBibtex = true } = Astro.props;
 
-const typeLabel = { journal: '期刊', conference: '会议', preprint: '预印本' }[pub.type] ?? '论文';
+const typeLabel = { journal: '期刊', conference: '会议', preprint: '预印本', patent: '专利' }[pub.type] ?? '论文';
 
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

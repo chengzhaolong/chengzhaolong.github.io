@@ -108,7 +108,7 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
   venue: Computer Methods in Applied Mechanics and Engineering
   venue_short: CMAME          # 可选，缩写
   year: 2026
-  type: journal               # journal | conference | preprint
+  type: journal               # journal | conference | preprint | patent
   highlight: true             # 首页「代表性论文」优先取
   status: in press            # 可选，显示为角标
   links: { pdf: '', doi: '', code: '', data: '' }   # 留空不显示徽章
@@ -121,6 +121,21 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 - `tags` 与研究方向的 `tags` 有交集时，该论文会自动出现在对应研究方向的「相关论文」里。
 - `bibtex` 会渲染成「复制 BibTeX」按钮；不要的话删掉该字段即可。
 - `doi` 可以只写 `10.xxxx/xxxxx`，页面会自动补 `https://doi.org/`。
+
+**专利**用同一套字段，把 `type` 写成 `patent` 即可（角标显示「专利」）。不想逐条列发明人时，`authors` 直接写专利权人（单位），完整发明人留在 `bibtex` 里：
+
+```yaml
+- id: zhang2026-patent-embedded-contact
+  title: 一种用于多体接触问题的表面嵌入物质点方法
+  authors: [大连理工大学, 中国核电工程有限公司]
+  venue: 中国发明专利
+  venue_short: CN121031225B   # 公告号，显示为「中国发明专利 (CN121031225B), 2026」
+  year: 2026
+  type: patent
+  status: 已授权
+  bibtex: |
+    @patent{CN121031225B, ...}
+```
 
 ### 4.3 软件 — `src/data/software.yml`
 

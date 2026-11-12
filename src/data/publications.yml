@@ -6,7 +6,7 @@
 #   title_zh    中文译名（可选，列表里作为副标题）
 #   authors     作者数组，本人姓名写 "Chaolong Cheng" 会被自动加粗
 #   venue       期刊 / 会议全称
-#   type        journal | conference | preprint
+#   type        journal | conference | preprint | patent
 #   highlight   true = 首页「最新论文」优先展示
 #   links       pdf / doi / code / data，留空则不显示徽章
 #   bibtex      原样字符串，页面上可一键复制
@@ -38,6 +38,38 @@
       journal = {International Journal for Numerical Methods in Engineering},
       year    = {2026},
       doi     = {10.1002/nme.70260}
+    }
+  tags:
+    - MPM
+    - 表面嵌入接触算法
+
+# 专利：type 写 patent，作者栏可直接写专利权人（单位）
+- id: zhang2026-patent-embedded-contact
+  title: 一种用于多体接触问题的表面嵌入物质点方法
+  authors:
+    - 大连理工大学
+    - 中国核电工程有限公司
+  venue: 中国发明专利
+  venue_short: CN121031225B
+  year: 2026
+  type: patent
+  highlight: false
+  status: 已授权
+  links:
+    pdf: ''
+    doi: ''
+    code: ''
+  bibtex: |
+    @patent{CN121031225B,
+      author      = {张盛 and 成朝龙 and 张世超 and 李云鹏 and 姚伟岸 and 叶宏飞 and 王骥骁 and 杨林民 and 郑修鹏 and 王艳苹 and 刘诗华},
+      title       = {一种用于多体接触问题的表面嵌入物质点方法},
+      number      = {CN121031225B},
+      type        = {中国发明专利},
+      year        = {2026},
+      month       = {feb},
+      day         = {3},
+      assignee    = {大连理工大学 and 中国核电工程有限公司},
+      nationality = {CN}
     }
   tags:
     - MPM

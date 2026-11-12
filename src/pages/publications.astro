@@ -13,6 +13,7 @@ const counts = {
   journal: pubs.filter((p) => p.data.type === 'journal').length,
   conference: pubs.filter((p) => p.data.type === 'conference').length,
   preprint: pubs.filter((p) => p.data.type === 'preprint').length,
+  patent: pubs.filter((p) => p.data.type === 'patent').length,
 };
 
 // 连续编号（跨年份）
@@ -37,6 +38,7 @@ const numbered = pubs.map((p) => ({ pub: p, index: ++n }));
         <span class="badge">期刊 {counts.journal}</span>
         <span class="badge">会议 {counts.conference}</span>
         <span class="badge">预印本 {counts.preprint}</span>
+        {counts.patent > 0 && <span class="badge">专利 {counts.patent}</span>}
       </div>
 
       <div class="cluster" style="margin-top:1rem">

@@ -33,7 +33,7 @@
   intro_zh: |-
     我对工业CAE求解器算法及软件研发感兴趣, 希望和大家一起交流学习。
     我的研究方向是热力耦合有限元-无网格法耦合算法、热力接触算法及其高性能计算实现。
-    我开发了CUSPIC (Coupled Unified Solver with PIC-FEM)高性能PIC-FEM显式动力求解器和
+    我开发了CUSPIC (Coupled Unified Solver with PIC-FEM)高性能PIC-FEM显式动力求解器和与其适配的
     CUSPER-CuttingLab软件, 用于机械加工工艺物理仿真的快速建模和高效后处理，能够基于CUSPIC使用消费级GPU对大型金属切削问题进行高效仿真。
 
   intro_en: |-
@@ -47,32 +47,10 @@
     - 热流固耦合问题
     - 金属切削加工仿真
 
-  # 教育/任职经历：只用于 /about 的时间线，一处维护
-  timeline:
-    - when: 〔20XX〕— 至今
-      what: 博士研究生（直博）· 计算力学
-      where: 〔学校 · 学院 · 实验室〕
-      desc: 大变形热力耦合、FEM–MPM 耦合与高性能计算。
-    - when: 〔20XX〕—〔20XX〕
-      what: 本科 · 〔专业〕
-      where: 〔学校〕
-      desc: 〔可写：毕业论文题目、科研训练、竞赛与奖学金〕
-
-  # 首页「算例」小面板的实测指标（等宽字体横排，4 项以内最好看）
-  metrics:
-    - k: 网格规模
-      v: 〔2.1 M〕
-    - k: 粒子数
-      v: 〔8.4 M〕
-    - k: GPU 加速比
-      v: 〔×17.6〕
-    - k: 单算例耗时
-      v: 〔≈ 3.5 h〕
-
   # 只填你有的，留空则不显示
   links:
     scholar: ''
-    orcid: ''
+    orcid: 'https://orcid.org/0009-0008-8757-7836'
     github: ''
     researchgate: ''
     bilibili: ''

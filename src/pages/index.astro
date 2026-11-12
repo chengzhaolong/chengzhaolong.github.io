@@ -27,7 +27,7 @@ const portrait = profile.photo ?? '/media/portrait.svg';
 
     <div class="hero__inner">
       <div class="hero__text">
-        <p class="hero__eyebrow">FEM–MPM · 切削仿真 · GPU</p>
+        <p class="hero__eyebrow">热力耦合 · 高性能 · 非线性 · CAE求解器</p>
         <h1 class="hero__title">{profile.name}</h1>
         <p class="hero__affil">{profile.title} · {profile.affiliation}</p>
         <p class="hero__lede">{profile.tagline_zh}</p>
@@ -68,30 +68,19 @@ const portrait = profile.photo ?? '/media/portrait.svg';
           <span class="eyebrow">算例</span>
           <VideoCard
             src="/media/videos/cut3d1.mp4"
-            alt="正交切削过程仿真动画：切屑形成与温度演化"
+            poster="/media/videos/cut3d1.png"
+            autoplay
+            alt="CUSPIC案例：三维微铣削仿真（FEM-MPM热力耦合）"
             badge="cuspic"
-            caption="正交切削：切屑形成、卷曲与温度演化。"
-            meta="Simulation · 待替换"
+            caption="CUSPIC案例：三维微铣削仿真（FEM-MPM热力耦合）"
+            meta="Simulation · "
             placeholder="c"
-            placeholderLabel="替换：切削仿真循环短片（mp4 / 5–10 s / 3 MB 以内）"
+            placeholderLabel="切削仿真循环短片"
             ratio="16 / 9"
           />
 
-          {
-            profile.metrics.length > 0 && (
-              <dl class="metric-strip">
-                {profile.metrics.map((m) => (
-                  <div>
-                    <dt class="metric-strip__k">{m.k}</dt>
-                    <dd class="metric-strip__v">{m.v}</dd>
-                  </div>
-                ))}
-              </dl>
-            )
-          }
-
           <p class="case-mini__link">
-            <a class="link-quiet" href="/software/cuspic">了解 cuspic 求解器 →</a>
+            <a class="link-quiet" href="/software/cuspic">了解 CUSPIC 求解器, 使用消费级GPU将FEM-MPM热力耦合切削仿真加速50倍 →</a>
           </p>
         </div>
       </div>
@@ -105,7 +94,7 @@ const portrait = profile.photo ?? '/media/portrait.svg';
         <div class="section-head__text">
           <span class="eyebrow eyebrow--media">软件</span>
           <h2 style="margin-top:.65rem">自研工具</h2>
-          <p>底层是 cuspic，上层是 Cusper CuttingLab：一个管精度与速度，一个管流程与可用性。</p>
+          <p>基于高性能FEM-MPM算法，加速制造工艺改进</p>
         </div>
         <a class="btn btn--media-ghost" href="/software">软件总览 →</a>
       </div>
@@ -125,9 +114,8 @@ const portrait = profile.photo ?? '/media/portrait.svg';
     <div class="container">
       <div class="section-head">
         <div class="section-head__text">
-          <span class="eyebrow">论文</span>
-          <h2 style="margin-top:.65rem">代表性论文</h2>
-          <p>完整列表含 BibTeX、DOI 与代码链接。</p>
+          <span class="eyebrow">Publications</span>
+          <h2 style="margin-top:.65rem">Publications</h2>
         </div>
         <a class="btn btn--ghost" href="/publications">全部论文 →</a>
       </div>

@@ -1,8 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection, getEntry } from 'astro:content';
-import FigureCard from '../../components/FigureCard.astro';
-import VideoCard from '../../components/VideoCard.astro';
+import CuspicDetails from '../../components/CuspicDetails.astro';
 
 export async function getStaticPaths() {
   const items = await getCollection('software');
@@ -14,15 +13,6 @@ const s = entry.data;
 const profile = (await getEntry('profile', 'main'))!.data;
 const email = profile.email;
 
-// 性能对比（示例数据：替换为你的实测加速比）
-const perf = [
-  { label: 'CPU · 1 线程', value: 1, text: '1.0×' },
-  { label: 'CPU · 16 线程', value: 11, text: '11×' },
-  { label: 'GPU · 单卡', value: 78, text: '78×' },
-  { label: 'GPU · 4 卡', value: 260, text: '260×' },
-];
-const perfMax = Math.max(...perf.map((p) => p.value));
-
 const workflow = [
   { when: 'Step 1', what: '几何与材料', desc: '导入工件与刀具几何，选择本构与摩擦模型，设定初始温度场。' },
   { when: 'Step 2', what: '工艺参数', desc: '切削速度、进给量、切深、刀尖几何与冷却条件；可保存为参数组批量提交。' },
@@ -30,6 +20,7 @@ const workflow = [
   { when: 'Step 4', what: '结果分析', desc: '云图、切屑形态演化、力与温度曲线；支持导出图片与数据表。' },
   { when: 'Step 5', what: '对比与报告', desc: '多组参数结果并列比较，生成可交付的图表与说明。' },
 ];
+
 ---
 
 <Base title={s.name} description={s.tagline}>
@@ -55,6 +46,7 @@ const workflow = [
           <a
             class:list={['btn', l.variant === 'primary' ? 'btn--media' : 'btn--media-ghost']}
             href={l.href}
+            download={l.download || undefined}
           >
             {l.label}
           </a>
@@ -83,15 +75,17 @@ const workflow = [
               <tbody>
                 {s.specs.map((row) => (
                   <tr>
-                    <th scope="row" style="background:transparent;white-space:normal">{row.k}</th>
-                    <td class="num">{row.v}</td>
+                    <th scope="row" style="background:transparent">{row.k}</th>
+                    <td>{row.v}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
           <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs)">
-            标注〔待填〕的条目为待补充信息，修改 <code class="mono">src/data/software.yml</code> 即可更新本表。
+            规格取自 <code class="mono">src/data/software.yml</code>{entry.id === 'cuspic'
+              ? ' 与 CUSPIC 用户手册 v3.0.0'
+              : ''}。
           </p>
         </div>
       </div>
@@ -117,95 +111,8 @@ const workflow = [
     </div>
   </section>
 
-  <section class="media-band">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-head__text">
-          <span class="eyebrow eyebrow--media">Gallery</span>
-          <h2 style="margin-top:.65rem">界面与结果</h2>
-          <p>截图和动画待补充：文件放入 <code class="mono">public/media/</code> 后填上 src 即可自动显示。</p>
-        </div>
-      </div>
-      <div class="media-grid">
-        <div class="span-8">
-          <VideoCard
-            alt={`${s.name} 操作或结果演示动画`}
-            badge="Demo"
-            caption="操作流程或结果演化动画（占位）。"
-            meta="Demo · 待替换"
-            placeholder="c"
-            placeholderLabel="替换：操作 / 结果演示 mp4"
-          />
-        </div>
-        <div class="span-4">
-          <FigureCard
-            alt={`${s.name} 界面截图`}
-            caption="主界面截图（占位）。"
-            meta="UI · 待替换"
-            placeholder="b"
-            placeholderLabel="替换：界面截图"
-            ratio="4 / 5"
-          />
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {
-    entry.id === 'cuspic' ? (
-      <section class="section">
-        <div class="container">
-          <div class="section-head">
-            <div class="section-head__text">
-              <span class="eyebrow">Performance</span>
-              <h2 style="margin-top:.6rem">性能</h2>
-              <p>
-                下面是<strong>示例数据</strong>，仅用于展示呈现方式；请替换为你实测的加速比（同一算例、同一精度）。
-              </p>
-            </div>
-            <span class="badge badge--dot badge--new">示例数据</span>
-          </div>
-
-          <div class="bars" data-reveal>
-            {perf.map((p) => (
-              <div class="bar">
-                <span class="bar__label">{p.label}</span>
-                <span class="bar__track">
-                  <span class="bar__fill" style={`width:${Math.max(4, (p.value / perfMax) * 100)}%`} />
-                </span>
-                <span class="bar__value">{p.text}</span>
-              </div>
-            ))}
-          </div>
-
-          <div class="table-wrap" style="margin-top:2rem">
-            <table class="data">
-              <thead>
-                <tr>
-                  <th scope="col">算例</th>
-                  <th scope="col">规模</th>
-                  <th scope="col">硬件</th>
-                  <th scope="col">耗时</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>二维正交切削</td>
-                  <td class="num">20 万粒子 / 100 万节点</td>
-                  <td class="num">1× GPU</td>
-                  <td class="num">〔待填〕</td>
-                </tr>
-                <tr>
-                  <td>三维车削（局部）</td>
-                  <td class="num">120 万粒子 / 600 万节点</td>
-                  <td class="num">4× GPU</td>
-                  <td class="num">〔待填〕</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
+  {entry.id === 'cuspic' ? (
+    <CuspicDetails />
     ) : (
       <section class="section">
         <div class="container">

@@ -64,12 +64,46 @@ const software = defineCollection({
     spec_line: z.string().optional(),
     features: z.array(z.object({ title: z.string(), text: z.string() })).default([]),
     specs: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
+    /** 能力矩阵：/software 与 /software/cuspic 共用，一行一类 */
+    matrix: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
     links: z
       .array(
         z.object({
           label: z.string(),
           href: z.string(),
           variant: z.enum(['primary', 'ghost']).default('ghost'),
+          /** true 时链接带 download 属性（PDF 直接存盘，不在浏览器里打开） */
+          download: z.boolean().default(false),
+        })
+      )
+      .default([]),
+  }),
+});
+
+/** CUSPIC 用户手册：元信息 + 章节索引（手册本体在 public/media/docs/） */
+const manual = defineCollection({
+  loader: file('./src/data/cuspic-manual.yml'),
+  schema: z.object({
+    title: z.string(),
+    subtitle: z.string().optional(),
+    version: z.string(),
+    /** 手册自身的文档版本号，和软件版本不是一回事 */
+    doc_version: z.string().optional(),
+    date: z.string().optional(),
+    pages: z.number(),
+    /** 相对 public 的路径，例如 /media/docs/cuspic-manual-v3.0.0.pdf */
+    file: z.string(),
+    size: z.string().optional(),
+    abstract: z.string().optional(),
+    /** 章节：page 是 PDF 物理页，用于 file#page=N 深链 */
+    chapters: z
+      .array(
+        z.object({
+          no: z.string(),
+          title: z.string(),
+          page: z.number(),
+          summary: z.string().optional(),
+          keywords: z.array(z.string()).default([]),
         })
       )
       .default([]),
@@ -167,4 +201,4 @@ const profile = defineCollection({
   }),
 });
 
-export const collections = { notes, publications, software, cv, profile };
+export const collections = { notes, publications, software, cv, profile, manual };

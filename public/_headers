@@ -9,5 +9,9 @@
 /media/*
   Cache-Control: public, max-age=2592000
 
+# 手册与简历是 PDF：显式声明 MIME，避免个别浏览器按二进制下载
+/media/docs/*
+  Content-Type: application/pdf
+
 /favicon.svg
   Cache-Control: public, max-age=86400

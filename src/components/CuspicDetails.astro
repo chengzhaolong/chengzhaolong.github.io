@@ -1,0 +1,448 @@
+---
+import { getEntry } from 'astro:content';
+import VideoCard from './VideoCard.astro';
+import ManualDocs from './ManualDocs.astro';
+
+/** CUSPIC 用户手册（collection: manual）；cuttinglab 没有对应手册 */
+const manual = (await getEntry('manual', 'cuspic'))?.data;
+
+/** 能力矩阵 —— 手册 1.2「功能范围」，数据在 software.yml 的 matrix 字段 */
+const cuspicEntry = await getEntry('software', 'cuspic');
+const matrix = cuspicEntry?.data.matrix ?? [];
+
+/** 运行环境（手册 1.3） */
+const env = [
+  { k: 'CPU', v: 'x86-64' },
+  { k: '内存', v: '取决于模型规模；百万单元级建议 16 GB 以上' },
+  { k: 'GPU（可选）', v: 'NVIDIA，计算能力 7.5 / 8.0 / 8.6 / 8.9（RTX 30/40 系列、A100 等）' },
+  { k: '操作系统', v: 'Linux（cusp_linux64）或 Windows（cusp_win64.exe）' },
+];
+
+/** 交付形态（手册 1.3） */
+const delivery = [
+  { k: 'cusp_linux64', v: 'Linux 可执行文件：CPU 多线程 + GPU 加速' },
+  { k: 'cusp_win64.exe', v: 'Windows 可执行文件：仅 CPU 计算' },
+  { k: 'license/license.lic', v: '许可证文件，放在可执行文件同目录的 license/ 下' },
+  { k: '用户手册', v: '86 页 PDF：章节索引见下方「用户手册」' },
+];
+
+/** 命令行（手册 2.2） */
+const cli = [
+  { k: '-i, --input <file>', v: '输入文件（.cusp）' },
+  { k: '-o, --output <dir>', v: '输出目录（默认：输入文件所在目录下的 result/）' },
+  { k: '-t, --threads <N>', v: 'CPU 线程数（默认全部逻辑核心）' },
+  { k: '--gpu / --cpu', v: '启用 GPU 加速（需 Linux 版）/ 强制 CPU 执行（默认）' },
+  { k: '--mpm-transfer-gpu-threads-per-block <N>', v: 'MPM 物质点–网格转移 kernel 的每块线程数（默认自动）' },
+  { k: '--vtk-binary <0|1>', v: 'VTU 输出格式：二进制（默认）/ ASCII 文本' },
+  { k: '--color / --banner', v: '终端彩色输出、启动横幅' },
+  { k: '-h, --help / -v, --version', v: '帮助 / 版本号' },
+];
+
+/** 求解流程（手册 10.1） */
+const flow = [
+  { when: '01', what: '命令行解析', desc: '--gpu / --threads / --output 等选项先落定。' },
+  { when: '02', what: '许可证校验', desc: '读取可执行文件同目录下的 license/license.lic。' },
+  { when: '03', what: '读输入文件', desc: '一次性报告全部输入错误；未知关键字只告警，不中断。' },
+  { when: '04', what: '初始化', desc: '节点、单元、分组、材料、接触、边界、载荷、背景网格依次装配。' },
+  { when: '05', what: '打印启动摘要', desc: '按 Platform / Time / Output / Mesh / Loads 等分组列出本次算例的规模与开关。' },
+  { when: '06', what: '显式时间步循环', desc: '更新步长 → 施加载荷与边界 → 单元内力与接触力 → 更新节点，按间隔输出进度与 .vtu。' },
+  { when: '07', what: '结束', desc: '到达 end time 或出错退出；性能报告与能量历史表写入日志。' },
+];
+
+/** 稳定性建议（手册 10.6） */
+const tips = [
+  '先确认输入没有报错：启动时若打印 Input file error: N error(s)，改完再正式求解。',
+  '时间步长系数默认 0.8 属保守值，通常不用改；出现 RUN-5201 / 5202 或能量异常时，先查网格质量与材料参数。',
+  '沙漏能占比持续超过 5% 时，先增大沙漏控制系数，再考虑改用选择减缩积分（Isolid = 2）。',
+  '.vtu 输出间隔过小会产生大量文件、磁盘 I/O 成为瓶颈；先按「末时间 ÷ 输出间隔」估算帧数。',
+  '大模型建议开启 --gpu，并把线程数与物理核心数对齐。',
+];
+
+/** 已知边界（手册 1.3 / 5.8 / 9.1 / 1.4） */
+const limits = [
+  '四面体只支持四节点 TET4，/TETRA10 不支持。',
+  'GPU 加速仅在 Linux 版提供，Windows 版只跑 CPU。',
+  '接触目前只有 NTS 节点–面罚函数（/INTER/PENA）一种算法。',
+  '许可证与机器码绑定，更换机器需重新申请；核心数与 GPU 数量受许可限制。',
+];
+
+/** 手册附录 C.2 的最小算例原文（MPM 物质点流入） */
+const sample = `# CUSP MPM inflow smoke test
+/TIME/1
+0.0        0.5        0.9        -1.0
+/NODE/1
+1          0.0        0.0        0.0
+2          0.0        1.0        0.0
+3          0.0        1.0        1.0
+4          0.0        0.0        1.0
+5          0.1        0.5        0.5
+/MAT/ELAST/1
+1000.0
+100000.0   0.3
+/PROP/MPM/1
+0.1        1.1        0.05
+/PART/1
+MPM inflow part
+1          1
+/MPMCEL/1
+5
+/GRNOD/1
+5
+/SURF/SEG/1
+1          2          3          4
+/FUNCT/1
+0.0        16.0
+1.0        16.0
+/MPMGRID/1
+1          0.25       2          1          0          0.999      0
+-0.5       -0.5       -0.5
+3.0        1.5        1.5
+/MPMINFLOW/1
+1          1          1          1          1          1
+0.25       1          0.0        -1.0       -1.0
+/OUTPUT/1
+1          0
+/RESULT
+ALL`;
+
+/** 进度输出（手册 10.3） */
+const progressSample = `STEP:500, t=0.000123456, dt_mech=2.5e-07, dt_thm=N/A
+Etotal=1.23456e+06, Ekin=3.4e+04, Eela=1.2e+06, Epla=1.0e+03
+Ehou=1.2e-03, Wext=1.25e+06, err(%)=-1.75
+Progress: 12.3% | Frame: 1/100 | Elapsed: 3.2s | Remaining: 22.5s`;
+---
+
+
+<section class="section--tight section--line">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow">Scope</span>
+        <h2 style="margin-top:.6rem">能力矩阵</h2>
+        <p>
+          手册 1.2 的功能范围，一行一类；参数怎么填、卡片怎么写，看下面「用户手册」的对应章节。
+        </p>
+      </div>
+    </div>
+
+    <div class="table-wrap" data-reveal>
+      <table class="data">
+        <thead>
+          <tr>
+            <th scope="col">类别</th>
+            <th scope="col">支持范围</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            matrix.map((row) => (
+              <tr>
+                <th scope="row" style="background:transparent">
+                  {row.k}
+                </th>
+                <td>{row.v}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="notice" style="margin-top:1.5rem">
+      <strong>当前版本的边界：</strong>
+      {limits.join(' ')}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow">Environment</span>
+        <h2 style="margin-top:.6rem">运行环境、交付与许可</h2>
+        <p>同一个可执行文件，CPU 多线程是默认，Linux 版额外提供 GPU 加速。</p>
+      </div>
+    </div>
+
+    <div class="split split--top">
+      <div data-reveal>
+        <h3>硬件与平台</h3>
+        <div class="table-wrap" style="margin-top:1rem">
+          <table class="data">
+            <tbody>
+              {
+                env.map((row) => (
+                  <tr>
+                    <th scope="row" style="background:transparent">
+                      {row.k}
+                    </th>
+                    <td>{row.v}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs);line-height:1.7">
+          启动摘要里的 Platform 组会打印实际使用的硬件、线程数与编译选项——先看这一组，确认没有掉回单线程或 CPU 模式。
+        </p>
+      </div>
+
+      <div data-reveal style="--d:.08s">
+        <h3>交付内容</h3>
+        <div class="table-wrap" style="margin-top:1rem">
+          <table class="data">
+            <tbody>
+              {
+                delivery.map((row) => (
+                  <tr>
+                    <th
+                      scope="row"
+                      style="background:transparent;text-transform:none;white-space:normal"
+                    >
+                      <code class="mono">{row.k}</code>
+                    </th>
+                    <td>{row.v}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="notice" style="margin-top:1rem">
+          <strong>许可：</strong>许可证绑定机器码，写明了用户、有效期、最大核心数与 GPU 数量；换机器、加卡或延期都要重新申请。
+          缺少 <code class="mono">license/license.lic</code> 时，程序在校验阶段直接退出，不会开始计算。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow">Getting started</span>
+        <h2 style="margin-top:.6rem">怎么跑起来</h2>
+        <p>没有图形界面：准备一个输入文件，在终端里跑一条命令，结果是一批 .vtu 和一份日志。</p>
+      </div>
+    </div>
+
+    <div class="prose" data-reveal style="max-width:none">
+      <ol>
+        <li>
+          <strong>拿许可证。</strong>把 <code>license/license.lic</code> 放到可执行文件同目录的
+          <code>license/</code> 下，文件名不要改。
+        </li>
+        <li>
+          <strong>写输入文件。</strong>按手册第 3~9 章的卡片拼出 .cusp；第一次可以直接抄附录 C.2
+          的两个算例，改材料参数就能跑。
+        </li>
+        <li>
+          <strong>运行。</strong>线程数与输出目录既可以写成位置参数，也可以写成选项，两者等价。
+        </li>
+        <li>
+          <strong>看结果。</strong>输出目录里是 <code>.vtu</code> 帧序列和日志：ParaView 里
+          <code>File → Open</code> 选第一个 .vtu，<code>Apply</code> 后在着色下拉里选
+          <code>Equivalent Plastic Strain</code> 或 <code>Temperature</code>，用播放键看演化。
+        </li>
+      </ol>
+    </div>
+
+    <pre class="code-block" data-reveal><code>{`# 位置参数：输入文件 线程数 输出目录
+./cusp_linux64 demo.cusp 8 ./result
+
+# 选项式：完全等价，Linux 版可再加 --gpu
+./cusp_linux64 -i demo.cusp -t 8 -o ./result --gpu
+
+# Windows 版只有 CPU；不写 -t 就用全部逻辑核心
+cusp_win64.exe -i demo.cusp`}</code></pre>
+
+    <div class="table-wrap" data-reveal style="margin-top:2rem">
+      <table class="data data--stack">
+        <thead>
+          <tr>
+            <th scope="col">命令行选项</th>
+            <th scope="col">说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            cli.map((row) => (
+              <tr>
+                <td class="num">
+                  <code class="mono">{row.k}</code>
+                </td>
+                <td>{row.v}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs)">
+      完整选项表见手册 2.2 节（第 7 页）。
+    </p>
+  </div>
+</section>
+
+
+<section class="section--tight section--line">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow">Example</span>
+        <h2 style="margin-top:.6rem">最小算例</h2>
+        <p>
+          手册附录 C.2 的 MPM 物质点流入算例：四十多行覆盖时间步、节点、材料、物质点、背景网格、流入边界与输出，
+          拿来验证装好的程序能不能跑通。
+        </p>
+      </div>
+    </div>
+
+    <pre class="code-block" data-reveal><code>{sample}</code></pre>
+    <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs)">
+      以上为手册附录 C.2 原文，逐行讲解见第 82 页；输入文件自查办法见附录 C.3。
+    </p>
+
+    <div class="split split--top" style="margin-top:2.5rem">
+      <div class="prose" data-reveal style="max-width:none">
+        <h3 style="margin-top:0">结果与后处理</h3>
+        <p>
+          <code>/RESULT</code> 里列出的字段会按 <code>/OUTPUT</code> 的间隔写成 <code>.vtu</code>
+          帧序列，可以直接拖进 ParaView：打开第一帧、Apply、选变量着色、播放即可看切屑与温度场的演化。
+          每帧的字段名与输入文件里的卡片一一对应，换算单位时对着手册 3.9 节的单位制自查。
+        </p>
+        <p>
+          终端则同时打印求解进度，日志末尾附能量历史表——先用它判断这次算得对不对，再去后处理里看图。
+        </p>
+      </div>
+      <div data-reveal style="--d:.08s">
+        <h3 style="margin-top:0">输出目录</h3>
+        <pre class="code-block"><code>{`demo/
+├── demo.cusp             # 输入文件
+├── license/license.lic   # 许可证
+├── result/               # -o 指定的输出目录
+│   ├── demo_0001.vtu     # 每帧结果（--vtk-binary 0 可改为 ASCII）
+│   ├── demo_0002.vtu
+│   └── demo.log          # 启动摘要 / 进度 / 能量历史表
+└── cusp_linux64`}</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="media-band">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow eyebrow--media">Case</span>
+        <h2 style="margin-top:.65rem">算例与终端</h2>
+        <p>工件用物质点、刀具用有限元，接触走 NTS 罚函数，塑性功生热进入同一时间推进——三维微铣削的一次完整切削。</p>
+      </div>
+    </div>
+
+    <div class="split split--top split--media-first">
+      <div>
+        <VideoCard
+          src="/media/videos/cut3d1.mp4"
+          poster="/media/videos/cut3d1.png"
+          autoplay
+          alt="CUSPIC 案例：三维微铣削仿真（FEM–MPM 热力耦合）"
+          badge="CUSPIC"
+          caption="三维微铣削：切屑成形、材料堆积与温度场。"
+          meta="3D micro-milling · FEM–MPM"
+          ratio="16 / 9"
+        />
+      </div>
+      <div>
+        <h3 style="color:var(--media-ink);margin-top:0">终端就是界面</h3>
+        <p style="margin-top:.75rem">
+          求解器不画图：启动时打印一份分组摘要（平台、时间、输出、网格、载荷），运行中按间隔打印四行进度，
+          结束后给出性能报告与能量历史表。所有信息同时写进日志，出问题先翻日志，比看云图快。
+        </p>
+        <ul style="margin-top:1rem;padding-left:1.1rem;font-size:var(--fs-sm);line-height:1.75">
+          <li>第一行：步号、当前时间、力学步长（热学步长另列）</li>
+          <li>第二行：总能量与动能、弹性、塑性能的分解</li>
+          <li>第三行：沙漏能、外力功与能量守恒误差 err(%)</li>
+          <li>第四行：完成百分比、帧号、已用时间与预计剩余</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow">Runtime</span>
+        <h2 style="margin-top:.6rem">求解流程与自查</h2>
+        <p>从敲下命令到拿到日志，一共七步；算得对不对，日志里的能量历史表先能回答一半。</p>
+      </div>
+    </div>
+
+    <div class="split split--top">
+      <ol class="timeline" data-reveal>
+        {
+          flow.map((f) => (
+            <li class="timeline__item">
+              <span class="timeline__when">{f.when}</span>
+              <p class="timeline__what">{f.what}</p>
+              <p class="timeline__desc">{f.desc}</p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div data-reveal style="--d:.08s">
+        <h3 style="margin-top:0">进度四行怎么读</h3>
+        <pre class="code-block"><code>{progressSample}</code></pre>
+        <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs);line-height:1.7">
+          <code class="mono">err(%)</code> 是外力功与内能的相对偏差，越接近 0 越好；沙漏能
+          <code class="mono">Ehou</code> 与外力功 <code class="mono">Wext</code>
+          的比值持续偏大，说明该加密网格或加强沙漏控制了。日志末尾的能量历史表按等步长抽稀，逐行对照就能看出失稳是从哪一步开始的。
+        </p>
+
+        <h3 style="margin-top:2rem">稳定性建议</h3>
+        <ul class="stack" style="padding-left:1.1rem;font-size:var(--fs-sm);line-height:1.75">
+          {tips.map((t) => <li>{t}</li>)}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+{manual && <ManualDocs manual={manual} />}
+
+
+<section class="section--tight section--line">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow">Limits</span>
+        <h2 style="margin-top:.6rem">限制与适用边界</h2>
+        <p>写清楚不能做什么，比再列一遍功能表有用。</p>
+      </div>
+    </div>
+
+    <div class="card-grid card-grid--2">
+      {
+        limits.map((t) => (
+          <div class="feature" data-reveal>
+            <p>{t}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <p class="muted" style="margin-top:1.5rem;font-size:var(--fs-xs);line-height:1.7">
+      这些边界来自手册 1.3 / 5.8 / 9.1 / 1.4 节。遇到手册没覆盖的情形，邮件里附一个最小算例，通常一两天内能给出答复。
+    </p>
+  </div>
+</section>
+

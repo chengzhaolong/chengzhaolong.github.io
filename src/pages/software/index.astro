@@ -1,25 +1,33 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getCollection } from 'astro:content';
-import FigureCard from '../../components/FigureCard.astro';
+import { getCollection, getEntry } from 'astro:content';
 
 const software = await getCollection('software');
 const [cuspic, cuttinglab] = [
   software.find((s) => s.id === 'cuspic')!,
   software.find((s) => s.id === 'cuttinglab')!,
 ];
+/** CUSPIC 用户手册：版本号、页数与下载地址都在 cuspic-manual.yml */
+const manual = (await getEntry('manual', 'cuspic'))?.data;
+
+/** CuttingLab 的规格里还留着〔待填〕的条目，总览只展示已知的部分 */
+const labSpecs = cuttinglab.data.specs.filter((r) => !r.v.includes('〔'));
 
 const compare = [
   { k: '定位', a: '求解器内核', b: '图形化仿真软件' },
   { k: '使用者', a: '研究 / 算法开发', b: '工艺研究、工程试算' },
-  { k: '操作方式', a: '算例文件 + 命令行', b: '界面操作，一键求解' },
-  { k: '输出', a: '场数据（VTK 等）', b: '云图 / 曲线 / 报告' },
-  { k: '并行', a: 'GPU（多卡）', b: '继承 cuspic' },
-  { k: '获取', a: '邮件联系', b: '邮件申请试用' },
+  { k: '操作方式', a: '.cusp 输入文件 + 命令行', b: '界面操作，一键求解' },
+  { k: '物理能力', a: 'FEM–MPM · 热力耦合 · 接触', b: '面向切削工艺的材料与工况模板' },
+  { k: '并行', a: 'OpenMP 多线程 + GPU（Linux 版）', b: '继承 CUSPIC 的求解设置' },
+  { k: '输出', a: 'VTU 场数据 + 日志', b: '云图 / 曲线 / 报告' },
+  { k: '获取', a: '邮件申请 + 用户手册', b: '邮件申请试用' },
 ];
 ---
 
-<Base title="软件" description="自研求解器 cuspic 与金属切削仿真软件 Cusper CuttingLab：能力、技术规格与获取方式。">
+<Base
+  title="软件"
+  description="自研 FEM–MPM 显式动力学求解器 CUSPIC 与金属切削仿真软件 Cusper CuttingLab：能力矩阵、运行环境、命令行与用户手册。"
+>
   <header class="page-head page-head--media">
     <div class="hero__media">
       <img src="/media/hero-contour.svg" alt="" width="1600" height="900" />
@@ -28,14 +36,9 @@ const compare = [
       <span class="eyebrow eyebrow--media">Software</span>
       <h1 class="page-head__title">求解器与软件</h1>
       <p class="page-head__lede">
-        研究里的算法不会自己变成可用的工具。cuspic 负责把 FEM–MPM 耦合与 GPU 并行做成可靠的求解内核，
-        Cusper CuttingLab 负责把它包装成工艺研究能直接使用的流程。
+        研究里的算法不会自己变成可用的工具。CUSPIC 把 FEM–MPM 耦合与 GPU 并行做成可靠的求解内核，
+        Cusper CuttingLab 把它包装成工艺研究能直接使用的流程。
       </p>
-      <div class="cluster" style="margin-top:1.5rem">
-        <a class="btn btn--media" href="#cuspic">cuspic</a>
-        <a class="btn btn--media-ghost" href="#cuttinglab">Cusper CuttingLab</a>
-        <a class="btn btn--media-ghost" href="#compare">对比</a>
-      </div>
     </div>
   </header>
 
@@ -44,25 +47,50 @@ const compare = [
       <div class="split split--top">
         <div data-reveal>
           <span class="card__meta">{cuspic.data.kicker} · {cuspic.data.version}</span>
-          <h2 style="margin-top:.6rem;font-size:var(--fs-h1)">{cuspic.data.name}</h2>
+          <h2 style="margin-top:.6rem;font-size:var(--fs-h2)">CUSPIC —— 高性能显式动力学求解器</h2>
           <p class="lead" style="margin-top:.75rem">{cuspic.data.tagline}</p>
           <p style="margin-top:1rem;color:var(--ink-2)">{cuspic.data.summary}</p>
           <div class="cluster" style="margin-top:1.25rem">
             {cuspic.data.features.slice(0, 4).map((f) => <span class="badge">{f.title}</span>)}
           </div>
           <div class="cluster" style="margin-top:1.5rem">
-            <a class="btn" href="/software/cuspic">cuspic 详情 →</a>
-            <a class="btn btn--ghost" href={`mailto:${cuspic.data.links[0]?.href.replace('mailto:', '') ?? ''}`}>联系</a>
+            <a class="btn" href="/software/cuspic">CUSPIC 详情 →</a>
+            {
+              manual && (
+                <a class="btn btn--ghost" href={manual.file} download>
+                  用户手册（PDF，{manual.size}）
+                </a>
+              )
+            }
           </div>
         </div>
         <div data-reveal style="--d:.08s">
-          <FigureCard
-            alt="cuspic 求解流程示意"
-            caption="从输入算例到 GPU 并行求解与场数据输出的流程示意（占位）。"
-            meta="Pipeline · 待替换"
-            placeholder="c"
-            placeholderLabel="替换：cuspic 架构 / 流程图"
-          />
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col">能力</th>
+                  <th scope="col">范围</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  cuspic.data.matrix.map((row) => (
+                    <tr>
+                      <th scope="row" style="background:transparent">
+                        {row.k}
+                      </th>
+                      <td>{row.v}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+          <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs);line-height:1.7">
+            当前版本边界：<code class="mono">/TETRA10</code> 不支持，GPU 加速仅 Linux 版，接触只有 NTS 罚函数一种；
+            用法、卡片与算例见<a href="/software/cuspic#docs">用户手册</a>。
+          </p>
         </div>
       </div>
     </div>
@@ -72,17 +100,31 @@ const compare = [
     <div class="container">
       <div class="split split--top split--media-first" id="cuttinglab">
         <div data-reveal>
-          <FigureCard
-            alt="Cusper CuttingLab 界面示意"
-            caption="参数设置 → 提交求解 → 结果云图与曲线的界面流程（占位）。"
-            meta="UI · 待替换"
-            placeholder="b"
-            placeholderLabel="替换：CuttingLab 界面截图"
-          />
+          <div class="table-wrap">
+            <table class="data">
+              <tbody>
+                {
+                  labSpecs.map((row) => (
+                    <tr>
+                      <th scope="row" style="background:transparent">
+                        {row.k}
+                      </th>
+                      <td>{row.v}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+          <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs);line-height:1.7">
+            界面截图与操作视频尚在整理，先在详情页看工作流。
+          </p>
         </div>
         <div data-reveal style="--d:.08s">
           <span class="card__meta">{cuttinglab.data.kicker} · {cuttinglab.data.version}</span>
-          <h2 style="margin-top:.6rem;font-size:var(--fs-h1)">{cuttinglab.data.name}</h2>
+          <h2 style="margin-top:.6rem;font-size:var(--fs-h2)">
+            Cusper CuttingLab —— 金属切削加工仿真软件
+          </h2>
           <p class="lead" style="margin-top:.75rem">{cuttinglab.data.tagline}</p>
           <p style="margin-top:1rem;color:var(--ink-2)">{cuttinglab.data.summary}</p>
           <div class="cluster" style="margin-top:1.25rem">
@@ -139,12 +181,12 @@ const compare = [
           <span class="eyebrow">Get started</span>
           <h2 style="margin-top:.7rem;font-size:var(--fs-h2)">想在自己的算例上试一下？</h2>
           <p class="muted" style="margin-top:.6rem;max-width:54ch">
-            写明材料、工况与关注的物理量，并说明可用的 GPU 型号；我会回复可运行的算例模板。
+            写明材料、工况与关注的物理量，并说明可用的硬件；我会回复可运行的算例模板与手册对应章节。
           </p>
         </div>
         <div class="cluster">
           <a class="btn" href={`mailto:${cuspic.data.links[0]?.href.replace('mailto:', '') ?? ''}`}>申请试用</a>
-          <a class="btn btn--ghost" href="/research">先看研究方向 →</a>
+          <a class="btn btn--ghost" href="/publications">先看相关工作 →</a>
         </div>
       </div>
     </div>

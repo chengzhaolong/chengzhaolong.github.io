@@ -1420,7 +1420,8 @@ table.data {
   width: 100%;
   border-collapse: collapse;
   font-size: var(--fs-sm);
-  min-width: 34rem;
+  /* 34rem 是「还想看两列并排」的下限；放不下时退回容器宽度，避免整表被横向截断 */
+  min-width: min(34rem, 100%);
 }
 
 table.data th,
@@ -1459,6 +1460,124 @@ table.data tr:last-child td {
 table.data td.num {
   font-family: var(--f-mono);
   white-space: nowrap;
+}
+
+/* 「参数 + 说明」两列表格：窄屏竖排，避免说明列被挤成三四个字一行 */
+@media (max-width: 620px) {
+  table.data--stack,
+  table.data--stack tbody,
+  table.data--stack tr,
+  table.data--stack th,
+  table.data--stack td {
+    display: block;
+  }
+
+  table.data--stack thead {
+    display: none;
+  }
+
+  table.data--stack tr {
+    padding-block: 0.55rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  table.data--stack tr:last-child {
+    border-bottom: 0;
+  }
+
+  table.data--stack th,
+  table.data--stack td {
+    padding: 0.15rem 1rem;
+    border: 0;
+    white-space: normal;
+  }
+
+  table.data--stack th {
+    padding-bottom: 0;
+    background: transparent;
+    text-transform: none;
+  }
+}
+
+/* ---------- 15b. 代码块（命令行 / 输入文件，可独立于 .prose 使用） ---------- */
+.code-block {
+  margin: 0;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--media-line);
+  border-radius: var(--radius);
+  background: #0f0f13;
+  color: #d9d9e0;
+  font-family: var(--f-mono);
+  font-size: 0.8rem;
+  line-height: 1.75;
+  overflow-x: auto;
+  tab-size: 2;
+}
+
+.code-block code {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+@media (max-width: 620px) {
+  /* 固定列格式的输入文件一行较长，窄屏缩一号字，尽量少横向滚动 */
+  .code-block {
+    padding: 0.85rem 0.9rem;
+    font-size: 0.72rem;
+  }
+}
+
+/* ---------- 15c. 时间线（软件页的求解流程 / 工作流） ---------- */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.timeline__item {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 0.2rem 1.25rem;
+  padding-block: 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.timeline__when {
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+}
+
+.timeline__what {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.timeline__desc {
+  grid-column: 2;
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+
+@media (max-width: 620px) {
+  .timeline__item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .timeline__desc {
+    grid-column: 1;
+  }
 }
 
 /* ---------- 16. prose（MDX 正文） ---------- */

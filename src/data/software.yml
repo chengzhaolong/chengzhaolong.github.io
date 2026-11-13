@@ -7,44 +7,81 @@
   name: CUSPIC
   name_zh: CUSPIC 求解器
   kicker: Solver
-  tagline: 面向大变形热力耦合问题的 FEM–MPM 高性能GPU并行求解器
+  tagline: 面向冲击动力学与大变形热力耦合的 FEM–MPM 高性能显式动力学求解器
   summary: |-
-    CUSPIC 是我自研的计算力学求解器核心。它以有限元背景网格承载连续介质的应力平衡与热传导，以物质点离散材料并追踪其历史，通过 FEM–MPM 耦合把「刀具–工件接触、切屑分离、极端塑性变形」这几类难点放进同一个时间推进框架里，并用 GPU 并行把单次切削仿真压到可迭代的时间尺度。
-  version: v1.3
-  status: 内部研发 / 持续迭代
-  license: 〔许可方式待定：内部使用 / 开源协议〕
-  spec_line: 热力耦合 · FEM–MPM · 非线性 · GPU并行
+    CUSPIC（Coupled Unified Solver with PIC-FEM）把有限元与物质点法放进同一套显式时间推进框架：常规区域用六面体、四面体或壳单元求解，大变形与材料流动区域用物质点描述并追踪其历史，两者之间可耦合、可接触。所有能力都由 .cusp 输入文件里的关键字卡片控制；CPU 多线程是默认配置，Linux 版可加 --gpu 走 GPU 加速。
+  version: v3.0.0
+  status: 内部研发 · 邮件申请试用
+  license: 许可证绑定机器码（含用户、有效期、最大核心数、GPU 数量）
+  spec_line: FEM–MPM · 热力耦合 · 显式积分 · GPU 并行
   features:
-    - title: 大变形与极端畸变
-      text: 物质点承载材料历史，避免网格畸变导致的单元失效；切屑分离与材料堆积在同一个离散框架内自然发生。
-    - title: 热力耦合
-      text: 塑性功生热与热传导进入同一求解循环，支持切削温度场、刀具温升与热软化效应的联合分析。
-    - title: FEM–MPM 耦合
-      text: 结构化背景网格负责高效的空间搜索与场变量插值，边界与接触区域用有限元描述，兼顾精度与稳定性。
-    - title: GPU 并行
-      text: 粒子循环、网格映射与接触检测并行化，配合稀疏数据结构与多卡扩展，支撑工程尺度的算例规模。
-    - title: 可复现算例
-      text: 内置验证算例，输出格式与主流后处理工具（VTK / ParaView）对接。
+    - title: FEM 与 MPM 同模型
+      text: 六面体（8 节点）、TET4、四边形壳与 B-T 壳按需混用；材料流动与极端畸变交给物质点，避免网格畸变导致的单元失效。
+    - title: MPM 高阶传递
+      text: 二次 B 样条插值、FLIP-PIC 混合方案、APIC / PolyPIC 高阶传递，兼顾低数值耗散与稳定性；物质点流入按质量流量函数持续生成粒子。
+    - title: 材料与状态方程
+      text: 线弹性、Johnson-Cook（热软化 / 应变率 / 失效与损伤）、JC-Tanh、牛顿流体、Drucker-Prager，配 Gruneisen / Monaghan 状态方程与热材料库。
+    - title: 接触与热力绑定
+      text: NTS 节点–面罚接触，FEM-FEM、FEM-MPM、MPM-MPM 三类热力绑定，刚性 / 粘性库伦摩擦，障碍函数支持变刚度与常刚度。
+    - title: 边界与载荷
+      text: 节点位移 / 速度 / 力边界、径向边界、MPM 盒与墙边界；重力、集中力、强制位移与转动、初始速度与温度、面切向力、温度载荷。
+    - title: 并行与性能
+      text: OpenMP 多线程可指定线程数，Linux 版支持 GPU 加速；计算平台信息打印在启动摘要的 Platform 组，便于确认是否用上了预期硬件。
+    - title: 输出与自查
+      text: 按 /RESULT 选择字段输出 VTU（二进制或 ASCII），终端按固定间隔打印四行进度，日志末尾附能量历史表与 err(%) 守恒自查。
   specs:
     - k: 核心方法
       v: FEM–MPM 耦合，显式时间积分
-    - k: 物理场
-      v: 位移 / 应力 / 等效塑性应变 / 温度
+    - k: 单元类型
+      v: 六面体（8 节点）/ TET4 / 四边形壳 / B-T 壳
+    - k: MPM 方案
+      v: 二次 B 样条 · FLIP-PIC · APIC / PolyPIC
+    - k: 材料库
+      v: 线弹性 · Johnson-Cook（含失效）· JC-Tanh · Drucker-Prager · 牛顿流体
+    - k: 状态方程
+      v: Gruneisen · Monaghan
+    - k: 接触
+      v: NTS 罚接触；FEM-FEM / FEM-MPM / MPM-MPM 热力绑定
     - k: 并行方式
-      v: GPU（CUDA），支持多卡
+      v: OpenMP 多线程；GPU（Linux 版，--gpu）
     - k: 实现语言
-      v: 〔C++ / CUDA，待填〕
+      v: C++ / CUDA
     - k: 输出格式
-      v: 〔VTK / HDF5 / 自定义，待填〕
+      v: VTU（Binary / ASCII）+ 日志（含能量历史表）
     - k: 运行平台
-      v: 〔Linux / Windows，待填〕
+      v: Linux（CPU + GPU）/ Windows（仅 CPU）
+    - k: 硬件建议
+      v: x86-64；百万单元级 16 GB 以上；NVIDIA 计算能力 7.5 / 8.0 / 8.6 / 8.9
+    - k: 许可
+      v: license.lic 绑定机器码，换机器需重新申请
+    - k: 文档
+      v: CUSPIC 用户手册 v3.0.0（86 页）
+  # 能力矩阵：/software 与 /software/cuspic 共用（手册 1.2 功能范围）
+  matrix:
+    - k: FEM 单元
+      v: 六面体（8 节点）与 TET4 体单元、四边形（4 节点）壳与 B-T 壳；六面体减缩积分配 F-B 沙漏控制，可选 SRI；支持热力耦合。
+    - k: MPM 方法
+      v: 二次 B 样条插值、FLIP-PIC 混合方案、APIC / PolyPIC 高阶传递；物质点流入按质量流量函数持续生成粒子。
+    - k: 材料与状态方程
+      v: 线弹性、Johnson-Cook（热软化 / 应变率 / 失效与损伤）、JC-Tanh、牛顿流体、Drucker-Prager；Gruneisen 与 Monaghan 状态方程；热材料库支持温度场演化。
+    - k: 接触与界面
+      v: NTS 节点–面罚接触；FEM-FEM、FEM-MPM、MPM-MPM 热力绑定；刚性 / 粘性库伦摩擦；障碍函数支持变刚度与常刚度。
+    - k: 边界与载荷
+      v: 节点位移 / 速度 / 力边界、径向边界、MPM 盒边界与墙边界；重力、集中节点力、强制位移与转动、初始速度与温度、面切向力、温度载荷。
+    - k: 并行与性能
+      v: OpenMP 多线程（线程数可指定，且不超过许可证允许的最大核心数）；Linux 版可选 GPU 加速。
+    - k: 输出
+      v: VTU 结果文件（二进制 / ASCII）、终端求解进度表、自动日志（含能量历史表）。
+    - k: 输入方式
+      v: 全部能力由 .cusp 文件里的关键字卡片控制；卡片按固定列格式书写，ID 引用在读取时统一校验，报错一次给全。
   links:
     - label: 申请试用 / 技术交流
       href: mailto:chengzhaolong@mail.dlut.edu.cn
       variant: primary
-    - label: 架构与算例
-      href: /software/cuspic
+    - label: 用户手册（PDF）
+      href: /media/docs/cuspic-manual-v3.0.0.pdf
       variant: ghost
+      download: true
 
 - id: cuttinglab
   name: CUSPER CuttingLab
@@ -68,7 +105,7 @@
       text: 应力 / 应变 / 温度云图、切屑形态演化、切削力与温度曲线，支持导出图与数据。
   specs:
     - k: 底层求解器
-      v: cuspic（FEM–MPM）
+      v: CUSPIC v3.0.0（FEM–MPM）
     - k: 运行平台
       v: 〔Windows / Linux，待填〕
     - k: 典型输出

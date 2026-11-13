@@ -55,7 +55,10 @@ const personLd = {
   url: canonical,
   email: profile.email ? `mailto:${profile.email}` : undefined,
   knowsAbout: profile.interests,
-  sameAs: Object.values(profile.links ?? {}).filter(Boolean),
+  // sameAs 只收绝对 URL（schema.org 语义）：站内相对路径如 /media/docs/cv.pdf 不能放进来
+  sameAs: Object.values(profile.links ?? {}).filter(
+    (v): v is string => typeof v === 'string' && /^https?:\/\//.test(v)
+  ),
 };
 ---
 

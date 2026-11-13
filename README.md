@@ -234,10 +234,23 @@ npx astro preview --port 4399      # 这个终端保持开着
 - `spec_line`：首页卡片底部那一行等宽字体的技术规格，一句话，别超过 30 个字符
 - `features[]`：`title` + `text`，详情页两列卡片，首页只取前 3 个 `title`
 - `specs[]`：`k` + `v`，详情页右侧「技术规格」表
-- `links[]`：`label` / `href` / `variant`（`primary` 实心、`ghost` 描边）
+- `matrix[]`：`k` + `v`，能力矩阵，`/software` 与 `/software/cuspic` 共用（改一处两边同步）
+- `links[]`：`label` / `href` / `variant`（`primary` 实心、`ghost` 描边）/ `download`（`true` 时直接存盘）
 
 详情页路由由 id 决定：`/software/cuspic`、`/software/cuttinglab`。
 若要加第三个软件，直接在 YAML 末尾追加一个条目即可，列表与详情页会自动生成。
+
+#### 换 CUSPIC 用户手册
+
+手册本体是静态文件，元信息与章节索引在 `src/data/cuspic-manual.yml`（collection `manual`）：
+
+1. PDF 放进 `public/media/docs/`，**文件名用 ASCII**（如 `cuspic-manual-v3.0.0.pdf`）。
+   中文文件名在部分部署 / URL 编码环境下会 404，`dist/` 里也可能复制不过去。
+2. 改 `cuspic-manual.yml` 的 `version` / `pages` / `size` / `date` / `file`。
+3. 章节页码变了就改 `chapters[].page`——`page` 是 PDF **物理页**，要和页脚「第 N 页」对得上，
+   详情页 `#docs` 的深链按它生成 `file#page=N`。
+4. 页面里的算例、命令行、进度输出是手抄进组件的（`src/components/CuspicDetails.astro`），
+   手册若改了这些示例，同步改那几处常量。
 
 ### 4.5 写笔记 — `src/content/notes/*.mdx`
 
@@ -355,7 +368,7 @@ import peeq from '../assets/figures/peeq.png';
 - [ ] 首页算例短片：`index.astro` 里 `VideoCard` 填 `src`（mp4，5–10 s，3 MB 以内），并删掉 `placeholderLabel`；`metrics` 换成实测值
 - [ ] 技术笔记：把 `/notes` 里「在写」的四条逐个写成 `src/content/notes/*.mdx`，写完从 `planned` 删掉
 - [ ] `software.yml`：版本、许可、平台、输出格式
-- [ ] `software/[slug].astro` 里 `perf` 数组换成实测加速比，算例表里的「耗时」补上
+- [ ] `src/components/CuspicDetails.astro`：算例全文、命令行选项、进度输出是手抄进组件的常量，对着手册核对一遍
 - [ ] `public/og-image.svg` 的文案（改完跑 `npm run og`）
 
 ## 8. 常见问题

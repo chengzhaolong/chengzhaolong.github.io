@@ -1,0 +1,90 @@
+# ==========================================================
+# CUSPIC 用户手册 —— 元信息 + 章节索引
+# 手册本体是 public/media/docs/cuspic-manual-v3.0.0.pdf（直接入库的静态文件）
+# 换版本：换文件名 → 改下面的 version / pages / size / file，
+#         章节页码变了就改 chapters[].page（页码 = PDF 物理页 = 页脚「第 N 页」）
+# ==========================================================
+
+- id: cuspic
+
+  title: CUSPIC 用户手册
+  subtitle: Coupled Unified Solver with PIC-FEM —— 输入文件与使用指南
+  version: v3.0.0
+  doc_version: '1.0'
+  date: 2026-09
+  pages: 86
+  size: 5.5 MB
+  file: /media/docs/cuspic-manual-v3.0.0.pdf
+  abstract: 从软件定位、快速上手，到 30 余张关键字卡片的逐张说明，附关键字总索引、固定列宽速查与两个完整算例。
+
+  chapters:
+    - no: '1'
+      title: 软件介绍
+      page: 5
+      summary: 定位、七类能力、运行环境与交付形态、许可机制——先看这章判断它能不能做你的问题。
+      keywords: [功能范围, 运行环境, 许可]
+    - no: '2'
+      title: 快速开始
+      page: 7
+      summary: 四步准备、命令行选项、跑通第一个算例，以及用 ParaView 看结果的四个动作。
+      keywords: [命令行, mpm_inflow, VTU]
+    - no: '3'
+      title: 输入文件基础
+      page: 11
+      summary: .cusp 的整体结构、注释与关键字头、固定列规则、数据起始行、ID 引用校验、单位制。
+      keywords: [固定列, 数据起始行, 单位制]
+    - no: '4'
+      title: 控制类卡片
+      page: 16
+      summary: /BEGIN /TIME /OUTPUT /RESULT /END —— 时间步、输出间隔与结果字段的总开关。
+      keywords: [/TIME, /OUTPUT, /RESULT]
+    - no: '5'
+      title: 网格与集合卡片
+      page: 20
+      summary: /NODE /GRNOD /SURF/SEG /BRICK /SHELL /MPMCEL /FUNCT /TETRA4 的列宽与用法。
+      keywords: [/NODE, /BRICK, /MPMCEL]
+    - no: '6'
+      title: 材料与属性卡片
+      page: 28
+      summary: /MAT /EOS /HEAT/MAT /PROP /PART 的关系与本构、状态方程、单元属性的参数含义。
+      keywords: [Johnson-Cook, Gruneisen, /PROP]
+    - no: '7'
+      title: 边界条件与载荷卡片
+      page: 39
+      summary: /BCS /BCR /CLOAD /GRAV /IMPDISP /IMPROTA /INIVEL /INITEMP 等 10 张卡片的通用约定。
+      keywords: [/BCS, /CLOAD, 初始条件]
+    - no: '8'
+      title: MPM 卡片
+      page: 47
+      summary: /MPMGRID /MPMINFLOW /MPMCONTACT /MPMBOXBCS /MPMWALLBCS /MPMVELBCS —— 背景网格、流入与边界。
+      keywords: [/MPMGRID, /MPMINFLOW, 盒边界]
+    - no: '9'
+      title: 接触卡片
+      page: 55
+      summary: NTS 节点–面罚接触 /INTER/PENA 的从属面、主面、罚参数与热力绑定。
+      keywords: [/INTER/PENA, 罚函数, 热力绑定]
+    - no: '10'
+      title: 运行与输出
+      page: 59
+      summary: 求解流程七步、启动摘要怎么读、进度四行字段、日志里的能量历史表与 err(%) 自查、并行与稳定性建议。
+      keywords: [启动摘要, 能量守恒, GPU]
+    - no: '11'
+      title: 错误排查
+      page: 64
+      summary: 报错机制、错误码速查（RUN-5101 沙漏能、5102 负体积…）、按现象排查与常见问题。
+      keywords: [错误码, FAQ]
+    - no: A
+      title: 关键字总索引
+      page: 68
+      summary: 全部卡片 → 章节的对照表，按需查而不是从头读。
+      keywords: [索引]
+    - no: B
+      title: 列宽速查表
+      page: 70
+      summary: 固定列格式下每张卡片每一列的宽度对照，手写输入文件时对着抄。
+      keywords: [列宽, 固定格式]
+    - no: C
+      title: 完整示例
+      page: 82
+      summary: FEM 六面体单单元冲击与 MPM 物质点流入两个算例全文、逐行讲解，附输入文件自查方法。
+      keywords: [示例, 自查]

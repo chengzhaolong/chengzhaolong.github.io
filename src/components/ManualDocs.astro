@@ -1,0 +1,93 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  /** cuspic-manual.yml 的数据（collection: manual） */
+  manual: CollectionEntry<'manual'>['data'];
+}
+
+const { manual } = Astro.props;
+/** 章节深链：PDF 的 #page=N 是物理页，和页脚「第 N 页」一致 */
+const at = (page: number) => `${manual.file}#page=${page}`;
+---
+
+<section class="section--tight section--line" id="docs">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow">Documentation</span>
+        <h2 style="margin-top:.6rem">用户手册</h2>
+        <p>
+          输入文件的每一张卡片、错误码与两个完整算例都在这本册子里。下面每一条直接跳到对应章节，
+          其余部分按需下载翻看。
+        </p>
+      </div>
+      <span class="badge badge--dot">{manual.version}</span>
+    </div>
+
+    <div class="split split--top">
+      <div data-reveal>
+        <p class="card__meta mono">
+          {manual.version} · {manual.pages} 页 · {manual.size} · {manual.date}
+        </p>
+        <h3 style="margin-top:.6rem;font-size:var(--fs-h2)">{manual.title}</h3>
+        {manual.subtitle && <p class="muted" style="margin-top:.5rem">{manual.subtitle}</p>}
+        {manual.abstract && <p style="margin-top:1rem;color:var(--ink-2)">{manual.abstract}</p>}
+
+        <div class="cluster" style="margin-top:1.5rem">
+          <a class="btn" href={manual.file} download>下载 PDF（{manual.size}）</a>
+          <a class="btn btn--ghost" href={at(1)} target="_blank" rel="noopener">在浏览器中打开 ↗</a>
+        </div>
+
+        <p class="muted" style="margin-top:1.25rem;font-size:var(--fs-xs);line-height:1.7">
+          章节链接带 <code class="mono">#page=</code> 片段，Chrome / Edge / Firefox 会直接翻到那一页；
+          手册本身也带可点的目录。PDF 由同一套输入文件生成，改版后版本号会写进文件名。
+        </p>
+      </div>
+
+      <div class="table-wrap" data-reveal style="--d:.08s">
+        <table class="data">
+          <thead>
+            <tr>
+              <th scope="col">章</th>
+              <th scope="col">标题与内容</th>
+              <th scope="col">页</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              manual.chapters.map((c) => (
+                <tr>
+                  <td class="num">{c.no}</td>
+                  <td>
+                    <a href={at(c.page)} target="_blank" rel="noopener">
+                      {c.title}
+                    </a>
+                    {c.summary && (
+                      <span
+                        class="muted"
+                        style="display:block;margin-top:.25rem;font-size:var(--fs-xs);line-height:1.65"
+                      >
+                        {c.summary}
+                      </span>
+                    )}
+                    {c.keywords.length > 0 && (
+                      <span class="cluster" style="margin-top:.45rem;gap:.3rem">
+                        {c.keywords.map((k) => (
+                          <span class="badge" style="font-size:.66rem;padding:.1rem .45rem">
+                            {k}
+                          </span>
+                        ))}
+                      </span>
+                    )}
+                  </td>
+                  <td class="num">{c.page}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

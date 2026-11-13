@@ -15,7 +15,8 @@ const contacts = [
   { label: 'Scholar ↗', href: profile.links?.scholar },
   { label: 'GitHub ↗', href: profile.links?.github },
   { label: 'Bilibili ↗', href: profile.links?.bilibili },
-  { label: 'CV（PDF）↓', href: profile.links?.cv },
+  // 简历 PDF 走下载而不是浏览器预览（文件在 public/media/docs/cv.pdf）
+  { label: 'CV（PDF）↓', href: profile.links?.cv, download: true },
 ].filter((c) => c.href);
 ---
 
@@ -24,19 +25,33 @@ const contacts = [
   description={`${profile.name}，${profile.title}，${profile.affiliation}。简历：教育背景、项目经历、获奖、技能。`}
 >
   <header class="cv-head">
-    <div class="container--cv">
-      <h1 class="cv-name">{profile.name}</h1>
-      <p class="cv-line">{meta.join(' · ')}</p>
-      <p class="cv-line cv-line--links">
-        {
-          contacts.map((c, i) => (
-            <>
-              {i > 0 && <span aria-hidden="true">·</span>}
-              <a href={c.href}>{c.label}</a>
-            </>
-          ))
-        }
-      </p>
+    <div class="container--cv cv-head__inner">
+      <div class="cv-head__main">
+        <h1 class="cv-name">{profile.name}</h1>
+        <p class="cv-line">{meta.join(' · ')}</p>
+        <p class="cv-line cv-line--links">
+          {
+            contacts.map((c, i) => (
+              <>
+                {i > 0 && (
+                  <span aria-hidden="true" class={c.download ? 'cv-line__sep--cv' : undefined}>
+                    ·
+                  </span>
+                )}
+                <a href={c.href} download={c.download} class={c.download ? 'cv-line__cv' : undefined}>
+                  {c.label}
+                </a>
+              </>
+            ))
+          }
+        </p>
+      </div>
+      {
+        profile.photo && (
+          /* 照片只出现在打印出的 PDF 里：屏幕上 display:none，不占位 */
+          <img class="cv-photo" src={profile.photo} alt={`${profile.name}的照片`} width="88" height="118" />
+        )
+      }
     </div>
   </header>
 

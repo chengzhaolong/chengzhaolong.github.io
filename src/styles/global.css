@@ -1637,6 +1637,22 @@ table.data td.num {
   border-bottom: 1px solid var(--line-strong);
 }
 
+/* 页首内层：屏幕上单栏（照片 display:none），打印时才变成「文字 + 照片」两列 */
+.cv-head__inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.cv-head__main {
+  min-width: 0;
+}
+
+.cv-photo {
+  display: none;
+}
+
 .cv-name {
   font-size: 1.9rem;
   letter-spacing: -0.01em;
@@ -2389,8 +2405,10 @@ button.badge:hover {
 }
 
 /* ---------- 22. 打印 ---------- */
+/* A4 + 固定页边距：Ctrl+P / headless 打印出来的就是简历 PDF 的版心 */
 @page {
-  margin: 14mm;
+  size: A4;
+  margin: 12mm 14mm;
 }
 
 @media print {
@@ -2415,17 +2433,115 @@ button.badge:hover {
     display: none;
   }
 
-  /* 简历页：打印即 PDF 简历，一条不拆行、一页放得下 */
+  /* 简历页：打印出来的就是简历 PDF —— 一页 A4、页首带照片、字号压到 0.76rem≈9pt */
   .cv-links {
     display: none !important;
   }
 
+  /* 自指链接（点它下载 PDF）不该印在 PDF 里，连同它前面的分隔点一起藏掉 */
+  .cv-line__cv,
+  .cv-line__sep--cv {
+    display: none !important;
+  }
+
   .cv-head {
-    padding-top: 0;
+    padding: 0 0 0.5rem;
+  }
+
+  .cv-head__inner {
+    gap: 6mm;
+  }
+
+  .cv-photo {
+    display: block;
+    flex: none;
+    width: 88px;
+    height: 118px;
+    border: 1px solid var(--line-strong);
+    object-fit: cover;
+  }
+
+  .cv-name {
+    font-size: 1.55rem;
+  }
+
+  .cv-line {
+    margin-top: 0.25rem;
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
+  .cv-line--links {
+    margin-top: 0.1rem;
+    font-size: 0.74rem;
+  }
+
+  .cv-line--links span {
+    margin-inline: 0.4rem;
   }
 
   .cv-body {
-    padding-block: 1.1rem 0;
+    padding: 0.5rem 0 0;
+  }
+
+  .cv-block + .cv-block {
+    margin-top: 0.8rem;
+  }
+
+  .cv-block__title {
+    padding-bottom: 0.15rem;
+    font-size: 0.9rem;
+  }
+
+  .cv-entry {
+    margin-top: 0.45rem;
+  }
+
+  .cv-entry__title {
+    font-size: 0.86rem;
+    line-height: 1.35;
+  }
+
+  .cv-entry__role {
+    font-size: 0.78rem;
+  }
+
+  .cv-entry__when {
+    font-size: 0.72rem;
+  }
+
+  .cv-list {
+    margin-top: 0.1rem;
+    padding-left: 0.9rem;
+  }
+
+  .cv-list li {
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .cv-row {
+    margin-top: 0.15rem;
+  }
+
+  .cv-row__title {
+    font-size: 0.82rem;
+    line-height: 1.42;
+  }
+
+  .cv-row__note {
+    font-size: 0.78rem;
+  }
+
+  .cv-skills {
+    gap: 0.12rem 0.8rem;
+    margin-top: 0.35rem;
+  }
+
+  .cv-skills dt,
+  .cv-skills dd {
+    font-size: 0.82rem;
+    line-height: 1.45;
   }
 
   .cv-entry,

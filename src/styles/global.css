@@ -1679,6 +1679,102 @@ table.data td.num {
   }
 }
 
+/* ---------- 18b. 简历页（/about）：单栏、只有条目块 + 表格 ---------- */
+.cv-meta {
+  margin-top: 0.5rem;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+.cv-contact {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 0.3rem;
+  list-style: none;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+.cv-contact li:not(:last-child)::after {
+  content: '·';
+  margin-inline: 0.7rem;
+  color: var(--line-strong);
+}
+
+.cv-summary {
+  max-width: 62ch;
+}
+
+.cv-block {
+  margin-top: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+.cv-block__title {
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-h3);
+  letter-spacing: -0.01em;
+}
+
+.cv-block .timeline,
+.cv-block .table-wrap {
+  margin-top: 1.4rem;
+}
+
+.cv-block table.data th {
+  width: 6.5rem;
+  background: transparent;
+  white-space: normal;
+}
+
+.cv-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.cv-awards {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.35rem;
+  list-style: none;
+}
+
+.cv-awards li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.9rem;
+}
+
+.cv-awards__when {
+  min-width: 5.5rem;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+}
+
+.cv-awards__title {
+  font-weight: 500;
+}
+
+.cv-awards__note {
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
+}
+
+.cv-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+  margin-top: clamp(2.75rem, 6vw, 4rem);
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
 /* ---------- 19. lightbox ---------- */
 .lightbox {
   width: min(1200px, 94vw);
@@ -2279,5 +2375,20 @@ button.badge:hover {
   .media-band::after,
   .media-band::before {
     display: none;
+  }
+
+  /* 简历页：打印即 PDF 简历 */
+  .cv-links {
+    display: none !important;
+  }
+
+  .cv-block,
+  .timeline__item,
+  .cv-awards li {
+    break-inside: avoid;
+  }
+
+  .cv-block__title {
+    break-after: avoid;
   }
 }

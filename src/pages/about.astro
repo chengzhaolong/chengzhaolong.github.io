@@ -4,187 +4,147 @@ import { getEntry } from 'astro:content';
 
 const profile = (await getEntry('profile', 'main'))!.data;
 const cv = (await getEntry('cv', 'main'))!.data;
+
+/** 页首一句话：cv.yml 没写（或写了空串）就退回 profile 的简介 */
+const summary = cv.summary?.trim() ? cv.summary : profile.intro_zh;
+
+/** 姓名下面那行：身份 · 单位 · 地点 */
+const meta = [profile.title, profile.affiliation, profile.location].filter(Boolean);
+
+/** 联系方式：只渲染填了的 */
+const contacts = [
+  { label: profile.email, href: `mailto:${profile.email}` },
+  { label: 'ORCID ↗', href: profile.links?.orcid },
+  { label: 'Scholar ↗', href: profile.links?.scholar },
+  { label: 'GitHub ↗', href: profile.links?.github },
+  { label: 'Bilibili ↗', href: profile.links?.bilibili },
+].filter((c) => c.href);
 ---
 
-<Base title="关于" description={`${profile.name}，${profile.title}。${profile.tagline_zh}`}>
+<Base title="简历" description={`${profile.name}，${profile.title}，${profile.affiliation}。简历：教育背景、项目经历、获奖与技能。`}>
   <header class="page-head">
-    <div class="container">
-      <span class="eyebrow">About · {profile.name}</span>
-      <h1 class="page-head__title">简介与简历</h1>
-      <p class="mono" style="margin-top:.6rem;color:var(--ink-3);font-size:.82rem">
-        {profile.name_en} · {profile.affiliation_en}
-      </p>
+    <div class="container--narrow">
+      <span class="eyebrow">CV · 简历</span>
+      <h1 class="page-head__title">{profile.name}</h1>
+      <p class="cv-meta mono">{meta.join(' · ')}</p>
+      <ul class="cv-contact mono">
+        {
+          contacts.map((c) => (
+            <li>
+              <a href={c.href}>{c.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        profile.links?.cv && (
+          <div class="cluster" style="margin-top:1.35rem">
+            <a class="btn btn--ghost" href={profile.links.cv}>
+              下载 CV（PDF）
+            </a>
+          </div>
+        )
+      }
     </div>
   </header>
 
   <section class="section">
-    <div class="container">
-      <div class="split split--top">
-        <div class="prose" data-reveal>
-          {profile.intro_zh.split('\n\n').map((p) => <p>{p}</p>)}
-          <h2>我在做什么</h2>
-          <p>
-            简单说，是把「切削过程」当成一个数值问题来解：建模（本构、摩擦、失效）、离散（FEM + MPM 分区）、
-            耦合（力学与热学交错推进）、加速（GPU 并行），最后把这些拼成一个能跑工程算例、也能被同行复现的软件。
-          </p>
-          <p>
-            我关心的不只是算例能不能收敛，还有：换一个切削速度结果是否稳定、失败算例能不能快速定位、
-            别人拿到算例能不能重复出同样的曲线。
-          </p>
+    <div class="container--narrow">
+      {summary && <p class="lead cv-summary">{summary}</p>}
 
-          {
-            cv.education.length > 0 && (
-              <>
-                <h2>教育经历</h2>
-                <ol class="timeline" style="margin-top:1.25rem">
-                  {cv.education.map((e) => (
-                    <li class="timeline__item">
-                      <span class="timeline__when">{e.period}</span>
-                      <p class="timeline__what">
-                        {e.degree}
-                        {e.major && ` · ${e.major}`}
-                      </p>
-                      <p class="timeline__where">{e.school}</p>
-                      {e.note && <p class="timeline__desc">{e.note}</p>}
-                    </li>
-                  ))}
-                </ol>
-              </>
-            )
-          }
+      {
+        cv.education.length > 0 && (
+          <section class="cv-block">
+            <h2 class="cv-block__title">教育背景</h2>
+            <ol class="timeline">
+              {cv.education.map((e) => (
+                <li class="timeline__item">
+                  <span class="timeline__when">{e.period}</span>
+                  <p class="timeline__what">
+                    {e.degree}
+                    {e.major && ` · ${e.major}`}
+                  </p>
+                  <p class="timeline__where">{e.school}</p>
+                  {e.note && <p class="timeline__desc">{e.note}</p>}
+                </li>
+              ))}
+            </ol>
+          </section>
+        )
+      }
 
-          {
-            cv.experience.length > 0 && (
-              <>
-                <h2>研究经历</h2>
-                <ol class="timeline" style="margin-top:1.25rem">
-                  {cv.experience.map((x) => (
-                    <li class="timeline__item">
-                      <span class="timeline__when">{x.period}</span>
-                      <p class="timeline__what">{x.role}</p>
-                      <p class="timeline__where">{x.org}</p>
-                      {x.note && <p class="timeline__desc">{x.note}</p>}
-                    </li>
-                  ))}
-                </ol>
-              </>
-            )
-          }
-
-          {
-            cv.awards.length > 0 && (
-              <>
-                <h2>获奖与荣誉</h2>
-                <ul>
-                  {cv.awards.map((a) => (
-                    <li>
-                      <span class="mono" style="font-size:.78rem;color:var(--ink-3)">
-                        {a.period}
-                      </span>{' '}
-                      {a.title}
-                      {a.note && `（${a.note}）`}
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )
-          }
-
-          {
-            cv.skills.length > 0 && (
-              <>
-                <h2>工具与技能</h2>
-                <div class="table-wrap" style="margin-top:1.25rem">
-                  <table class="data">
-                    <tbody>
-                      {cv.skills.map((s) => (
-                        <tr>
-                          <th scope="row" style="width:6rem;background:transparent;white-space:normal">
-                            {s.group}
-                          </th>
-                          <td>{s.items}</td>
-                        </tr>
+      {
+        cv.projects.length > 0 && (
+          <section class="cv-block">
+            <h2 class="cv-block__title">项目经历</h2>
+            <ol class="timeline">
+              {cv.projects.map((p) => (
+                <li class="timeline__item">
+                  <span class="timeline__when">{p.period}</span>
+                  <p class="timeline__what">{p.name}</p>
+                  {p.role && <p class="timeline__where">{p.role}</p>}
+                  <p class="timeline__desc">{p.text}</p>
+                  {(p.tags?.length || p.link) && (
+                    <div class="cv-tags">
+                      {p.tags?.map((t) => (
+                        <span class="badge">{t}</span>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            )
-          }
+                      {p.link && (
+                        <a class="badge" href={p.link}>
+                          详情 →
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </section>
+        )
+      }
 
-          <h2>研究之外</h2>
-          <p>
-            喜欢把计算结果做成能看懂的图与动画（本站的媒体区就是为此存在的）；
-            也在整理切削仿真的常见坑与对策，希望后来的人少走一点弯路。
-          </p>
-        </div>
+      {
+        cv.awards.length > 0 && (
+          <section class="cv-block">
+            <h2 class="cv-block__title">获奖与荣誉</h2>
+            <ul class="cv-awards">
+              {cv.awards.map((a) => (
+                <li>
+                  <span class="cv-awards__when mono">{a.period}</span>
+                  <span class="cv-awards__title">{a.title}</span>
+                  {a.note && <span class="cv-awards__note">{a.note}</span>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
 
-        <aside class="stack-lg">
-          <div data-reveal>
-            <dl class="info-list">
-              <div>
-                <dt>单位</dt>
-                <dd>{profile.affiliation}</dd>
-              </div>
-              <div>
-                <dt>地点</dt>
-                <dd>{profile.location}</dd>
-              </div>
-              <div>
-                <dt>邮箱</dt>
-                <dd><a href={`mailto:${profile.email}`}>{profile.email}</a></dd>
-              </div>
-              <div>
-                <dt>方向</dt>
-                <dd>{profile.interests.slice(0, 3).join('、')}</dd>
-              </div>
-            </dl>
-
-            <div class="cluster" style="margin-top:1.25rem">
-              {profile.links?.cv && <a class="btn btn--ghost" href={profile.links.cv}>下载 CV（PDF）</a>}
-              <a class="btn" href={`mailto:${profile.email}`}>联系我</a>
+      {
+        cv.skills.length > 0 && (
+          <section class="cv-block">
+            <h2 class="cv-block__title">工具与技能</h2>
+            <div class="table-wrap">
+              <table class="data">
+                <tbody>
+                  {cv.skills.map((s) => (
+                    <tr>
+                      <th scope="row">{s.group}</th>
+                      <td>{s.items}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </section>
+          </section>
+        )
+      }
 
-  <section class="media-band">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-head__text">
-          <span class="eyebrow eyebrow--media">Continue</span>
-          <h2 style="margin-top:.65rem">从哪看起</h2>
-          <p>如果你想知道东西能不能用，看软件；如果你想看方法是怎么定下来的，看笔记。</p>
-        </div>
-      </div>
-      <div class="media-grid">
-        <div class="span-4">
-          <a class="card card--media card--accent" href="/notes">
-            <span class="card__meta">Notes</span>
-            <span class="card__title">笔记</span>
-            <span class="card__text">论文背后的技术细节：设计取舍、失败的尝试、结果的验证。</span>
-            <span class="card__cta">进入</span>
-          </a>
-        </div>
-        <div class="span-4">
-          <a class="card card--media card--accent" href="/software">
-            <span class="card__meta">Software</span>
-            <span class="card__title">软件</span>
-            <span class="card__text">cuspic 与 Cusper CuttingLab 的能力与获取方式。</span>
-            <span class="card__cta">进入</span>
-          </a>
-        </div>
-        <div class="span-4">
-          <a class="card card--media card--accent" href="/publications">
-            <span class="card__meta">Publications</span>
-            <span class="card__title">论文</span>
-            <span class="card__text">带 BibTeX 与 PDF / DOI 链接的完整列表。</span>
-            <span class="card__cta">进入</span>
-          </a>
-        </div>
-      </div>
+      <p class="cv-links mono">
+        <a href="/publications">论文列表 →</a>
+        <a href="/software">软件 →</a>
+        <a href="/notes">笔记 →</a>
+      </p>
     </div>
   </section>
 </Base>

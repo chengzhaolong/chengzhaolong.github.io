@@ -35,14 +35,14 @@
 │  ├─ content/notes/         # 笔记：一篇一个 .mdx（文件名即 URL）
 │  ├─ data/
 │  │  ├─ profile.yml         # 个人信息（姓名/单位/邮箱/照片/简介/关键词）
-│  │  ├─ cv.yml              # 简历（教育经历 / 研究经历 / 获奖 / 技能）
+│  │  ├─ cv.yml              # 简历（summary / 教育 / 项目 / 获奖 / 技能）
 │  │  ├─ publications.yml    # 论文列表
 │  │  └─ software.yml        # 软件条目（cuspic / cuttinglab）
 │  ├─ components/            # Nav / Footer / FigureCard / VideoCard / PubItem …
 │  ├─ layouts/Base.astro     # <head>、SEO、导航、页脚、灯箱、入场动效
 │  ├─ pages/
 │  │  ├─ index.astro         # 首页
-│  │  ├─ about.astro
+│  │  ├─ about.astro         # 简历页（单栏，内容读 cv.yml）
 │  │  ├─ publications.astro
 │  │  ├─ notes/index.astro + [slug].astro
 │  │  ├─ software/index.astro + [slug].astro
@@ -100,28 +100,34 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 
 ### 4.2 简历 — `src/data/cv.yml`
 
-`/about` 的「教育经历 / 研究经历 / 获奖与荣誉 / 工具与技能」全部来自这一个文件。
+`/about` 是一页单栏简历，页面上所有内容（含姓名下方那行联系方式）都来自 `profile.yml` + `cv.yml`，
+`cv.yml` 只有五段：`summary` / `education` / `projects` / `awards` / `skills`。
 每段是一个列表，**写在前面先显示**；某段不需要就写 `[]`（或删掉整段），页面上不会出现空标题。
 
 ```yaml
 - id: main
 
-  education:                      # 教育经历
+  summary: >-                     # 页首一句话；留空则退回 profile.intro_zh
+    把金属切削当数值问题来解：本构与接触建模、FEM–MPM 分区离散、GPU 并行。
+
+  education:                      # 教育背景，新的在上
     - period: 2022.09 — 至今       # 时间原样显示，想怎么写就怎么写
       degree: 博士研究生
       major: 计算力学              # 可省略
       school: 大连理工大学
-      note: 导师：〔姓名〕          # 可省略
+      note: 导师：〔姓名〕          # 可省略；保研直博这类也写这里
 
-  experience:                     # 研究 / 工作经历，没有就 []
-    - period: 2023.07 — 2023.09
-      role: 研究助理
-      org: 〔单位 / 课题组〕
-      note: 〔一句话：做了什么、结果如何〕
+  projects:                       # 项目经历
+    - name: CUSPIC —— 高性能显式动力求解器
+      period: 2022 — 至今
+      role: 主要开发者 · C++ / CUDA   # 可省略
+      text: 一句话：解决什么问题、你负责哪块、做到什么程度。
+      tags: [FEM–MPM, GPU]           # 可省略，渲染成小标签
+      link: /software/cuspic         # 可省略，出现「详情 →」
 
   awards:                         # 获奖与荣誉，没有就 []
-    - period: 2024
-      title: 〔奖项 / 荣誉名称〕
+    - period: 2022                # 按年份倒序
+      title: 本科优秀毕业论文（校级）  # 写全称，评委认全称
       note: 〔可省略〕
 
   skills:                         # 工具与技能，一栏一行
@@ -129,11 +135,19 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
       items: C++ / CUDA、Python
 ```
 
-字段名是固定的：`period` / `degree` / `major` / `school` / `note`、`period` / `role` / `org` / `note`、
-`period` / `title` / `note`、`group` / `items`。填错字段名会在 `npm run check` 里报错，不会静默丢数据。
+字段名是固定的：`summary`；`period` / `degree` / `major` / `school` / `note`；
+`name` / `period` / `role` / `text` / `tags` / `link`；`period` / `title` / `note`；`group` / `items`。
+填错字段名 `npm run check` 会直接报 `projects.0: Unrecognized key: "xxx"`，不会静默丢数据。
 
+两条写法约定，能让简历更像简历：
+
+- **奖项用全称**（「美国大学生数学建模竞赛（MCM/ICM）Finalist」而不是「美赛 F 奖」），别写没有依据的比例；
+- **升学结果不是奖**：「保研直博」写进本科那条的 `note`，和 `period` 自然对齐，一眼能看出时间线。
+
+页首的姓名、`身份 · 单位 · 地点`、邮箱与 ORCID 都取自 `profile.yml`，改那边即可。
 简历 PDF 不放代码里：文件丢进 `public/media/docs/cv.pdf`，再把 `profile.yml` 的
-`links.cv` 填成 `/media/docs/cv.pdf`，`/about` 侧栏就会出现「下载 CV（PDF）」按钮。
+`links.cv` 填成 `/media/docs/cv.pdf`，页首就会出现「下载 CV（PDF）」按钮；
+不填这个按钮就不显示，浏览器 Ctrl+P 也能直接打印成 PDF（导航、页脚、页尾链接会自动隐藏）。
 
 ### 4.3 加一篇论文 — `src/data/publications.yml`
 
@@ -299,7 +313,7 @@ import peeq from '../assets/figures/peeq.png';
 占位内容在页面上都有明确标注（「待替换」/〔 〕），按下面顺序替换即可：
 
 - [ ] `profile.yml`：单位、邮箱、`links`（Scholar / ORCID / GitHub / B站）
-- [ ] `cv.yml`：教育经历的时间与导师、研究经历、获奖、技能；〔 〕全部替换
+- [ ] `cv.yml`：本科学校/专业/起止年月、导师、项目文案、获奖年份，〔 〕全部替换
 - [ ] 简历 PDF → `public/media/docs/cv.pdf`，`profile.yml` 的 `links.cv` 填 `/media/docs/cv.pdf`
 - [ ] 个人照片 → 放到 `public/media/portrait.jpg`（3:4 竖图，长边 1200 px 以内），把 `profile.yml` 的 `photo` 改成 `/media/portrait.jpg`
 - [ ] `publications.yml`：换成真实论文（含 BibTeX）

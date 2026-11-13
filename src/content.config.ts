@@ -80,6 +80,8 @@ const software = defineCollection({
 const cv = defineCollection({
   loader: file('./src/data/cv.yml'),
   schema: z.object({
+    /** 页首的一句话定位；留空则回退到 profile.intro_zh */
+    summary: z.string().optional(),
     /** 教育经历，按显示顺序排（新的在前） */
     education: z
       .array(
@@ -94,15 +96,17 @@ const cv = defineCollection({
           .strict()
       )
       .default([]),
-    /** 研究 / 工作经历 */
-    experience: z
+    /** 项目经历：一条一个项目，link 可选（指向 /software/xxx 等） */
+    projects: z
       .array(
         z
           .object({
+            name: z.string(),
             period: z.string(),
-            role: z.string(),
-            org: z.string(),
-            note: z.string().optional(),
+            role: z.string().optional(),
+            text: z.string(),
+            tags: z.array(z.string()).optional(),
+            link: z.string().optional(),
           })
           .strict()
       )

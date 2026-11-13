@@ -64,3 +64,5 @@
     # 简历 PDF：文件在 public/media/docs/cv.pdf（换简历就覆盖同名文件）
     # 清空则首页联系行、页脚、/about 页首三处入口一起消失
     cv: '/media/docs/cv.pdf'
+    # CUSPIC 项目主页：只在简历 PDF 里显示，网页上看不到（见 about.astro 的 .cv-line--home）
+    cuspic: 'https://chengzhaolong.github.io/cuspic/'

@@ -18,6 +18,10 @@ const contacts = [
   // 简历 PDF 走下载而不是浏览器预览（文件在 public/media/docs/cv.pdf）
   { label: '下载简历（PDF）↓', href: profile.links?.cv, download: true },
 ].filter((c) => c.href);
+
+/** 页首「想了解更多」那行：只在打印出的 PDF 里出现，网址去掉 https:// 好排版 */
+const cuspicUrl = profile.links?.cuspic;
+const cuspicLabel = cuspicUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '');
 ---
 
 <Base
@@ -46,11 +50,11 @@ const contacts = [
           }
         </p>
         {
-          Astro.site && (
+          cuspicUrl && (
             <p class="cv-line cv-line--home">
-              关于我的技术背景和 CUSPIC 求解器，想了解更多，可以看我的个人主页：
-              <a class="cv-home__url" href={Astro.site}>
-                {Astro.site.host}
+              查看我的个人主页，了解更多我的背景和CUSPIC求解器：
+              <a class="cv-home__url" href={cuspicUrl}>
+                {cuspicLabel}
               </a>
             </p>
           )

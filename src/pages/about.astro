@@ -3,16 +3,7 @@ import Base from '../layouts/Base.astro';
 import { getEntry } from 'astro:content';
 
 const profile = (await getEntry('profile', 'main'))!.data;
-
-const timeline = profile.timeline;
-
-const tools = [
-  { k: '自研', v: 'cuspic（FEM–MPM / GPU）、Cusper CuttingLab' },
-  { k: '语言', v: 'C++ / CUDA、Python、Fortran〔按实际填〕' },
-  { k: '并行', v: 'CUDA、MPI、OpenMP' },
-  { k: '前后处理', v: 'ParaView、VTK、Python 数据栈' },
-  { k: '写作', v: 'LaTeX、Markdown' },
-];
+const cv = (await getEntry('cv', 'main'))!.data;
 ---
 
 <Base title="关于" description={`${profile.name}，${profile.title}。${profile.tagline_zh}`}>
@@ -41,31 +32,85 @@ const tools = [
             别人拿到算例能不能重复出同样的曲线。
           </p>
 
-          <h2>教育经历</h2>
-          <ol class="timeline" style="margin-top:1.25rem">
-            {timeline.map((t) => (
-              <li class="timeline__item">
-                <span class="timeline__when">{t.when}</span>
-                <p class="timeline__what">{t.what}</p>
-                <p class="timeline__where">{t.where}</p>
-                <p class="timeline__desc">{t.desc}</p>
-              </li>
-            ))}
-          </ol>
+          {
+            cv.education.length > 0 && (
+              <>
+                <h2>教育经历</h2>
+                <ol class="timeline" style="margin-top:1.25rem">
+                  {cv.education.map((e) => (
+                    <li class="timeline__item">
+                      <span class="timeline__when">{e.period}</span>
+                      <p class="timeline__what">
+                        {e.degree}
+                        {e.major && ` · ${e.major}`}
+                      </p>
+                      <p class="timeline__where">{e.school}</p>
+                      {e.note && <p class="timeline__desc">{e.note}</p>}
+                    </li>
+                  ))}
+                </ol>
+              </>
+            )
+          }
 
-          <h2>工具与技能</h2>
-          <div class="table-wrap" style="margin-top:1.25rem">
-            <table class="data">
-              <tbody>
-                {tools.map((t) => (
-                  <tr>
-                    <th scope="row" style="width:6rem;background:transparent;white-space:normal">{t.k}</th>
-                    <td>{t.v}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {
+            cv.experience.length > 0 && (
+              <>
+                <h2>研究经历</h2>
+                <ol class="timeline" style="margin-top:1.25rem">
+                  {cv.experience.map((x) => (
+                    <li class="timeline__item">
+                      <span class="timeline__when">{x.period}</span>
+                      <p class="timeline__what">{x.role}</p>
+                      <p class="timeline__where">{x.org}</p>
+                      {x.note && <p class="timeline__desc">{x.note}</p>}
+                    </li>
+                  ))}
+                </ol>
+              </>
+            )
+          }
+
+          {
+            cv.awards.length > 0 && (
+              <>
+                <h2>获奖与荣誉</h2>
+                <ul>
+                  {cv.awards.map((a) => (
+                    <li>
+                      <span class="mono" style="font-size:.78rem;color:var(--ink-3)">
+                        {a.period}
+                      </span>{' '}
+                      {a.title}
+                      {a.note && `（${a.note}）`}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )
+          }
+
+          {
+            cv.skills.length > 0 && (
+              <>
+                <h2>工具与技能</h2>
+                <div class="table-wrap" style="margin-top:1.25rem">
+                  <table class="data">
+                    <tbody>
+                      {cv.skills.map((s) => (
+                        <tr>
+                          <th scope="row" style="width:6rem;background:transparent;white-space:normal">
+                            {s.group}
+                          </th>
+                          <td>{s.items}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )
+          }
 
           <h2>研究之外</h2>
           <p>

@@ -34,7 +34,8 @@
 │  ├─ content.config.ts      # 内容集合的 schema（字段校验）
 │  ├─ content/notes/         # 笔记：一篇一个 .mdx（文件名即 URL）
 │  ├─ data/
-│  │  ├─ profile.yml         # 个人信息（姓名/单位/邮箱/照片/简介/教育经历/算例指标）
+│  │  ├─ profile.yml         # 个人信息（姓名/单位/邮箱/照片/简介/关键词）
+│  │  ├─ cv.yml              # 简历（教育经历 / 研究经历 / 获奖 / 技能）
 │  │  ├─ publications.yml    # 论文列表
 │  │  └─ software.yml        # 软件条目（cuspic / cuttinglab）
 │  ├─ components/            # Nav / Footer / FigureCard / VideoCard / PubItem …
@@ -74,23 +75,22 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 | `demo` | `true` 时论文页会显示「示例数据」提示。全部换成真实内容后改为 `false` |
 | `name` / `name_en` / `latin` | 中文名 / 英文名 / 全大写英文名（页脚、导航用） |
 | `title` / `title_en` | 学术身份，用于结构化数据（JSON-LD 的 `jobTitle`）与 `/about` |
-| `role_short` | 首屏身份行的短标签，写作品不写头衔，如「CUSPIC 作者」；不填则用 `title` |
-| `site_suffix` | 浏览器标题后缀，如「CUSPIC · 切削仿真」；不填则用 `title` |
+| `role_short_en` | 英文页 `/en/` 身份行，如「CUSPIC author」；不填则用 `title_en` |
+| `site_suffix` | 浏览器标题后缀，如「个人主页」；不填则用 `title` |
 | `affiliation` / `affiliation_en` | 单位 / 学院 / 实验室（带〔〕的是占位，务必替换） |
 | `email` | 全站的联系入口都用它 |
 | `photo` | 首屏的小照片（3:4 竖图），放在 `public/media/` 下，填 `/media/portrait.jpg` |
 | `tagline_zh` / `tagline_en` | 首屏一句话 |
 | `intro_zh` / `intro_en` | 简介段落；用 `|-` 多行，空行分段 |
 | `interests` | 关键词，首页与 about 自动渲染 |
-| `timeline` | 教育/任职经历（`when` / `what` / `where` / `desc`），只用于 `/about` 的时间线 |
-| `metrics` | 首页「算例」小面板的实测指标（`k` / `v`），如网格规模、GPU 加速比；没有实测数据就留空或删掉整段 |
+| `metrics` | 预留：首页算例指标（`k` / `v`），当前模板未使用，可留空 |
 | `links` | `scholar` / `orcid` / `github` / `researchgate` / `bilibili` / `cv`，**留空则不显示** |
 
 #### 首页结构（`src/pages/index.astro`）
 
 顺序固定为 5 段，改文案直接改页面里的字符串，改数据改 YAML/MDX：
 
-1. **首屏（矮）**：`eyebrow` + 姓名 + 身份/单位 + 一句话 + 四个文本链接；右侧是 `profile.photo` 的小照片（点击进 `/about`）。`profile.name` 是唯一的 `h1`。
+1. **首屏（矮）**：`eyebrow` + 姓名 + 一句话 + 四个文本链接；右侧是 `profile.photo` 的小照片（点击进 `/about`）。`profile.name` 是唯一的 `h1`，不重复放身份行。
 2. **简介 + 算例**：左栏 `intro_zh` + `interests` + 「完整介绍与简历 →」；右栏一个算例短片（`VideoCard`，16:9），下面一行 `metrics` 指标，最后一行小字「了解 cuspic 求解器 →」。
 3. **自研工具**：深色区，自动读取 `software.yml`；卡片底部一行 `spec_line`。
 4. **论文**：取 3 条（`highlight: true` 优先）。
@@ -98,7 +98,44 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 
 「研究」模块已下线：首页只留首屏与导航入口，方法层面的长文统一写进 `/notes`（笔记）。
 
-### 4.2 加一篇论文 — `src/data/publications.yml`
+### 4.2 简历 — `src/data/cv.yml`
+
+`/about` 的「教育经历 / 研究经历 / 获奖与荣誉 / 工具与技能」全部来自这一个文件。
+每段是一个列表，**写在前面先显示**；某段不需要就写 `[]`（或删掉整段），页面上不会出现空标题。
+
+```yaml
+- id: main
+
+  education:                      # 教育经历
+    - period: 2022.09 — 至今       # 时间原样显示，想怎么写就怎么写
+      degree: 博士研究生
+      major: 计算力学              # 可省略
+      school: 大连理工大学
+      note: 导师：〔姓名〕          # 可省略
+
+  experience:                     # 研究 / 工作经历，没有就 []
+    - period: 2023.07 — 2023.09
+      role: 研究助理
+      org: 〔单位 / 课题组〕
+      note: 〔一句话：做了什么、结果如何〕
+
+  awards:                         # 获奖与荣誉，没有就 []
+    - period: 2024
+      title: 〔奖项 / 荣誉名称〕
+      note: 〔可省略〕
+
+  skills:                         # 工具与技能，一栏一行
+    - group: 编程
+      items: C++ / CUDA、Python
+```
+
+字段名是固定的：`period` / `degree` / `major` / `school` / `note`、`period` / `role` / `org` / `note`、
+`period` / `title` / `note`、`group` / `items`。填错字段名会在 `npm run check` 里报错，不会静默丢数据。
+
+简历 PDF 不放代码里：文件丢进 `public/media/docs/cv.pdf`，再把 `profile.yml` 的
+`links.cv` 填成 `/media/docs/cv.pdf`，`/about` 侧栏就会出现「下载 CV（PDF）」按钮。
+
+### 4.3 加一篇论文 — `src/data/publications.yml`
 
 复制一段，改字段即可；页面按 `year` 自动分组、倒序排列，编号自动生成。
 
@@ -139,7 +176,7 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
     @patent{CN121031225B, ...}
 ```
 
-### 4.3 软件 — `src/data/software.yml`
+### 4.4 软件 — `src/data/software.yml`
 
 两个条目：`cuspic`（求解器）与 `cuttinglab`（软件）。字段：
 
@@ -153,7 +190,7 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 详情页路由由 id 决定：`/software/cuspic`、`/software/cuttinglab`。
 若要加第三个软件，直接在 YAML 末尾追加一个条目即可，列表与详情页会自动生成。
 
-### 4.4 写笔记 — `src/content/notes/*.mdx`
+### 4.5 写笔记 — `src/content/notes/*.mdx`
 
 笔记 = 技术写作，回答「为什么这么做、试过什么、数对不对」。**写一篇 = 新建一个 `.mdx`**，
 文件名就是 URL（`gpu-particle-loop.mdx` → `/notes/gpu-particle-loop`），不用改任何页面代码。
@@ -189,9 +226,9 @@ import FigureCard from '../../components/FigureCard.astro';
 />
 ```
 
-新增一个方向 = 新建一个 `.mdx`，`order` 决定顺序，导航与本页目录自动更新。
+新增一篇笔记 = 在 `src/content/notes/` 新建一个 `.mdx`，`date` 决定排序，列表、详情页与 `/en/` 自动更新。
 
-### 4.5 图片与视频
+### 4.6 图片与视频
 
 **图片（`FigureCard`）** 支持两种写法：
 
@@ -262,6 +299,8 @@ import peeq from '../assets/figures/peeq.png';
 占位内容在页面上都有明确标注（「待替换」/〔 〕），按下面顺序替换即可：
 
 - [ ] `profile.yml`：单位、邮箱、`links`（Scholar / ORCID / GitHub / B站）
+- [ ] `cv.yml`：教育经历的时间与导师、研究经历、获奖、技能；〔 〕全部替换
+- [ ] 简历 PDF → `public/media/docs/cv.pdf`，`profile.yml` 的 `links.cv` 填 `/media/docs/cv.pdf`
 - [ ] 个人照片 → 放到 `public/media/portrait.jpg`（3:4 竖图，长边 1200 px 以内），把 `profile.yml` 的 `photo` 改成 `/media/portrait.jpg`
 - [ ] `publications.yml`：换成真实论文（含 BibTeX）
 - [ ] 首页算例短片：`index.astro` 里 `VideoCard` 填 `src`（mp4，5–10 s，3 MB 以内），并删掉 `placeholderLabel`；`metrics` 换成实测值

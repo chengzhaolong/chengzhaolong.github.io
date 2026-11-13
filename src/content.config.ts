@@ -76,6 +76,56 @@ const software = defineCollection({
   }),
 });
 
+/** 简历：改 src/data/cv.yml 即可，/about 页自动渲染 */
+const cv = defineCollection({
+  loader: file('./src/data/cv.yml'),
+  schema: z.object({
+    /** 教育经历，按显示顺序排（新的在前） */
+    education: z
+      .array(
+        z
+          .object({
+            period: z.string(),
+            degree: z.string(),
+            major: z.string().optional(),
+            school: z.string(),
+            note: z.string().optional(),
+          })
+          .strict()
+      )
+      .default([]),
+    /** 研究 / 工作经历 */
+    experience: z
+      .array(
+        z
+          .object({
+            period: z.string(),
+            role: z.string(),
+            org: z.string(),
+            note: z.string().optional(),
+          })
+          .strict()
+      )
+      .default([]),
+    /** 获奖与荣誉 */
+    awards: z
+      .array(
+        z
+          .object({
+            period: z.string(),
+            title: z.string(),
+            note: z.string().optional(),
+          })
+          .strict()
+      )
+      .default([]),
+    /** 工具与技能：group 一栏一个标签，items 一行文字 */
+    skills: z
+      .array(z.object({ group: z.string(), items: z.string() }).strict())
+      .default([]),
+  }),
+});
+
 const profile = defineCollection({
   loader: file('./src/data/profile.yml'),
   schema: z.object({
@@ -85,8 +135,7 @@ const profile = defineCollection({
     latin: z.string(),
     title: z.string(),
     title_en: z.string(),
-    /** 首屏身份行用的短标签（写作品/工具，不写头衔）；不填则用 title */
-    role_short: z.string().optional(),
+    /** 英文页首屏身份行的短标签；不填则用 title_en */
     role_short_en: z.string().optional(),
     /** 浏览器标题后缀，写技术定位而不是头衔；不填则退回 title */
     site_suffix: z.string().optional(),
@@ -101,17 +150,6 @@ const profile = defineCollection({
     intro_zh: z.string(),
     intro_en: z.string(),
     interests: z.array(z.string()).default([]),
-    /** 教育/任职经历，首页简历摘要与 /about 共用 */
-    timeline: z
-      .array(
-        z.object({
-          when: z.string(),
-          what: z.string(),
-          where: z.string(),
-          desc: z.string().optional(),
-        })
-      )
-      .default([]),
     /** 首页算例区的实测指标 */
     metrics: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
     links: z
@@ -127,4 +165,4 @@ const profile = defineCollection({
   }),
 });
 
-export const collections = { notes, publications, software, profile };
+export const collections = { notes, publications, software, cv, profile };

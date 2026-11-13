@@ -678,14 +678,6 @@ a.badge:hover {
   color: var(--accent-warm-bright);
 }
 
-/* 头衔 / 单位：紧随姓名的一行小字 */
-.hero__affil {
-  margin-top: 0.45rem;
-  font-size: 0.88rem;
-  line-height: 1.6;
-  color: #d4d4d8;
-}
-
 .hero__lede {
   margin-top: 1rem;
   max-width: min(54ch, 100%);

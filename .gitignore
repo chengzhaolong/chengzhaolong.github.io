@@ -18,6 +18,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# 私有材料（带手机号的求职版简历等）：不进 git，也不会被复制进 dist
+_private/
+
 # macOS / Windows
 .DS_Store
 Thumbs.db

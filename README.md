@@ -29,6 +29,7 @@
 │  ├─ favicon.svg
 │  ├─ og-image.svg / .png    # 社交分享图（改完 svg 后 npm run og 重新生成 png）
 │  └─ media/                 # 视频、截图、云图放这里
+│     └─ docs/cv.pdf         # 简历 PDF（换简历就覆盖这个文件，见 4.2）
 ├─ scripts/make-og.mjs       # svg → png
 ├─ src/
 │  ├─ content.config.ts      # 内容集合的 schema（字段校验）
@@ -145,9 +146,39 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 - **奖项用全称**（「美国大学生数学建模竞赛（MCM/ICM）Finalist」而不是「美赛 F 奖」）；升学结果（保研直博）写进本科那条的 `points`，和 `period` 自然对齐。
 
 页首的姓名、`身份 · 单位 · 地点`、邮箱与 ORCID 都取自 `profile.yml`，改那边即可。
-简历 PDF 不放代码里：文件丢进 `public/media/docs/cv.pdf`，再把 `profile.yml` 的
-`links.cv` 填成 `/media/docs/cv.pdf`，页首联系方式那行会多一个「CV（PDF）↓」；
-不填就不显示，浏览器 Ctrl+P 也能直接打印成 PDF（导航、页脚、页尾链接自动隐藏，`@page` 留 14mm 页边距）。
+
+简历 PDF 是**预先做好、直接入库**的静态文件：`public/media/docs/cv.pdf`。
+`profile.yml` 的 `links.cv` 已指向它，所以首页联系行、页脚、`/about` 页首、英文页联系条
+都会出现「CV（PDF）↓」；链接带 `download`，点一下直接存盘，不会在浏览器里打开 PDF 预览。
+不想公开就把 `links.cv` 改回 `''`，这几处一起消失。
+
+**换简历 = 覆盖同一个文件**（URL 不变，不用改代码）。生成方式就是打印 `/about`，
+`@media print` 里已经写好一页 A4 的版式：正文 13px、页边距 12/14mm、页首带照片、
+自指的「CV（PDF）↓」和网页导航页脚自动隐藏：
+
+```bash
+npm run build
+npx astro preview --port 4399      # 这个终端保持开着
+```
+
+浏览器打开 `http://localhost:4399/about/` → `Ctrl+P` → 目标选「另存为 PDF」：
+纸张 A4（CSS 的 `@page { size: A4 }` 已锁死）、边距「默认」、缩放 100%、背景图形不用勾；
+预览右下角确认是 `1 / 1` 页，存到 `public/media/docs/cv.pdf` 覆盖。
+
+习惯命令行就用 Edge/Chrome 的 headless 打印（一次成型，不用开浏览器）：
+
+```powershell
+& "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --headless --disable-gpu `
+  --no-pdf-header-footer --virtual-time-budget=3500 `
+  --print-to-pdf="$PWD\public\media\docs\cv.pdf" http://127.0.0.1:4399/about/
+```
+
+自检一行：`pdfinfo public/media/docs/cv.pdf | findstr Pages` → 应为 `Pages: 1`。
+
+`public/_headers` 给 `/media/*` 设了 30 天缓存，所以换完简历老访客可能还拿到旧版；
+想立刻生效就把文件改名（`cv-2026-11.pdf`）并同步 `links.cv`，或者等缓存过期。
+公开的这份只有邮箱和 ORCID；带手机号的求职版**别放 `public/`**（那目录部署后就是公开 URL），
+扔进已被 `.gitignore` 的 `_private/` 即可。
 
 ### 4.3 加一篇论文 — `src/data/publications.yml`
 

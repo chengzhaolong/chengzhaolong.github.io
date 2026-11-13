@@ -61,4 +61,6 @@
     github: ''
     researchgate: ''
     bilibili: ''
-    cv: ''
+    # 简历 PDF：文件在 public/media/docs/cv.pdf（换简历就覆盖同名文件）
+    # 清空则首页联系行、页脚、/about 页首三处入口一起消失
+    cv: '/media/docs/cv.pdf'

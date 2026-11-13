@@ -6,7 +6,7 @@ const profile = (await getEntry('profile', 'main'))!.data;
 const cv = (await getEntry('cv', 'main'))!.data;
 
 /** 姓名下面第一行：身份 · 单位 · 地点 */
-const meta = [profile.title, profile.affiliation, profile.location].filter(Boolean);
+const meta = [profile.affiliation].filter(Boolean);
 
 /** 姓名下面第二行：只渲染填了的联系方式 */
 const contacts = [
@@ -45,7 +45,7 @@ const contacts = [
       {
         cv.education.length > 0 && (
           <section class="cv-block">
-            <h2 class="cv-block__title">教育背景</h2>
+            <h2 class="cv-block__title">教育与经历</h2>
             {cv.education.map((e) => (
               <div class="cv-entry">
                 <div class="cv-entry__head">
@@ -70,7 +70,7 @@ const contacts = [
       {
         cv.projects.length > 0 && (
           <section class="cv-block">
-            <h2 class="cv-block__title">项目经历</h2>
+            <h2 class="cv-block__title">项目</h2>
             {cv.projects.map((p) => (
               <div class="cv-entry">
                 <div class="cv-entry__head">

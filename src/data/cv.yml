@@ -10,52 +10,71 @@
 
   # ---------- 教育背景（新的写在最上面） ----------
   education:
-    - period: 〔2022.09 — 至今〕
+    - period: 〔2023.09 — 至今〕
       school: 大连理工大学
       major: 计算力学
       degree: 博士研究生
       points:
-        - 导师：〔导师姓名〕
+        - 独立开发CUSPIC高性能GPU显式动力学求解器
+        - 主导开发CUSPER-CuttingLab机械加工工艺物理仿真软件
+        - 深度参与多项CAE算法研究及软件开发项目
+        - 在计算力学权威期刊IJNME发表学术论文1篇
 
-    - period: 〔2018.09 — 2022.06〕
-      school: 〔本科学校〕
-      major: 〔本科专业〕
-      degree: 〔工学学士〕
+    - period: 〔2022.06 — 2022.09〕
+      school: 大连星派科技有限公司
+      major: 结构力学有限元算法工程师
+      degree: 实习
       points:
-        - 保研直博
-        - 本科优秀毕业论文
+        - 完成转子动力学solid185单元复现及响应稳态、模态分析及扫频算法的初步开发和算法预研工作
+
+    - period: 〔2019.09 — 2023.06〕
+      school: 宁波大学
+      major: 工程力学（拔尖人才创新班）
+      degree: 本科
+      points:
+        - 获得研究生推荐免试资格
+        - 2023年宁波大学优秀毕业论文《基于对流粒子域插值的三维并行显式物质点法研究》
+        - 开发PMPM-CPDI3D求解器 (基于MPI并行的非线性大变形物质点求解器)
+        - 2022年美国大学生数学建模竞赛 (MCM/ICM) Finalist
 
   # ---------- 项目经历 ----------
   projects:
-    - period: 〔2022 — 至今〕
+    - period: 〔2022.09 — 至今〕
       name: CUSPIC —— 高性能显式动力求解器
-      role: 主要开发者 · C++ / CUDA
+      role: 独立开发者 · C++ / CUDA
       points:
         - 面向极端大变形与强非线性热力耦合问题，统一 FEM 与 MPM 的分区离散与接触处理
-        - 实现 GPU 并行求解，让工程尺度的切削算例可算、可复现
+        - 支持GPU及OpenMP并行，高性能数据结构及访存冲突处理算法
+        - 支持FEM四面体，六面体减缩积分单元，SRI单元，及B-T壳单元，支持多种PIC无网格方法格式
+        - 支持多种非线性材料本构，载荷，约束功能
+        - 支持丰富的热力绑定及有限滑移接触模型
 
-    - period: 〔2023 — 至今〕
-      name: CUSPER-CuttingLab —— 加工工艺仿真软件
-      role: 软件设计与开发
+    - period: 〔2025.010 — 至今〕
+      name: CUSPER-CuttingLab —— 机械加工工艺物理仿真软件
+      role: 核心开发者 · Python / C++
       points:
-        - 以 CUSPIC 求解器为核心，实现前后处理与工艺参数分析
+        - 以 CUSPIC 求解器为核心，实现复杂工况快速前后处理与工艺参数分析
         - 把求解能力组织成可交付的加工工艺仿真与优化流程
 
-  # ---------- 获奖与荣誉（一项一行，按年份倒序；title 写全称） ----------
-  awards:
-    - period: 〔2022〕
-      title: 本科优秀毕业论文
-      note: 〔校级〕
-    - period: 〔20XX〕
-      title: 美国大学生数学建模竞赛（MCM/ICM）Finalist
-      note: 〔题目简称 / 分工，可删〕
-
+    - period: 〔2025.010 — 至今〕
+      name: JCCDXT数字原理样机研制及验证项目
+      role: 参与 · C++ / CUDA
+      points:
+        - 开发热力流耦合有限元-无网格法显式动力学求解器，适用于减速器、离合器传动系统润滑精细化仿真
+        - 完成了有限元、物质点法GPU异构并行计算模块开发
+      
+    - period: 〔2022.010 — 2025.010〕
+      name: 国家重点研发计划 · 330项目核工程*****技术研究与软件研制
+      role: 参与 · C++ / CUDA
+      points:
+        - 开发并行非线性有限元-无网格法显式动力学求解器，适用于结构冲击大变形问题的高效求解
+  
   # ---------- 工具与技能（group 一栏一个标签，items 一行文字） ----------
   skills:
     - group: 自研
       items: CUSPIC（FEM–MPM / GPU）、CUSPER-CuttingLab
     - group: 编程
-      items: C++ / CUDA、Python
+      items: C++ / CUDA、Python、Matlab
     - group: 并行
       items: CUDA、MPI、OpenMP
     - group: 前后处理

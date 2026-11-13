@@ -1603,59 +1603,6 @@ table.data td.num {
   color: var(--ink-2);
 }
 
-/* ---------- 17. timeline ---------- */
-.timeline {
-  list-style: none;
-  display: grid;
-  gap: 1.6rem;
-  border-left: 1px solid var(--line);
-  padding-left: 1.5rem;
-  margin-left: 0.25rem;
-}
-
-.timeline__item {
-  position: relative;
-}
-
-.timeline__item::before {
-  content: '';
-  position: absolute;
-  left: calc(-1.5rem - 4.5px);
-  top: 0.62rem;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--bg);
-  border: 2px solid var(--accent);
-}
-
-.timeline__when {
-  font-family: var(--f-mono);
-  font-size: var(--fs-xs);
-  letter-spacing: 0.06em;
-  color: var(--ink-3);
-}
-
-.timeline__what {
-  margin-top: 0.25rem;
-  font-family: var(--f-display);
-  font-size: 1.05rem;
-  font-weight: 600;
-}
-
-.timeline__where {
-  margin-top: 0.15rem;
-  font-size: var(--fs-sm);
-  color: var(--ink-2);
-}
-
-.timeline__desc {
-  margin-top: 0.35rem;
-  font-size: var(--fs-sm);
-  line-height: 1.7;
-  color: var(--ink-2);
-}
-
 /* ---------- 18. 双栏（文字 + 媒体） ---------- */
 .split {
   display: grid;
@@ -1679,100 +1626,187 @@ table.data td.num {
   }
 }
 
-/* ---------- 18b. 简历页（/about）：单栏、只有条目块 + 表格 ---------- */
-.cv-meta {
-  margin-top: 0.5rem;
-  font-size: var(--fs-sm);
-  color: var(--ink-2);
+/* ---------- 18b. 简历页（/about）：紧凑单栏 ---------- */
+.container--cv {
+  width: min(820px, 100% - 2.5rem);
+  margin-inline: auto;
 }
 
-.cv-contact {
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 0.3rem;
-  list-style: none;
-  font-size: var(--fs-sm);
-  color: var(--ink-2);
+.cv-head {
+  padding-block: clamp(2rem, 4vw, 2.75rem) 1.25rem;
+  border-bottom: 1px solid var(--line-strong);
 }
 
-.cv-contact li:not(:last-child)::after {
-  content: '·';
-  margin-inline: 0.7rem;
-  color: var(--line-strong);
-}
-
-.cv-summary {
-  max-width: 62ch;
-}
-
-.cv-block {
-  margin-top: clamp(2.5rem, 5vw, 3.5rem);
-}
-
-.cv-block__title {
-  padding-bottom: 0.6rem;
-  border-bottom: 1px solid var(--line);
-  font-size: var(--fs-h3);
+.cv-name {
+  font-size: 1.9rem;
   letter-spacing: -0.01em;
 }
 
-.cv-block .timeline,
-.cv-block .table-wrap {
-  margin-top: 1.4rem;
+.cv-line {
+  margin-top: 0.45rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--ink-2);
 }
 
-.cv-block table.data th {
-  width: 6.5rem;
-  background: transparent;
-  white-space: normal;
-}
-
-.cv-tags {
+.cv-line--links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 0.6rem;
+  align-items: center;
+  margin-top: 0.2rem;
+  font-family: var(--f-mono);
+  font-size: 0.82rem;
 }
 
-.cv-awards {
-  display: grid;
-  gap: 0.7rem;
-  margin-top: 1.35rem;
-  list-style: none;
+.cv-line--links span {
+  margin-inline: 0.55rem;
+  color: var(--line-strong);
 }
 
-.cv-awards li {
+.cv-body {
+  padding-block: clamp(1.5rem, 3vw, 2rem) clamp(2.5rem, 5vw, 3.5rem);
+}
+
+.cv-block + .cv-block {
+  margin-top: 1.6rem;
+}
+
+/* 段标题：sans 粗体 + 通栏细线，模仿 PDF 简历的分节线 */
+.cv-block__title {
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--line-strong);
+  font-family: var(--f-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.cv-entry {
+  margin-top: 0.85rem;
+}
+
+/* 条目头：标题在左、日期在右，同一基线 */
+.cv-entry__head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.15rem 0.9rem;
+  justify-content: space-between;
+  gap: 0.15rem 1rem;
 }
 
-.cv-awards__when {
-  min-width: 5.5rem;
-  font-size: var(--fs-xs);
-  letter-spacing: 0.04em;
+.cv-entry__title {
+  min-width: 0;
+  font-size: 0.97rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.cv-entry__role {
+  margin-left: 0.5rem;
+  font-size: 0.84rem;
+  font-weight: 400;
   color: var(--ink-3);
 }
 
-.cv-awards__title {
-  font-weight: 500;
+.cv-entry__when {
+  flex: none;
+  font-family: var(--f-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+  white-space: nowrap;
 }
 
-.cv-awards__note {
-  font-size: var(--fs-sm);
+.cv-list {
+  margin-top: 0.3rem;
+  padding-left: 1.05rem;
+  list-style: disc;
+}
+
+.cv-list li {
+  font-size: 0.92rem;
+  line-height: 1.58;
+  color: var(--ink-2);
+}
+
+.cv-list li::marker {
+  color: var(--line-strong);
+}
+
+/* 获奖：一项一行，标题左、年份右 */
+.cv-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.1rem 1rem;
+  margin-top: 0.35rem;
+}
+
+.cv-row__title {
+  min-width: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.cv-row__note {
+  margin-left: 0.4rem;
+  font-size: 0.84rem;
   color: var(--ink-3);
+}
+
+/* 技能：无边框两列 */
+.cv-skills {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 0.3rem 1rem;
+  margin: 0.75rem 0 0;
+}
+
+.cv-skills dt {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.cv-skills dd {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.58;
+  color: var(--ink-2);
 }
 
 .cv-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1.4rem;
-  margin-top: clamp(2.75rem, 6vw, 4rem);
-  padding-top: 1.4rem;
+  gap: 0.4rem 1.2rem;
+  margin-top: 1.8rem;
+  padding-top: 0.9rem;
   border-top: 1px solid var(--line);
-  font-size: var(--fs-sm);
+  font-size: 0.84rem;
   color: var(--ink-2);
+}
+
+/* 窄屏：日期掉到标题下面一行，避免右侧被挤出屏幕 */
+@media (max-width: 560px) {
+  .cv-entry__head,
+  .cv-row {
+    display: block;
+  }
+
+  .cv-entry__when {
+    display: block;
+    margin-top: 0.1rem;
+  }
+
+  .cv-skills {
+    grid-template-columns: 1fr;
+    gap: 0.1rem;
+  }
+
+  .cv-skills dd {
+    margin-bottom: 0.5rem;
+  }
 }
 
 /* ---------- 19. lightbox ---------- */
@@ -2355,6 +2389,10 @@ button.badge:hover {
 }
 
 /* ---------- 22. 打印 ---------- */
+@page {
+  margin: 14mm;
+}
+
 @media print {
   .site-header,
   .site-footer,
@@ -2377,14 +2415,22 @@ button.badge:hover {
     display: none;
   }
 
-  /* 简历页：打印即 PDF 简历 */
+  /* 简历页：打印即 PDF 简历，一条不拆行、一页放得下 */
   .cv-links {
     display: none !important;
   }
 
-  .cv-block,
-  .timeline__item,
-  .cv-awards li {
+  .cv-head {
+    padding-top: 0;
+  }
+
+  .cv-body {
+    padding-block: 1.1rem 0;
+  }
+
+  .cv-entry,
+  .cv-row,
+  .cv-skills > * {
     break-inside: avoid;
   }
 

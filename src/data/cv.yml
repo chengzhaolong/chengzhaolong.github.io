@@ -1,56 +1,51 @@
 # ==========================================================
 # 简历 —— 只改这一个文件，/about 页自动渲染
-# 五段：summary / education / projects / awards / skills
+# 四段：education / projects / awards / skills
+# 每个条目一行（左侧标题 + 右侧日期），要点写在 points 里，一条一行
 # 带 〔 〕 的是要你替换的占位，填完删掉方括号
-# 每段都是列表：某项不要就删掉那一项；整段不要就写 [] 或删掉整段
+# 某段不要就写 [] 或删掉整段
 # ==========================================================
 
 - id: main
 
-  # ---------- 页首一句话（留空则用 profile.yml 的 intro_zh） ----------
-  summary: >-
-    把金属切削当数值问题来解：本构与接触建模、FEM–MPM 分区离散、热力耦合显式推进，
-    最后在 GPU 上跑到工程算例尺度。独立开发 CUSPIC 求解器与 CUSPER-CuttingLab 软件。
-
   # ---------- 教育背景（新的写在最上面） ----------
   education:
     - period: 〔2022.09 — 至今〕
-      degree: 博士研究生
-      major: 计算力学
       school: 大连理工大学
-      note: 导师：〔导师姓名〕
+      major: 计算力学
+      degree: 博士研究生
+      points:
+        - 导师：〔导师姓名〕
 
     - period: 〔2018.09 — 2022.06〕
-      degree: 〔工学学士〕
-      major: 〔本科专业〕
       school: 〔本科学校〕
-      # 保研直博不是奖项，写在这里最准确
-      note: 保研直博；本科优秀毕业论文
+      major: 〔本科专业〕
+      degree: 〔工学学士〕
+      points:
+        - 保研直博
+        - 本科优秀毕业论文
 
-  # ---------- 项目经历（一条一个项目，link 可省略） ----------
+  # ---------- 项目经历 ----------
   projects:
-    - name: CUSPIC —— 高性能显式动力求解器
-      period: 〔2022 — 至今〕
+    - period: 〔2022 — 至今〕
+      name: CUSPIC —— 高性能显式动力求解器
       role: 主要开发者 · C++ / CUDA
-      text: >-
-        面向极端大变形与强非线性热力耦合问题，统一 FEM 与 MPM 的分区离散与接触处理，
-        实现 GPU 并行求解，让工程尺度的切削算例可算、可复现。
-      tags: [FEM–MPM, 热力耦合, GPU]
-      link: /software/cuspic
+      points:
+        - 面向极端大变形与强非线性热力耦合问题，统一 FEM 与 MPM 的分区离散与接触处理
+        - 实现 GPU 并行求解，让工程尺度的切削算例可算、可复现
 
-    - name: CUSPER-CuttingLab —— 加工工艺仿真软件
-      period: 〔2023 — 至今〕
+    - period: 〔2023 — 至今〕
+      name: CUSPER-CuttingLab —— 加工工艺仿真软件
       role: 软件设计与开发
-      text: >-
-        以 CUSPIC 求解器为核心的前后处理与工艺参数分析工具，
-        把求解能力组织成可交付的加工工艺仿真与优化流程。
-      tags: [CAE 前处理, 工艺优化]
-      link: /software/cuttinglab
+      points:
+        - 以 CUSPIC 求解器为核心，实现前后处理与工艺参数分析
+        - 把求解能力组织成可交付的加工工艺仿真与优化流程
 
-  # ---------- 获奖与荣誉（按年份倒序；title 写全称，评委认全称） ----------
+  # ---------- 获奖与荣誉（一项一行，按年份倒序；title 写全称） ----------
   awards:
     - period: 〔2022〕
-      title: 本科优秀毕业论文〔校级〕
+      title: 本科优秀毕业论文
+      note: 〔校级〕
     - period: 〔20XX〕
       title: 美国大学生数学建模竞赛（MCM/ICM）Finalist
       note: 〔题目简称 / 分工，可删〕

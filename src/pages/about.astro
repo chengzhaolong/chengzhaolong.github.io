@@ -5,70 +5,64 @@ import { getEntry } from 'astro:content';
 const profile = (await getEntry('profile', 'main'))!.data;
 const cv = (await getEntry('cv', 'main'))!.data;
 
-/** 页首一句话：cv.yml 没写（或写了空串）就退回 profile 的简介 */
-const summary = cv.summary?.trim() ? cv.summary : profile.intro_zh;
-
-/** 姓名下面那行：身份 · 单位 · 地点 */
+/** 姓名下面第一行：身份 · 单位 · 地点 */
 const meta = [profile.title, profile.affiliation, profile.location].filter(Boolean);
 
-/** 联系方式：只渲染填了的 */
+/** 姓名下面第二行：只渲染填了的联系方式 */
 const contacts = [
   { label: profile.email, href: `mailto:${profile.email}` },
   { label: 'ORCID ↗', href: profile.links?.orcid },
   { label: 'Scholar ↗', href: profile.links?.scholar },
   { label: 'GitHub ↗', href: profile.links?.github },
   { label: 'Bilibili ↗', href: profile.links?.bilibili },
+  { label: 'CV（PDF）↓', href: profile.links?.cv },
 ].filter((c) => c.href);
 ---
 
-<Base title="简历" description={`${profile.name}，${profile.title}，${profile.affiliation}。简历：教育背景、项目经历、获奖与技能。`}>
-  <header class="page-head">
-    <div class="container--narrow">
-      <span class="eyebrow">CV · 简历</span>
-      <h1 class="page-head__title">{profile.name}</h1>
-      <p class="cv-meta mono">{meta.join(' · ')}</p>
-      <ul class="cv-contact mono">
+<Base
+  title="简历"
+  description={`${profile.name}，${profile.title}，${profile.affiliation}。简历：教育背景、项目经历、获奖、技能。`}
+>
+  <header class="cv-head">
+    <div class="container--cv">
+      <h1 class="cv-name">{profile.name}</h1>
+      <p class="cv-line">{meta.join(' · ')}</p>
+      <p class="cv-line cv-line--links">
         {
-          contacts.map((c) => (
-            <li>
+          contacts.map((c, i) => (
+            <>
+              {i > 0 && <span aria-hidden="true">·</span>}
               <a href={c.href}>{c.label}</a>
-            </li>
+            </>
           ))
         }
-      </ul>
-      {
-        profile.links?.cv && (
-          <div class="cluster" style="margin-top:1.35rem">
-            <a class="btn btn--ghost" href={profile.links.cv}>
-              下载 CV（PDF）
-            </a>
-          </div>
-        )
-      }
+      </p>
     </div>
   </header>
 
-  <section class="section">
-    <div class="container--narrow">
-      {summary && <p class="lead cv-summary">{summary}</p>}
-
+  <section class="cv-body">
+    <div class="container--cv">
       {
         cv.education.length > 0 && (
           <section class="cv-block">
             <h2 class="cv-block__title">教育背景</h2>
-            <ol class="timeline">
-              {cv.education.map((e) => (
-                <li class="timeline__item">
-                  <span class="timeline__when">{e.period}</span>
-                  <p class="timeline__what">
-                    {e.degree}
-                    {e.major && ` · ${e.major}`}
+            {cv.education.map((e) => (
+              <div class="cv-entry">
+                <div class="cv-entry__head">
+                  <p class="cv-entry__title">
+                    {[e.school, e.major, e.degree].filter(Boolean).join('，')}
                   </p>
-                  <p class="timeline__where">{e.school}</p>
-                  {e.note && <p class="timeline__desc">{e.note}</p>}
-                </li>
-              ))}
-            </ol>
+                  <span class="cv-entry__when">{e.period}</span>
+                </div>
+                {e.points.length > 0 && (
+                  <ul class="cv-list">
+                    {e.points.map((t) => (
+                      <li>{t}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
           </section>
         )
       }
@@ -77,28 +71,24 @@ const contacts = [
         cv.projects.length > 0 && (
           <section class="cv-block">
             <h2 class="cv-block__title">项目经历</h2>
-            <ol class="timeline">
-              {cv.projects.map((p) => (
-                <li class="timeline__item">
-                  <span class="timeline__when">{p.period}</span>
-                  <p class="timeline__what">{p.name}</p>
-                  {p.role && <p class="timeline__where">{p.role}</p>}
-                  <p class="timeline__desc">{p.text}</p>
-                  {(p.tags?.length || p.link) && (
-                    <div class="cv-tags">
-                      {p.tags?.map((t) => (
-                        <span class="badge">{t}</span>
-                      ))}
-                      {p.link && (
-                        <a class="badge" href={p.link}>
-                          详情 →
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ol>
+            {cv.projects.map((p) => (
+              <div class="cv-entry">
+                <div class="cv-entry__head">
+                  <p class="cv-entry__title">
+                    {p.name}
+                    {p.role && <span class="cv-entry__role">{p.role}</span>}
+                  </p>
+                  <span class="cv-entry__when">{p.period}</span>
+                </div>
+                {p.points.length > 0 && (
+                  <ul class="cv-list">
+                    {p.points.map((t) => (
+                      <li>{t}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
           </section>
         )
       }
@@ -107,15 +97,15 @@ const contacts = [
         cv.awards.length > 0 && (
           <section class="cv-block">
             <h2 class="cv-block__title">获奖与荣誉</h2>
-            <ul class="cv-awards">
-              {cv.awards.map((a) => (
-                <li>
-                  <span class="cv-awards__when mono">{a.period}</span>
-                  <span class="cv-awards__title">{a.title}</span>
-                  {a.note && <span class="cv-awards__note">{a.note}</span>}
-                </li>
-              ))}
-            </ul>
+            {cv.awards.map((a) => (
+              <div class="cv-row">
+                <p class="cv-row__title">
+                  {a.title}
+                  {a.note && <span class="cv-row__note">{a.note}</span>}
+                </p>
+                <span class="cv-entry__when">{a.period}</span>
+              </div>
+            ))}
           </section>
         )
       }
@@ -124,18 +114,14 @@ const contacts = [
         cv.skills.length > 0 && (
           <section class="cv-block">
             <h2 class="cv-block__title">工具与技能</h2>
-            <div class="table-wrap">
-              <table class="data">
-                <tbody>
-                  {cv.skills.map((s) => (
-                    <tr>
-                      <th scope="row">{s.group}</th>
-                      <td>{s.items}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <dl class="cv-skills">
+              {cv.skills.map((s) => (
+                <>
+                  <dt>{s.group}</dt>
+                  <dd>{s.items}</dd>
+                </>
+              ))}
+            </dl>
           </section>
         )
       }

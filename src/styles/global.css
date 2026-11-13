@@ -21,6 +21,10 @@
   --media-ink-2: #a1a1aa;
   --media-line: #26262d;
 
+  /* 简历页强调色：只给「个人主页」和「下载简历」两个动作，正文仍是 ink 系 */
+  --link: #1a6fd4;
+  --link-deep: #14589f;
+
   --accent: #21918c;
   --accent-soft: #e3f1f0;
   --accent-warm: #b07d0a;
@@ -1679,6 +1683,39 @@ table.data td.num {
   color: var(--line-strong);
 }
 
+/* 页首第三行：引导去个人主页。蓝色只留在这行和下载入口上，PDF 里也保留 */
+.cv-line--home {
+  margin-top: 0.55rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.cv-home__url {
+  font-family: var(--f-mono);
+  font-weight: 600;
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.cv-home__url:hover {
+  color: var(--link-deep);
+  text-decoration-thickness: 2px;
+}
+
+/* 「下载简历（PDF）↓」是页首唯一的动作，蓝字加粗压过其它灰色联系链接 */
+.cv-line--links .cv-line__cv {
+  color: var(--link);
+  font-weight: 600;
+  text-decoration-color: currentColor;
+}
+
+.cv-line--links .cv-line__cv:hover {
+  color: var(--link-deep);
+}
+
 .cv-body {
   padding-block: clamp(1.5rem, 3vw, 2rem) clamp(2.5rem, 5vw, 3.5rem);
 }
@@ -2478,6 +2515,19 @@ button.badge:hover {
 
   .cv-line--links span {
     margin-inline: 0.4rem;
+  }
+
+  /* 「想了解更多」那行在 PDF 里留着：招聘方看得到个人主页地址，链接也可点 */
+  .cv-line--home {
+    margin-top: 0.3rem;
+    font-size: 0.74rem;
+    line-height: 1.45;
+    break-inside: avoid;
+  }
+
+  .cv-home__url {
+    color: var(--link);
+    text-decoration-thickness: 1px;
   }
 
   .cv-body {

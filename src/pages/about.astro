@@ -16,7 +16,7 @@ const contacts = [
   { label: 'GitHub ↗', href: profile.links?.github },
   { label: 'Bilibili ↗', href: profile.links?.bilibili },
   // 简历 PDF 走下载而不是浏览器预览（文件在 public/media/docs/cv.pdf）
-  { label: 'CV（PDF）↓', href: profile.links?.cv, download: true },
+  { label: '下载简历（PDF）↓', href: profile.links?.cv, download: true },
 ].filter((c) => c.href);
 ---
 
@@ -45,6 +45,16 @@ const contacts = [
             ))
           }
         </p>
+        {
+          Astro.site && (
+            <p class="cv-line cv-line--home">
+              关于我的技术背景和 CUSPIC 求解器，想了解更多，可以看我的个人主页：
+              <a class="cv-home__url" href={Astro.site}>
+                {Astro.site.host}
+              </a>
+            </p>
+          )
+        }
       </div>
       {
         profile.photo && (

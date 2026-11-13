@@ -146,6 +146,9 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 - **奖项用全称**（「美国大学生数学建模竞赛（MCM/ICM）Finalist」而不是「美赛 F 奖」）；升学结果（保研直博）写进本科那条的 `points`，和 `period` 自然对齐。
 
 页首的姓名、`身份 · 单位 · 地点`、邮箱与 ORCID 都取自 `profile.yml`，改那边即可。
+第三行「关于我的技术背景和 CUSPIC 求解器…」里的网址取自 `astro.config.mjs` 的 `site`，
+换域名不用改文案；蓝色强调（`--link`）只给这一行的网址和「下载简历（PDF）↓」，
+打印成 PDF 时这行保留（招聘方能看到个人主页地址），下载链接本身印进 PDF 没意义，继续隐藏。
 
 简历 PDF 是**预先做好、直接入库**的静态文件：`public/media/docs/cv.pdf`。
 `profile.yml` 的 `links.cv` 已指向它，所以首页联系行、页脚、`/about` 页首、英文页联系条

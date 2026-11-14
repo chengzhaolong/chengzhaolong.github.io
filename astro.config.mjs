@@ -3,9 +3,11 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
-// 部署后把 site 换成自己的正式域名（影响 sitemap / canonical / OG 的绝对地址）
+// 部署在 GitHub Pages 用户站：仓库名就是 chengzhaolong.github.io，站点落在根域，
+// 所以不需要 base（换成项目站 /<repo>/ 才需要，并要给所有站内链接和 /media/* 手动加前缀）。
+// site 决定 sitemap / canonical / OG / hreflang 的绝对地址；换自定义域名时只改这一行。
 export default defineConfig({
-  site: 'https://zlcheng.pages.dev',
+  site: 'https://chengzhaolong.github.io',
   integrations: [
     mdx(),
     sitemap({

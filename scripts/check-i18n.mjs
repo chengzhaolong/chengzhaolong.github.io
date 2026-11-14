@@ -6,11 +6,20 @@
  *   2. 站内链接都带 /en 前缀（语言切换、/media、/_astro 除外）；
  *   3. hreflang 三件套齐全，且 en 指向自己、zh-CN 指向中文同页。
  * 有任何一条不过就以退出码 1 结束，适合挂进 CI。
+ * 站点地址从 astro.config.mjs 的 site 读取，换域名不用改这个脚本。
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
 const root = 'dist';
+
+/** 站点根地址：读 astro.config.mjs，避免脚本里再写一份域名 */
+const site = readFileSync('astro.config.mjs', 'utf8').match(/site:\s*'([^']+)'/)?.[1];
+if (!site) {
+  console.error('✗ 读不到 astro.config.mjs 里的 site，自检中止');
+  process.exit(1);
+}
+const siteOrigin = site.replace(/\/+$/, '');
 const CJK = /[\u3400-\u4dbf\u4e00-\u9fff\u3000-\u303f\uff01-\uff60]/g;
 const HAS_CJK = /[\u3400-\u4dbf\u4e00-\u9fff\u3000-\u303f\uff01-\uff60]/;
 
@@ -67,7 +76,7 @@ for (const file of walk(join(root, 'en'))) {
     report(rel, '[hreflang 不全]', langs || '(无)');
   } else {
     const map = Object.fromEntries(alternates.map((m) => [m[1], m[2]]));
-    const self = `https://zlcheng.pages.dev/${rel.replace(/index\.html$/, '')}`;
+    const self = `${siteOrigin}/${rel.replace(/index\.html$/, '')}`;
     if (map.en !== self) report(rel, '[hreflang en]', `en=${map.en} 期望=${self}`);
     if (map['zh-CN'].includes('/en/')) report(rel, '[hreflang zh-CN]', map['zh-CN']);
   }

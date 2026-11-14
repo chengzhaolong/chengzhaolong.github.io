@@ -25,6 +25,7 @@
 ```
 .
 ├─ astro.config.mjs          # site / 集成 / 代码高亮
+├─ .github/workflows/deploy.yml  # 推送 main → 构建 → 发布到 GitHub Pages
 ├─ media-src/videos/         # 视频母版（4K 原件，几十 MB 级，不进 git、不发布）
 ├─ public/                   # 原样复制的静态资源
 │  ├─ favicon.svg
@@ -79,7 +80,8 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 ```
 
 > 本项目依赖安装时用了 npmmirror 源，`package-lock.json` 里的 `resolved` 指向该镜像。
-> 若在 Cloudflare 上构建失败，把 `package-lock.json` 删掉重新 `npm install` 即可。
+> GitHub Actions 上 `npm ci` 也能拉通（只是略慢）；若哪天 CI 报网络错，本地跑
+> `npm install --package-lock-only --registry=https://registry.npmjs.org` 后提交锁文件即可。
 
 ## 4. 改内容（不用碰代码）
 
@@ -404,7 +406,7 @@ import peeq from '../assets/figures/peeq.png';
   两边**文件名保持一致**（`gear.mp4` / `gear.jpg`），换素材时各覆盖一次即可
 - 分辨率按**显示宽度**定，不做一刀切：主展 / 半宽用 1080p，三分之一宽的卡片用 720p
 - H.264 mp4 + `-movflags +faststart`（moov 放文件头，首帧不用等下完）；有画面的视频一律 `-an` 去音轨
-- 单条尽量 **5 MB 以内**；Cloudflare Pages 单文件上限 25 MB
+- 单条尽量 **5 MB 以内**；GitHub 单文件上限 100 MB、仓库建议 <1 GB
 - poster 取**第 1 秒**的画面（比首帧有信息量），1280 宽、`-q:v 3`，一张 30–80 KB
 
 转码常用命令（ffmpeg 装好后在 PATH 里）：
@@ -473,22 +475,42 @@ npm run check:i18n   # scripts/check-i18n.mjs
 版式节奏靠「浅色正文 band ↔ 深色媒体 band」交替：浅色区读文字，深色区放云图、动画、性能数据。
 `Section.astro` 的 `tone="media"` 就是一段深色区，也可以直接写 `<section class="media-band">`。
 
-## 6. 部署（Cloudflare Pages）
+## 6. 部署（GitHub Pages）
 
-1. 推到 GitHub：`git init` → 建仓库 → `git remote add origin ...` → `git push -u origin main`
-2. Cloudflare Dashboard → Workers & Pages → Create → Pages → Connect to Git → 选仓库
-3. 构建设置：
-   - Framework preset：**Astro**
-   - Build command：`npm run build`
-   - Build output directory：`dist`
-   - 环境变量：`NODE_VERSION = 24`（Astro 7 需要 Node ≥ 22.12）
-4. 先拿到 `xxx.pages.dev` 域名；绑定自定义域名后再改 `astro.config.mjs` 的 `site`（影响 canonical / sitemap / OG 绝对地址）。
+站点是 GitHub Pages 的**用户站**：仓库名必须正好是 `chengzhaolong.github.io`，构建产物发布在根域
+`https://chengzhaolong.github.io/`，所以 `astro.config.mjs` 里**不需要 `base`**。
+（若哪天改成项目站 `/<repo>/`，就必须设 `base`，并给所有站内链接、`/media/*`、canonical 手动加前缀。）
 
-部署完记得做这四件事：
-- [ ] 改 `astro.config.mjs` 里的 `site`
-- [ ] `npm run og` 重新生成分享图（图上写的是姓名与方向）
-- [ ] 把 `profile.yml` 的 `demo` 改为 `false`
-- [ ] 在 Google Search Console 提交 `https://你的域名/sitemap-index.xml`
+一次性设置（在 GitHub 网页上点两下）：
+
+1. 仓库名改为 `chengzhaolong.github.io`：`Settings → General → Repository name`。
+   改名后旧的 `chengzhaolong.github.io/cuspic/` 地址会失效（那里原本只是占位 README）。
+2. `Settings → Pages → Build and deployment → Source` 选 **GitHub Actions**。
+
+之后每次推送到 `main`，`.github/workflows/deploy.yml` 会自动跑：
+`npm ci` → `astro check` → `astro build` → `check:i18n` → 上传 `dist/` → 发布到 Pages。
+构建产物只走 Actions artifact，**不提交进 git**（`dist/` 已在 `.gitignore` 里）；
+`astro check` 或中英自检不过，这次提交就不会上线。
+
+发布后自检：
+
+- [ ] `https://chengzhaolong.github.io/` 中英文各点一遍，视频 / PDF 能加载
+- [ ] 页面源码里 `canonical` / `hreflang` / `og:url` 都是 `chengzhaolong.github.io`（改 `site` 后重新构建即生效）
+- [ ] `/sitemap-index.xml` 的 URL 前缀正确，再去 Google Search Console 提交它
+- [ ] 随便访问一个不存在的路径，确认中英双语 404 页生效
+
+> `public/_headers` 是 Cloudflare Pages 专用的缓存头 / 安全头，GitHub Pages 会忽略，留着不影响。
+> 项目站点的 `public/robots.txt` 也不会被爬虫读取（爬虫只读域名根目录的 `/robots.txt`）——
+> 本站是用户站，`/robots.txt` 就在根上，正常生效。
+
+<details>
+<summary>备选：Cloudflare Pages</summary>
+
+Framework preset 选 **Astro**，Build command `npm run build`，输出目录 `dist`，
+环境变量 `NODE_VERSION = 24`。若构建报找不到包，删掉 `package-lock.json` 重新 `npm install`。
+换成它之后要改 `astro.config.mjs` 的 `site`（或绑定自定义域名），并删掉 `.github/workflows/deploy.yml`。
+
+</details>
 
 > 中文字体：本站中文走系统字体栈（PingFang / 微软雅黑 / 思源），**不下载任何中文字体文件**，
 > 这是国内访问速度能接受的关键。英文只自托管拉丁子集（约 60–80 KB，按需加载）。
@@ -517,8 +539,9 @@ npm run check:i18n   # scripts/check-i18n.mjs
 ## 8. 常见问题
 
 **npm install 很慢或超时？**
-用镜像：`npm install --registry=https://registry.npmmirror.com`。若之后 Cloudflare 构建报找不到包，
-删掉 `package-lock.json` 后重新安装（生成指向官方源的锁文件）。
+用镜像：`npm install --registry=https://registry.npmmirror.com`。当前 `package-lock.json` 的
+`resolved` 就是该镜像；若哪天 GitHub Actions 因此拉包失败，跑一次
+`npm install --package-lock-only --registry=https://registry.npmjs.org` 后提交锁文件即可。
 
 **`sharp` 装不上？**
 它是 `astro:assets` 的图片优化依赖。`npm install sharp --registry=https://registry.npmmirror.com` 即可；

@@ -30,7 +30,7 @@
 
   # 单位 / 实验室
   affiliation: 大连理工大学 · 力学与航空航天学院 · 工业装备结构分析优化与CAE软件全国重点实验室
-  affiliation_en: Dalian University of Technology
+  affiliation_en: Dalian University of Technology · School of Mechanics and Aerospace Engineering · State Key Laboratory of Structural Analysis, Optimization and CAE Software for Industrial Equipment
   location: 中国 · 大连
   location_en: Dalian, China
 
@@ -42,7 +42,7 @@
 
   # 首屏一句话（同时也是 meta description 的一部分，写"做什么"而不是口号）
   tagline_zh: 大变形非线性热力耦合求解器算法研究及软件开发
-  tagline_en: Large-deformation thermo-mechanical cutting — solved accurately and fast.
+  tagline_en: Research and Software Development of Large Deformation Nonlinear Thermo-Mechanical Coupled Solver Algorithm.
 
   intro_zh: |-
     我的研究方向是热力耦合有限元-无网格算法、接触算法及其高性能计算实现。

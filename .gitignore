@@ -21,6 +21,9 @@ pnpm-debug.log*
 # 私有材料（带手机号的求职版简历等）：不进 git，也不会被复制进 dist
 _private/
 
+# 视频母版（4K 原件，几十 MB 级）：只留本地，public/ 里放压缩后的 web 版
+media-src/
+
 # macOS / Windows
 .DS_Store
 Thumbs.db

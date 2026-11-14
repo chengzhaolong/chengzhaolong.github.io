@@ -61,20 +61,43 @@
       v: OpenMP 多线程（受许可核心数限制）；Linux 版 GPU
     - k: 输出
       v: VTU 结果文件 + 终端进度 + 自动日志
-  # 案例位：video 留空即显示「待替换」占位，后面补上 mp4 路径即可；
-  #         第一条整行展示，其余两条并排
+  # 案例位：按数组顺序排版 —— 第 1 条主展（视频 2/3 + 文案 1/3 两栏），
+  #         第 2–3 条半宽并排，第 4 条起三分之一。
+  #         video 留空即渲染「待替换」占位；ratio 填视频原生画面比例，
+  #         不填按 16 / 9 处理（1:1、4:3 这类方块别硬塞进 16:9 会被裁）。
+  #         caption 先留空，主展文案列与卡片说明后面补。
   cases:
     - title: 三维微铣削
       meta: 3D micro-milling · FEM–MPM
-      caption: 工件用物质点、刀具有限元，NTS 罚接触；切屑成形、材料堆积与温度场同步演化。
+      # caption: 待补（一句话说明）
       video: /media/videos/cut3d1.mp4
-      poster: /media/videos/cut3d1.png
-    - title: 高速冲击 / 侵彻
-      meta: Impact · FEM–MPM
-      caption: 金属靶板侵彻：单元畸变区自动转为物质点，不必手动删单元。
-    - title: MPM 大变形流动
-      meta: MPM inflow
-      caption: 物质点流入算例：极端变形下的稳定推进。
+      poster: /media/videos/cut3d1.jpg
+      ratio: "16 / 9"
+    - title: 二维正交切削
+      meta: 2D orthogonal cutting · Force / Temperature
+      video: /media/videos/cut2d.mp4
+      poster: /media/videos/cut2d.jpg
+      ratio: "16 / 9"
+    - title: 斜齿轮啮合接触
+      meta: Helical gears · Contact
+      video: /media/videos/gear.mp4
+      poster: /media/videos/gear.jpg
+      ratio: "16 / 9"
+    - title: 三维车削
+      meta: 3D turning · PEEQ
+      video: /media/videos/turning3d.mp4
+      poster: /media/videos/turning3d.jpg
+      ratio: "1 / 1"
+    - title: 块体叠放接触
+      meta: Block stacking · Contact
+      video: /media/videos/block.mp4
+      poster: /media/videos/block.jpg
+      ratio: "4 / 3"
+    - title: 物质点流入
+      meta: MPM inflow · Chip flow
+      video: /media/videos/inflow.mp4
+      poster: /media/videos/inflow.jpg
+      ratio: "7 / 6"
   links:
     - label: 用户手册（PDF）
       href: /media/docs/cuspic-manual-v3.0.0.pdf

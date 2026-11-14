@@ -68,7 +68,8 @@ const software = defineCollection({
     /** 能力矩阵：只在 /software 总览里用，一行一类 */
     matrix: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
     /**
-     * 案例位：第一条整行展示，其余两条并排。
+     * 案例位：按顺序排版 —— 第 1 条主展（视频 + 文案两栏），
+     * 第 2–3 条半宽，第 4 条起三分之一。
      * video 留空即渲染「待替换」占位（见 VideoCard），后面补 mp4 路径即可。
      */
     cases: z
@@ -83,6 +84,8 @@ const software = defineCollection({
           poster: z.string().optional(),
           /** 静态截图（给图不给视频时用） */
           image: z.string().optional(),
+          /** 原生画面比例，如 "16 / 9"、"1 / 1"；不填按 16 / 9 */
+          ratio: z.string().optional(),
           badge: z.string().optional(),
         })
       )

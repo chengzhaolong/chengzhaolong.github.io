@@ -1,0 +1,57 @@
+---
+import VideoCard from './VideoCard.astro';
+import FigureCard from './FigureCard.astro';
+
+/** 案例数据（software.yml 的 cases 一项） */
+interface CaseItem {
+  title: string;
+  caption?: string;
+  meta?: string;
+  video?: string;
+  poster?: string;
+  image?: string;
+  ratio?: string;
+  badge?: string;
+}
+
+interface Props {
+  item: CaseItem;
+  /** 角标，一般传软件名 */
+  badge?: string;
+  /** 自动循环播放（只给主展） */
+  autoplay?: boolean;
+  /** 由卡片自己渲染说明；主展的说明在右侧文案栏，传 false */
+  showCaption?: boolean;
+}
+
+const { item, badge, autoplay = false, showCaption = true } = Astro.props;
+/** 没填 ratio 的按 16 / 9 出画面 */
+const ratio = item.ratio ?? '16 / 9';
+---
+
+{
+  item.image && !item.video ? (
+    <FigureCard
+      src={item.image}
+      alt={item.title}
+      ratio={ratio}
+      title={showCaption ? item.title : undefined}
+      caption={showCaption ? item.caption : undefined}
+      meta={showCaption ? item.meta : undefined}
+      placeholderLabel={item.title}
+    />
+  ) : (
+    <VideoCard
+      src={item.video}
+      poster={item.poster}
+      autoplay={autoplay}
+      alt={item.title}
+      badge={item.badge ?? badge}
+      title={showCaption ? item.title : undefined}
+      caption={showCaption ? item.caption : undefined}
+      meta={showCaption ? item.meta : undefined}
+      placeholderLabel={`${item.title}（mp4）`}
+      ratio={ratio}
+    />
+  )
+}

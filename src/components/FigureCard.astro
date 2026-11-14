@@ -9,6 +9,8 @@ interface Props {
   caption?: string;
   /** 冒号后的补充信息，如「Fig. 3 · 温度场 / °C」 */
   meta?: string;
+  /** 图注里的中文标题（放在 meta 之前，可省略） */
+  title?: string;
   placeholder?: 'a' | 'b' | 'c';
   /** 占位时显示的提示，例如「替换：切削温度场云图」 */
   placeholderLabel?: string;
@@ -21,6 +23,7 @@ const {
   alt,
   caption,
   meta,
+  title,
   placeholder = 'a',
   placeholderLabel = '仿真结果图',
   ratio,
@@ -76,8 +79,9 @@ const phClass = placeholder === 'b' ? 'media-placeholder--b' : placeholder === '
       </div>
     )
   }
-  {(caption || meta) && (
+  {(caption || meta || title) && (
     <figcaption class="figure__cap">
+      {title && <span class="figure__title">{title}</span>}
       {meta && <span class="mono">{meta}</span>}
       {caption && <span>{caption}</span>}
     </figcaption>

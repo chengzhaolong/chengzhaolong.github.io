@@ -777,6 +777,48 @@ a.badge:hover {
   grid-column: span 12;
 }
 
+/* 主展案例：视频占 2/3，右栏放 Case 编号与说明（说明文字由 gallery 传入） */
+.case-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  align-items: center;
+}
+
+.case-hero__index {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--media-ink-2);
+}
+
+.case-hero__text h3 {
+  margin-top: 0.6rem;
+  font-size: clamp(1.15rem, 1.5vw, 1.4rem);
+}
+
+.case-hero__meta {
+  margin-top: 0.35rem;
+  font-size: var(--fs-xs);
+  color: #d4d4d8;
+}
+
+.case-hero__desc {
+  margin-top: 0.85rem;
+  max-width: 34ch;
+  font-size: var(--fs-sm);
+  line-height: 1.75;
+  color: #c3c3cb;
+}
+
+/* 与 .media-grid 的断点同步：网格塌成单列时主展也改成上下排 */
+@media (max-width: 900px) {
+  .case-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* ---------- 10. cards ---------- */
 .card {
   position: relative;
@@ -985,6 +1027,15 @@ a.badge:hover {
 
 .media-band .figure__cap .mono {
   color: #d4d4d8;
+}
+
+.figure__title {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.media-band .figure__title {
+  color: var(--media-ink);
 }
 
 .figure__zoom {
@@ -2223,28 +2274,42 @@ button.badge:hover {
   color: var(--media-ink-2);
 }
 
-.feature {
-  padding: 1.35rem 1.4rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--bg-elev);
-  transition: border-color 0.2s var(--ease), box-shadow 0.25s var(--ease);
+/* 「能做什么」：概述旁的细线列表，一行一类（替代原来的卡片网格） */
+.cap-list {
+  margin: 0;
 }
 
-.feature:hover {
-  border-color: var(--line-strong);
-  box-shadow: var(--shadow-1);
+.cap-list__row {
+  display: grid;
+  grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr);
+  gap: 0.25rem 1.15rem;
+  padding-block: 0.7rem;
+  border-top: 1px solid var(--line);
 }
 
-.feature h3 {
-  font-size: 1.05rem;
+.cap-list__row:last-child {
+  border-bottom: 1px solid var(--line);
 }
 
-.feature p {
-  margin-top: 0.5rem;
+.cap-list dt {
+  font-weight: 600;
   font-size: var(--fs-sm);
-  line-height: 1.72;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.cap-list dd {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: 1.7;
   color: var(--ink-2);
+}
+
+@media (max-width: 620px) {
+  .cap-list__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.2rem;
+  }
 }
 
 .pub-summary {

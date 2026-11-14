@@ -25,10 +25,12 @@
 ```
 .
 ├─ astro.config.mjs          # site / 集成 / 代码高亮
+├─ media-src/videos/         # 视频母版（4K 原件，几十 MB 级，不进 git、不发布）
 ├─ public/                   # 原样复制的静态资源
 │  ├─ favicon.svg
 │  ├─ og-image.svg / .png    # 社交分享图（改完 svg 后 npm run og 重新生成 png）
 │  └─ media/                 # 视频、截图、云图放这里
+│     ├─ videos/             # 页面实际加载的 mp4（压缩版）+ jpg poster
 │     └─ docs/cv.pdf         # 简历 PDF（换简历就覆盖这个文件，见 4.2）
 ├─ scripts/make-og.mjs       # svg → png
 ├─ src/
@@ -234,11 +236,14 @@ npx astro preview --port 4399      # 这个终端保持开着
 - `version` / `status`：版本、状态（`status` 以徽章显示在首屏；没填 `version` 就不显示版本）
 - `chips[]`：首屏那一行小标签（FEM–MPM 耦合、GPU 并行…），4 个以内
 - `spec_line`：首页卡片底部那一行等宽字体的技术规格，一句话，别超过 30 个字符
-- `features[]`：`title` + `text`，详情页卡片（4 条走两列，6 条走三列），首页只取前 3 个 `title`
-- `specs[]`：`k` + `v`，详情页右侧「技术规格」表；`v` 里带〔…〕的行不上页面
+- `features[]`：`title` + `text`，详情页「能做什么」列表（放在概述同一行的右栏，一行一类）；首页卡片只取前 3 个 `title`
+- `specs[]`：`k` + `v`，详情页「技术规格」表（在案例区之后，左标题右表格）；`v` 里带〔…〕的行不上页面
 - `matrix[]`：`k` + `v`，能力矩阵，只在 `/software` 总览里出现（详情页用 `specs`，避免两张表重复）
-- `cases[]`：`title` / `meta` / `caption` / `video` / `poster` / `image` / `badge`，详情页深色区「界面与案例」，
-  **第一条整行、其余两条并排**；`video` 留空即显示「待替换」占位，补上 mp4 路径就自动换成播放器
+- `cases[]`：`title` / `meta` / `caption` / `video` / `poster` / `image` / `ratio` / `badge`，
+  详情页深色区「界面与案例」。**按数组顺序排版：第 1 条主展（视频 2/3 + 文案 1/3 两栏）、
+  第 2–3 条半宽并排、第 4 条起三分之一**；`ratio` 填视频原生比例（`"16 / 9"`、`"1 / 1"`、`"4 / 3"`…，不填按 16 / 9），
+  方块视频别硬塞进 16:9 会被裁；`video` 留空即显示「待替换」占位，补上 mp4 路径就自动换成播放器；
+  只有主展自动循环播放，其余带 poster + 点击播放
 - `application`：**只有 CuttingLab 有**，`/software/cuttinglab#access` 的试用申请块：
   `open`（`false` = 「试用即将开启」，`true` = 「申请试用」，文案自动切换）/ `email` / `subject` /
   `lead` / `fields[]`（`k` + `hint`，必填三项）/ `extra_lines[]`（邮件模板里的可选项）/ `note` / `mac_help[]`
@@ -247,6 +252,17 @@ npx astro preview --port 4399      # 这个终端保持开着
 
 详情页路由由 id 决定：`/software/cuspic`、`/software/cuttinglab`。
 若要加第三个软件，直接在 YAML 末尾追加一个条目即可，列表与详情页会自动生成。
+
+详情页（`src/pages/software/[slug].astro`）的段落顺序固定为：
+
+```
+页头（深色）
+概述 ｜ 能做什么        ← 同一行，左栏概述、右栏 features 细线列表
+界面与案例（深色区）    ← 1 条主展 + 2 条半宽 + 其余三分之一
+技术规格                ← 左标题 / 右表格
+用户手册                ← 仅 CUSPIC 有（ManualDocs compact）
+联系条 / 试用申请        ← CUSPIC 走邮箱条，CuttingLab 走 TrialApply
+```
 
 #### 换 CUSPIC 用户手册
 
@@ -324,9 +340,27 @@ import peeq from '../assets/figures/peeq.png';
 ```
 
 体积控制（重要）：
-- 循环短片：720p、5–10 s、**3 MB 以内**，优先 H.264 mp4（兼容性最好）
-- 更长/更高清的视频**不要进仓库**：传到 B 站或对象存储，页面里用链接或嵌入播放器
-- 大文件天然会拖慢构建与部署，Cloudflare Pages 单文件上限 25 MB
+- 母版放 `media-src/videos/`（几 MB 到上百 MB，**不进 git、不发布**）；`public/media/videos/` 只放压缩版 mp4 与 jpg poster，
+  两边**文件名保持一致**（`gear.mp4` / `gear.jpg`），换素材时各覆盖一次即可
+- 分辨率按**显示宽度**定，不做一刀切：主展 / 半宽用 1080p，三分之一宽的卡片用 720p
+- H.264 mp4 + `-movflags +faststart`（moov 放文件头，首帧不用等下完）；有画面的视频一律 `-an` 去音轨
+- 单条尽量 **5 MB 以内**；Cloudflare Pages 单文件上限 25 MB
+- poster 取**第 1 秒**的画面（比首帧有信息量），1280 宽、`-q:v 3`，一张 30–80 KB
+
+转码常用命令（ffmpeg 装好后在 PATH 里）：
+
+```powershell
+# 4K → 1080p（主展 / 半宽）
+ffmpeg -i IN.mp4 -vf "scale=-2:1080:flags=lanczos" -c:v libx264 -preset slow -crf 23 `
+       -pix_fmt yuv420p -movflags +faststart -an OUT.mp4
+
+# 时长偏长的演示：加速 1.4× + 抽到 25 fps（13.5 s → 9.6 s）
+ffmpeg -i IN.mp4 -vf "setpts=PTS/1.4,fps=25,scale=-2:1080:flags=lanczos" -c:v libx264 -preset slow -crf 22 `
+       -pix_fmt yuv420p -movflags +faststart -an OUT.mp4
+
+# poster：取第 1 秒
+ffmpeg -ss 1 -i OUT.mp4 -frames:v 1 -vf "scale=1280:-2" -q:v 3 OUT.jpg
+```
 
 ## 5. 样式怎么改
 
@@ -373,9 +407,10 @@ import peeq from '../assets/figures/peeq.png';
 - [ ] 简历 PDF → `public/media/docs/cv.pdf`，`profile.yml` 的 `links.cv` 填 `/media/docs/cv.pdf`
 - [ ] 个人照片 → 放到 `public/media/portrait.jpg`（3:4 竖图，长边 1200 px 以内），把 `profile.yml` 的 `photo` 改成 `/media/portrait.jpg`
 - [ ] `publications.yml`：换成真实论文（含 BibTeX）
-- [ ] 首页算例短片：`cut3d1.mp4` 现在约 10 MB，建议压到 3 MB 以内（720p、5–10 s）；替换后把 `index.astro` 里 `VideoCard` 的 `placeholderLabel` 一并改成对应的说明
+- [ ] 软件详情页的 6 条案例 `caption`：`software.yml` 里现在留空，补一句说明（主展文案列与小卡说明都用它）
+- [ ] 首页算例短片：`cut3d1.mp4` 保持 4K 原片（约 10 MB，首页与详情页主展共用）；若首屏嫌重，再单独压一版 1080p 给首页
 - [ ] 技术笔记：把 `/notes` 里「在写」的四条逐个写成 `src/content/notes/*.mdx`，写完从 `planned` 删掉
-- [ ] `software.yml`：`specs` / `matrix` 核对一遍；`cases[].video` 与 `poster` 补上真实文件（留空即占位）
+- [ ] `software.yml`：`specs` / `matrix` 核对一遍；`cases[]` 的 `video` / `poster` / `ratio` 核对一遍（留空即占位）
 - [ ] `software.yml` 的 `application.open`：试用正式开放时改成 `true`，页面文案自动从「即将开启」切到「申请试用」
 - [ ] `public/og-image.svg` 的文案（改完跑 `npm run og`）
 

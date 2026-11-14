@@ -243,7 +243,7 @@ npx astro preview --port 4399      # 这个终端保持开着
   详情页深色区「界面与案例」。**按数组顺序排版：第 1 条主展（视频 2/3 + 文案 1/3 两栏）、
   第 2–3 条半宽并排、第 4 条起三分之一**；`ratio` 填视频原生比例（`"16 / 9"`、`"1 / 1"`、`"4 / 3"`…，不填按 16 / 9），
   方块视频别硬塞进 16:9 会被裁；`video` 留空即显示「待替换」占位，补上 mp4 路径就自动换成播放器；
-  只有主展自动循环播放，其余带 poster + 点击播放
+  全部静音自动循环播放：滚进视口才播、滚出即暂停（`VideoCard` 里的 observer），别让整页 6 个视频一起跑
 - `application`：**只有 CuttingLab 有**，`/software/cuttinglab#access` 的试用申请块：
   `open`（`false` = 「试用即将开启」，`true` = 「申请试用」，文案自动切换）/ `email` / `subject` /
   `lead` / `fields[]`（`k` + `hint`，必填三项）/ `extra_lines[]`（邮件模板里的可选项）/ `note` / `mac_help[]`
@@ -338,6 +338,10 @@ import peeq from '../assets/figures/peeq.png';
 <VideoCard src="/media/videos/cutting.mp4" poster="/media/videos/cutting.jpg"
            alt="切屑形成过程" badge="Simulation" caption="正交切削，v = 120 m/min" />
 ```
+
+默认**静音 + 循环 + 自动播放**（浏览器只允许静音自动播，勉强有声的片子也不该在版面上突然响）；
+组件里的 `IntersectionObserver` 会让视频滚进视口才播、滚出视口暂停，系统开了「减少动态效果」时
+改为不自动播、给出原生控制器。需要手动点播的场合传 `autoplay={false}` 即可。
 
 体积控制（重要）：
 - 母版放 `media-src/videos/`（几 MB 到上百 MB，**不进 git、不发布**）；`public/media/videos/` 只放压缩版 mp4 与 jpg poster，

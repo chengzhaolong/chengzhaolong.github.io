@@ -18,7 +18,7 @@ interface Props {
   item: CaseItem;
   /** 角标，一般传软件名 */
   badge?: string;
-  /** 自动循环播放（只给主展） */
+  /** 自动循环播放（案例区默认开）；滚出视口会自动暂停，传 false 则给控制器点播 */
   autoplay?: boolean;
   /** 由卡片自己渲染说明；主展的说明在右侧文案栏，传 false */
   showCaption?: boolean;

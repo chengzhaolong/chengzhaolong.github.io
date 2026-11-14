@@ -12,7 +12,7 @@ interface Props {
   title?: string;
   /** 左上角角标，如「仿真 / 切削」 */
   badge?: string;
-  /** 自动循环播放（hero 用）；默认 false，显示控制器 */
+  /** 静音自动循环播放（默认开，滚出视口自动暂停）；传 false 则给控制器、点播 */
   autoplay?: boolean;
   placeholder?: 'a' | 'b' | 'c';
   placeholderLabel?: string;
@@ -53,6 +53,7 @@ const phClass = placeholder === 'b' ? 'media-placeholder--b' : placeholder === '
           autoplay={autoplay}
           controls={!autoplay}
           aria-label={alt}
+          data-auto={autoplay ? '' : undefined}
         >
           {webm && <source src={webm} type="video/webm" />}
           <source src={src} type="video/mp4" />
@@ -82,3 +83,35 @@ const phClass = placeholder === 'b' ? 'media-placeholder--b' : placeholder === '
     </figcaption>
   )}
 </figure>
+
+<script>
+  // 自动播放的卡片视频只在视口内播放：进场就播，滚出去暂停，别让整页 6 个视频一起烧 CPU / 流量
+  const autoVideos = document.querySelectorAll<HTMLVideoElement>('video[data-auto]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (autoVideos.length && (reduce || !('IntersectionObserver' in window))) {
+    // 关掉动效偏好或不支持 observer：不自动播，换成控制器让访客自己点
+    autoVideos.forEach((v) => {
+      v.autoplay = false;
+      v.pause();
+      v.controls = true;
+    });
+  } else if (autoVideos.length) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const v = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) {
+            v.play().catch(() => {
+              /* 浏览器策略拦下就保持 poster */
+            });
+          } else {
+            v.pause();
+          }
+        });
+      },
+      { rootMargin: '200px 0px', threshold: 0.12 }
+    );
+    autoVideos.forEach((v) => io.observe(v));
+  }
+</script>

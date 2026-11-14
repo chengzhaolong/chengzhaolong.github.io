@@ -6,7 +6,7 @@
 
 - id: main
 
-  demo: true
+  demo: false
 
   # 笔记模块：false 时导航 / 首页 / 页脚 / 简历 / 404 的「笔记」入口全部隐藏，
   # /notes 自动跳回首页且不进 sitemap；写好第一篇笔记后改成 true
@@ -43,9 +43,9 @@
 
   intro_zh: |-
     我的研究方向是热力耦合有限元-无网格算法、接触算法及其高性能计算实现。
-    独立开发了CUSPIC (Coupled Unified Solver with PIC-FEM) 高性能显式动力求解器, 
+    我开发了CUSPIC (Coupled Unified Solver with PIC-FEM) 高性能显式动力求解器, 
     能够基于GPU实现极端大变形非线性热力耦合问题的高效求解。
-    并以CUSPIC为核心开发了CUSPER CuttingLab 软件, 用于机械加工工艺物理仿真及工艺优化。
+    并以CUSPIC为核心设计了CUSPER CuttingLab 软件, 用于机械加工工艺物理仿真及工艺优化。
     求解器和软件功能还在持续完善中, 希望和大家一起交流学习, 探索 CAE 技术赋能工业的更多可能。
 
   intro_en: |-

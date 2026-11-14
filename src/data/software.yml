@@ -12,38 +12,38 @@
     CUSPIC能够基于GPU高性能并行计算，高效稳定的处理结构冲击、侵彻、切削等极端大变形热力耦合问题，为复杂大变形工程问题提供可靠的求解能力。
   version: v3.0.0
   status: 内部研发
-  chips: [FEM–MPM 耦合, 热力耦合, GPU 并行, 关键字驱动]
+  chips: [FEM–MPM 耦合, 热力耦合, GPU 并行]
   spec_line: FEM–MPM · 热力耦合 · 显式积分 · GPU 并行
   features:
-    - title: FEM 与 MPM 同模型
-      text: 常规区域用单元、大变形区域用物质点，同一个模型里混用，避免网格畸变压垮计算。
-    - title: 材料与状态方程
-      text: Johnson-Cook（含失效）、JC-Tanh、Drucker-Prager 与牛顿流体，配 Gruneisen / Monaghan 状态方程。
-    - title: 接触与热力绑定
-      text: NTS 罚接触，FEM-FEM、FEM-MPM、MPM-MPM 三类热力绑定，摩擦生热与热传导一起算。
-    - title: 全流程关键字驱动
-      text: 网格、材料、边界、载荷到输出都由 .cusp 关键字卡片控制，一套输入文件即可复现算例。
-    - title: 显式并行求解
-      text: OpenMP 多线程为默认，Linux 版可开 GPU 加速；实际使用的硬件与线程数打印在启动摘要。
-    - title: 结果直出 ParaView
-      text: 按间隔输出 VTU 场数据（二进制 / ASCII），拖进 ParaView 就能看切屑与温度场的演化。
+    - title: FEM-PIC耦合计算
+      text: 结构大变形和中等变形区域基于PIC和FEM分区离散，稳定处理极端变形问题
+    - title: 非线性处理
+      text: 支持多种非线性材料本构及热力接触算法、摩擦模型，适用于多种复杂工况
+    - title: 并行计算
+      text: 支持GPU及OpenMP并行计算，在桌面机器上高效处理大规模问题
+    - title: 热力流多场耦合分析
+      text: 支持热力流固耦合问题，适用于切削、冲击、自由表面流体冷却等多种复杂工况
+    - title: 方便的前处理
+      text: 输入文件格式部分继承Hypermesh rad格式，清晰的卡片式关键字方便集成LLM辅助建模
   specs:
-    - k: 核心方法
-      v: FEM–MPM 耦合，显式时间积分
-    - k: 单元类型
-      v: 六面体（8 节点）/ TET4 / 四边形壳 / B-T 壳
-    - k: 材料与状态方程
-      v: Johnson-Cook（含失效）· JC-Tanh · Drucker-Prager；Gruneisen / Monaghan
-    - k: 接触
-      v: NTS 罚接触；FEM-FEM / FEM-MPM / MPM-MPM 热力绑定
+    - k: 系统
+      v: win64 / linux64
+    - k: FEM 单元
+      v: BRICK8R / BRICK8SRI / TETRA4 / B-T SHELL4
+    - k: PIC 方法
+      v: B-Spline MPM · FLIP-PIC · APIC / PolyPIC
+    - k: 材料
+      v: 线弹性 / Johnson-Cook/ Tanh-Johnson-Cook / Newtonian liquid / Drucker-Prager
+    - k: 状态方程
+      v: Gruneisen / Monaghan
+    - k: 接触与界面
+      v: NTS 罚接触 · FEM-FEM / FEM-MPM / MPM-MPM 三类热力绑定及有限滑移接触 · 高温摩擦界面软化 · 库伦摩擦 · 压力相关Tresca摩擦 · 压力相关接触热导 · 多场网格接触算法
+    - k: 边界与载荷
+      v: 指定位移 / 温度 / 热流 / 速度 / 力 / 转动 / 径向约束 / MPM 盒与墙边界；重力、初始速度条件
     - k: 并行
-      v: OpenMP 多线程；GPU 加速（Linux 版）
-    - k: 实现语言
-      v: C++ / CUDA
+      v: OpenMP 多线程 / GPU 异构计算 (目前仅linux64支持该功能)
     - k: 输出
-      v: VTU 场数据（Binary / ASCII）+ 运行日志
-    - k: 运行平台
-      v: Linux（CPU + GPU）/ Windows（仅 CPU）
+      v: VTU 二进制结果文件 + 终端进度 + 自动日志
   # 能力矩阵：/software 与 /software/cuspic 共用，一行一类，只写短语
   matrix:
     - k: 系统
@@ -57,7 +57,7 @@
     - k: 状态方程
       v: Gruneisen / Monaghan
     - k: 接触与界面
-      v: NTS 罚接触 · FEM-FEM / FEM-MPM / MPM-MPM 三类热力绑定及有限滑移接触 · 高温摩擦界面软化 · 库伦摩擦 · 压力相关Tresca摩擦 · 压力相关接触热导
+      v: NTS 罚接触 · FEM-FEM / FEM-MPM / MPM-MPM 三类热力绑定及有限滑移接触 · 高温摩擦界面软化 · 库伦摩擦 · 压力相关Tresca摩擦 · 压力相关接触热导 · 多场网格接触算法
     - k: 边界与载荷
       v: 指定位移 / 温度 / 热流 / 速度 / 力 / 转动 / 径向约束 / MPM 盒与墙边界；重力、初始速度条件
     - k: 并行
@@ -70,33 +70,33 @@
   #         不填按 16 / 9 处理（1:1、4:3 这类方块别硬塞进 16:9 会被裁）。
   #         caption 先留空，主展文案列与卡片说明后面补。
   cases:
-    - title: 三维微铣削
+    - title: 三维微铣削Ti-6Al-4V合金
       meta: 3D micro-milling · FEM–MPM
       # caption: 待补（一句话说明）
       video: /media/videos/cut3d1.mp4
       poster: /media/videos/cut3d1.jpg
       ratio: "16 / 9"
-    - title: 二维正交切削
+    - title: 二维正交切削Ti-6Al-4V合金
       meta: 2D orthogonal cutting · Force / Temperature
       video: /media/videos/cut2d.mp4
       poster: /media/videos/cut2d.jpg
       ratio: "16 / 9"
-    - title: 斜齿轮啮合接触
+    - title: 船用多级减速器斜齿轮润滑
       meta: Helical gears · Contact
       video: /media/videos/gear.mp4
       poster: /media/videos/gear.jpg
       ratio: "16 / 9"
-    - title: 三维车削
+    - title: 三维车削AISI4340钢
       meta: 3D turning · PEEQ
       video: /media/videos/turning3d.mp4
       poster: /media/videos/turning3d.jpg
       ratio: "1 / 1"
-    - title: 块体叠放接触
+    - title: 大规模积木坍塌
       meta: Block stacking · Contact
       video: /media/videos/block.mp4
       poster: /media/videos/block.jpg
       ratio: "4 / 3"
-    - title: 物质点流入
+    - title: 自由表面流体
       meta: MPM inflow · Chip flow
       video: /media/videos/inflow.mp4
       poster: /media/videos/inflow.jpg
@@ -136,7 +136,7 @@
     - k: 运行平台
       v: Windows / Linux（以内测版本为准）
     - k: 获取方式
-      v: 邮件登记，试用开启后按登记顺序发放
+      v: 邮件登记试用，试用开启后将及时发放
   # 案例位：video / poster 留空即显示「待替换」占位
   cases:
     - title: 主界面与工艺参数

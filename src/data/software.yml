@@ -115,45 +115,85 @@
   kicker: Application
   tagline: 以 CUSPIC 为核心的金属切削加工仿真一体化软件
   summary: |-
-    CUSPER CuttingLab 把「几何与材料准备 → 工艺参数设置 → 求解 → 结果分析」做成不写代码也能跑通的流程。面向切削工艺研究与小批量工艺试算：参数扫描、结果对比与图表输出都在界面里完成，不用再回头写前处理脚本。
-  status: 即将开启试用
-  chips: [一键求解, 参数扫描, 结果对比]
-  spec_line: 几何–工艺–求解–后处理 · 工艺优化 · 切削力 · 刀具温度
+    CUSPER CuttingLab 目前打通了二维正交切削的完整链条：参数化建模 → 网格划分 → 生成 CUSPIC 求解器输入文件 → 实时后处理，切削力时程曲线随计算同步刷新，不用再回头写前处理脚本。
+    三维钻削的参数化建模与网格划分已完成，求解与后处理在开发中；铣削、车削与冷却液辅助工况随后接入，刀具磨损分析、基于 LLM 的参数扫描与刀具形状优化、自动仿真报告在后续版本提供。
+  status: 2D 正交切削 · 全流程内测
+  chips: [参数化建模, 实时后处理, 切削力时程]
+  spec_line: 2D 正交切削全流程 · 3D 钻削开发中
   features:
-    - title: 几何与材料
-      text: 导入工件与刀具几何，建立材料本构（JC 类塑性、温度相关参数）与摩擦模型。
-    - title: 工艺参数
-      text: 切削速度、进给量、切深、刀尖几何与冷却条件集中设置，可保存成参数组批量提交。
-    - title: 一键求解
-      text: 内部调用 CUSPIC，自动完成背景网格与物质点布置、时间步控制与任务调度。
-    - title: 结果后处理
-      text: 应力 / 应变 / 温度云图、切屑形态演化、切削力与温度曲线，支持导出图与数据。
+    - title: 参数化建模
+      text: 工件、刀具与刀尖几何参数化，材料本构（JC 类塑性）与摩擦模型集中设置，改参数即可重建算例。
+    - title: 网格划分
+      text: 自动布置背景网格与物质点，切削区局部加密；三维钻削的网格模块已可用。
+    - title: 生成求解器输入文件
+      text: 直接输出 CUSPIC 可读的关键字输入文件，不用手写卡片，前处理脚本交给软件。
+    - title: 实时后处理
+      text: 计算过程中同步刷新云图与切削力时程曲线，边算边看趋势，结果可导出图片与数据。
   specs:
     - k: 底层求解器
       v: CUSPIC v3.0.0（FEM–MPM）
-    - k: 典型输出
-      v: 云图 / 视频 / 力–位移曲线 / 温度曲线
+    - k: 当前支持
+      v: 二维正交切削（全流程打通）
+    - k: 已打通环节
+      v: 参数化建模 / 网格划分 / 生成 CUSPIC 输入文件 / 实时后处理 / 切削力时程曲线
+    - k: 3D 进展
+      v: 钻削——参数化建模与网格划分已完成，求解与后处理开发中
     - k: 运行平台
       v: Windows / Linux（以内测版本为准）
     - k: 获取方式
       v: 邮件登记试用，试用开启后将及时发放
-  # 案例位：video / poster 留空即显示「待替换」占位
+  # 案例位：第 1 条主展（视频），第 2–3 条半宽并排（截图）。
+  # 视频母版在 media-src/videos/（不进 git），public 里放压缩版 + 同名 jpg poster；
+  # 截图的 ratio 必须填原生像素比，否则 object-fit: cover 会把界面文字裁掉。
   cases:
-    - title: 主界面与工艺参数
-      meta: UI · Parameter setup
-      caption: 界面截图或一段操作录屏。
-    - title: 切削力与温度曲线
-      meta: Result · Force / Temperature
-      caption: 后处理曲线与云图。
-    - title: 切屑形态演化
-      meta: Result · Chip morphology
-      caption: 多帧切屑演化对比。
+    - title: 二维正交切削全流程演示
+      meta: 2D orthogonal cutting · Modeling → Solve → Post
+      caption: 从参数化建模、网格划分、生成 CUSPIC 输入文件到实时后处理，一次跑通的完整算例。
+      video: /media/videos/cusper_2d_demo.mp4
+      poster: /media/videos/cusper_2d_demo.jpg
+      ratio: "16 / 9"
+    - title: 二维求解界面
+      meta: 2D solver · UI
+      caption: 求解在界面内启动：进度、时间步与终端日志同屏可见，左侧可随时调出切削力时程。
+      image: /media/figures/cuttinglab-2d-solver.png
+      ratio: "2092 / 1281"
+    - title: 三维钻削网格
+      meta: 3D drilling · Mesh
+      caption: 钻削工况的参数化建模与网格划分已完成，求解与后处理在开发中。
+      image: /media/figures/cuttinglab-3d-drilling-mesh.png
+      ratio: "2098 / 1266"
+  # 进度与路线图：state 取 done（已打通）/ wip（开发中）/ plan（计划）
+  roadmap:
+    - when: 现在
+      what: 二维正交切削 · 全流程打通
+      state: done
+      desc: 参数化建模、网格划分、生成 CUSPIC 输入文件、实时后处理与切削力时程曲线已可用。
+    - when: 进行中
+      what: 三维钻削 · 参数化建模与网格划分
+      state: wip
+      desc: 建模与网格模块已完成，求解与后处理在开发中。
+    - when: "2027.06"
+      what: 五类工况的链条打通
+      state: plan
+      desc: 二维正交切削、三维钻削、三维铣削、三维车削与冷却液辅助切削，前处理—求解—后处理全部连通。
+    - when: 之后
+      what: 刀具磨损分析
+      state: plan
+      desc: 面向二维正交切削的刀具磨损计算与分析。
+    - when: 之后
+      what: LLM 驱动的参数扫描与刀具形状优化
+      state: plan
+      desc: 由 LLM 组织批量参数扫描、解读结果并给出刀具形状优化建议。
+    - when: 之后
+      what: 自动仿真报告
+      state: plan
+      desc: 算例跑完自动生成含云图、曲线与结论的仿真报告。
   # 试用申请：open 改成 true 就自动从「即将开启」切换到「申请试用」文案
   application:
     open: false
     email: chengzhaolong@mail.dlut.edu.cn
     subject: CUSPER CuttingLab 试用申请
-    lead: 填写以下信息，以便我们在开放试用后及时通知你
+    lead: 对CUSPER CuttingLab项目感兴趣？填写以下信息，以便我们在开放试用后及时通知你
     fields:
       - k: 用户名
         hint: 姓名或称呼
@@ -168,4 +208,7 @@
       variant: primary
     - label: 工作流 ↓
       href: '#workflow'
+      variant: ghost
+    - label: 路线图 ↓
+      href: '#roadmap'
       variant: ghost

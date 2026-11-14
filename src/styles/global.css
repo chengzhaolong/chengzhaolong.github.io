@@ -1660,6 +1660,31 @@ table.data td.num {
   color: var(--ink-2);
 }
 
+/* 路线图状态徽标：已打通 / 开发中 / 计划（挂在 .timeline__what 里，跟着标题走） */
+.timeline__state {
+  margin-left: 0.5rem;
+  padding: 0.02rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  vertical-align: 0.08em;
+  white-space: nowrap;
+}
+
+.timeline__state--done {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.timeline__state--wip {
+  border-color: var(--accent-warm);
+  color: var(--accent-warm);
+}
+
 @media (max-width: 620px) {
   .timeline__item {
     grid-template-columns: minmax(0, 1fr);

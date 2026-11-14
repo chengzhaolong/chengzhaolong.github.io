@@ -65,6 +65,20 @@ const software = defineCollection({
     chips: z.array(z.string()).default([]),
     features: z.array(z.object({ title: z.string(), text: z.string() })).default([]),
     specs: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
+    /**
+     * 进度与路线图：目前只有 CuttingLab 用，渲染在详情页「进度与路线图」时间线。
+     * state = done（已打通）/ wip（开发中）/ plan（计划）。
+     */
+    roadmap: z
+      .array(
+        z.object({
+          when: z.string(),
+          what: z.string(),
+          desc: z.string().optional(),
+          state: z.enum(['done', 'wip', 'plan']).default('plan'),
+        })
+      )
+      .default([]),
     /** 能力矩阵：只在 /software 总览里用，一行一类 */
     matrix: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
     /**

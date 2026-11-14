@@ -19,12 +19,16 @@ const manual = entry.id === 'cuspic' ? (await getEntry('manual', 'cuspic'))?.dat
 /** 〔待填〕的行不上页面 */
 const specs = s.specs.filter((row) => !row.v.includes('〔'));
 
+/**
+ * CuttingLab 的工作流：写的是已经跑通的二维正交切削链路；
+ * 三维工况沿用同一套步骤，按 software.yml 的 roadmap 逐步接入。
+ */
 const workflow = [
-  { when: 'Step 1', what: '几何与材料', desc: '导入工件与刀具几何，选择本构与摩擦模型，设定初始温度场。' },
-  { when: 'Step 2', what: '工艺参数', desc: '切削速度、进给量、切深、刀尖几何与冷却条件；可保存为参数组批量提交。' },
-  { when: 'Step 3', what: '离散与求解', desc: '自动布置背景网格与物质点，调用 CUSPIC 求解，失败算例给出定位信息。' },
-  { when: 'Step 4', what: '结果分析', desc: '云图、切屑形态演化、力与温度曲线；支持导出图片与数据表。' },
-  { when: 'Step 5', what: '对比与报告', desc: '多组参数结果并列比较，生成可交付的图表与说明。' },
+  { when: 'Step 1', what: '参数化建模', desc: '工件、刀具与刀尖几何参数化，材料本构与摩擦模型集中设置，改参数即可重建算例。' },
+  { when: 'Step 2', what: '网格划分', desc: '自动布置背景网格与物质点，切削区局部加密；三维钻削的网格模块同样可用。' },
+  { when: 'Step 3', what: '生成输入文件', desc: '输出 CUSPIC 可读的关键字输入文件，不用手写卡片，前处理脚本交给软件。' },
+  { when: 'Step 4', what: '求解', desc: '在界面内调用 CUSPIC（FEM–MPM），时间步控制与任务调度由软件接管。' },
+  { when: 'Step 5', what: '实时后处理', desc: '云图与切削力时程曲线随计算刷新，结果可导出图片与数据。' },
 ];
 ---
 
@@ -159,7 +163,7 @@ const workflow = [
             <div class="section-head__text">
               <span class="eyebrow">Workflow</span>
               <h2 style="margin-top:.6rem">五步走完一个算例</h2>
-              <p>从几何到报告，一条不需要写代码的路径。</p>
+              <p>以二维正交切削为例：从参数到曲线，一条不需要写代码的路径。</p>
             </div>
           </div>
 
@@ -169,6 +173,37 @@ const workflow = [
                 <span class="timeline__when">{w.when}</span>
                 <p class="timeline__what">{w.what}</p>
                 <p class="timeline__desc">{w.desc}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    entry.id === 'cuttinglab' && s.roadmap.length > 0 && (
+      <section class="section--tight section--line" id="roadmap">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-head__text">
+              <span class="eyebrow">Roadmap</span>
+              <h2 style="margin-top:.6rem">进度与路线图</h2>
+              <p>二维正交切削已全流程打通；三维工况与后续功能按下面的节奏推进。</p>
+            </div>
+          </div>
+
+          <ol class="timeline">
+            {s.roadmap.map((r) => (
+              <li class="timeline__item" data-reveal>
+                <span class="timeline__when">{r.when}</span>
+                <p class="timeline__what">
+                  {r.what}
+                  <span class:list={['timeline__state', `timeline__state--${r.state}`]}>
+                    {r.state === 'done' ? '已打通' : r.state === 'wip' ? '开发中' : '计划'}
+                  </span>
+                </p>
+                {r.desc && <p class="timeline__desc">{r.desc}</p>}
               </li>
             ))}
           </ol>

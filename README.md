@@ -250,7 +250,11 @@ npx astro preview --port 4399      # 这个终端保持开着
   详情页深色区「界面与案例」。**按数组顺序排版：第 1 条主展（视频 2/3 + 文案 1/3 两栏）、
   第 2–3 条半宽并排、第 4 条起三分之一**；`ratio` 填视频原生比例（`"16 / 9"`、`"1 / 1"`、`"4 / 3"`…，不填按 16 / 9），
   方块视频别硬塞进 16:9 会被裁；`video` 留空即显示「待替换」占位，补上 mp4 路径就自动换成播放器；
-  全部静音自动循环播放：滚进视口才播、滚出即暂停（`VideoCard` 里的 observer），别让整页 6 个视频一起跑
+  全部静音自动循环播放：滚进视口才播、滚出即暂停（`VideoCard` 里的 observer），别让整页 6 个视频一起跑。
+  **截图用 `image`**（同时给 `video` 时以视频为准）：渲染成 `FigureCard`，带「放大」灯箱；
+  `ratio` 要填截图原生像素比（如 `"2092 / 1281"`），`object-fit: cover` 会照这个比例裁，填 16 / 9 会把界面文字裁掉
+- `roadmap[]`：`when` / `what` / `desc` / `state`，**目前只有 CuttingLab 有**，渲染在详情页「进度与路线图」时间线；
+  `state` 取 `done`（已打通）/ `wip`（开发中）/ `plan`（计划），只影响状态徽标的颜色
 - `application`：**只有 CuttingLab 有**，`/software/cuttinglab#access` 的试用申请块：
   `open`（`false` = 「试用即将开启」，`true` = 「申请试用」，文案自动切换）/ `email` / `subject` /
   `lead` / `fields[]`（`k` + `hint`，必填三项）/ `extra_lines[]`（邮件模板里的可选项）/ `note` / `mac_help[]`
@@ -344,6 +348,8 @@ import peeq from '../assets/figures/peeq.png';
 ```
 
 不传 `src` 时会渲染一个「待替换」的占位云图——所有占位都会明确标出，方便一眼找出待补位置。
+截图统一放 `public/media/figures/`（软件界面、网格这类），视频与 poster 放 `public/media/videos/`，
+`xxx.mp4` 与 `xxx.jpg` 同名成对。
 
 **视频（`VideoCard`）**：`src` 填 mp4 路径，`poster` 填首帧图。
 
@@ -424,11 +430,13 @@ ffmpeg -ss 1 -i OUT.mp4 -frames:v 1 -vf "scale=1280:-2" -q:v 3 OUT.jpg
 - [ ] 简历 PDF → `public/media/docs/cv.pdf`，`profile.yml` 的 `links.cv` 填 `/media/docs/cv.pdf`
 - [ ] 个人照片 → 放到 `public/media/portrait.jpg`（3:4 竖图，长边 1200 px 以内），把 `profile.yml` 的 `photo` 改成 `/media/portrait.jpg`
 - [ ] `publications.yml`：换成真实论文（含 BibTeX）
-- [ ] 软件详情页的 6 条案例 `caption`：`software.yml` 里现在留空，补一句说明（主展文案列与小卡说明都用它）
+- [ ] CUSPIC 详情页的 6 条案例 `caption`：`software.yml` 里现在留空，补一句说明（主展文案列与小卡说明都用它）
+- [ ] CuttingLab 案例已就位：`cusper_2d_demo.mp4`（1080p / 3.4 MB）+ 同名 `.jpg` poster，两张截图在 `public/media/figures/`；换素材时按 4.6 的体积约定重压、重抽 poster，母版放 `media-src/videos/`
 - [ ] 首页算例短片：`cut3d1.mp4` 保持 4K 原片（约 10 MB，首页与详情页主展共用）；若首屏嫌重，再单独压一版 1080p 给首页
 - [ ] 技术笔记：把 `/notes` 里「在写」的四条逐个写成 `src/content/notes/*.mdx`，写完从 `planned` 删掉；第一篇发布时把 `profile.yml` 的 `show_notes` 改回 `true`，并删掉 `astro.config.mjs` 里 sitemap 的 notes `filter`
 - [ ] `software.yml`：`specs` / `matrix` 核对一遍；`cases[]` 的 `video` / `poster` / `ratio` 核对一遍（留空即占位）
 - [ ] `software.yml` 的 `application.open`：试用正式开放时改成 `true`，页面文案自动从「即将开启」切到「申请试用」
+- [ ] `software.yml` 的 `cuttinglab.roadmap`：三维钻削 / 铣削 / 车削 / 冷却液工况推进后，把对应条目的 `state` 从 `plan` 改成 `wip` 或 `done`，`when` 同步改（如「进行中」→「已落地」）
 - [ ] `public/og-image.svg` 的文案（改完跑 `npm run og`）
 
 ## 8. 常见问题

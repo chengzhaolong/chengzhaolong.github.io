@@ -1,6 +1,11 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
+
+const profile = (await getEntry('profile', 'main'))!.data;
+/** 笔记模块关闭时（profile.yml → show_notes: false）页面不对外，直接回首页。
+ *  用 307（临时跳转）：Astro 对 302 会加 2 秒等待，307 是立即跳。 */
+if (!profile.show_notes) return Astro.redirect('/', 307);
 
 const posts = (await getCollection('notes'))
   .filter((n) => !n.data.draft)

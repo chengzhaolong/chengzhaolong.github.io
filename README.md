@@ -76,6 +76,7 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 | 字段 | 说明 |
 | --- | --- |
 | `demo` | `true` 时论文页会显示「示例数据」提示。全部换成真实内容后改为 `false` |
+| `show_notes` | 笔记模块开关。`false` 时导航 / 首页 / 页脚 / 简历 / 404 的「笔记」入口全部隐藏，`/notes` 跳回首页且不进 sitemap（默认 `true`） |
 | `name` / `name_en` / `latin` | 中文名 / 英文名 / 全大写英文名（页脚、导航用） |
 | `title` / `title_en` | 学术身份，用于结构化数据（JSON-LD 的 `jobTitle`）与 `/about` |
 | `role_short_en` | 英文页 `/en/` 身份行，如「CUSPIC author」；不填则用 `title_en` |
@@ -93,13 +94,14 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 
 顺序固定为 5 段，改文案直接改页面里的字符串，改数据改 YAML/MDX：
 
-1. **首屏（矮）**：`eyebrow` + 姓名 + 一句话 + 四个文本链接；右侧是 `profile.photo` 的小照片（点击进 `/about`）。`profile.name` 是唯一的 `h1`，不重复放身份行。
+1. **首屏（矮）**：`eyebrow` + 姓名 + 一句话 + 文本链接行（笔记 / 软件 / 论文 / 邮箱，其中「笔记」随 `show_notes` 开关出现或消失）；右侧是 `profile.photo` 的小照片（点击进 `/about`）。`profile.name` 是唯一的 `h1`，不重复放身份行。
 2. **简介 + 算例**：左栏 `intro_zh` + `interests` + 「完整介绍与简历 →」；右栏一个算例短片（`VideoCard`，16:9），下面一行小字「了解 CUSPIC 求解器 →」（跳详情页）。
 3. **自研工具**：深色区，自动读取 `software.yml`；卡片底部一行 `spec_line`。
 4. **论文**：取 3 条（`highlight: true` 优先）。
 5. **联系**：页面底部一行「联系」条；页脚只出现一次姓名。
 
-「研究」模块已下线：首页只留首屏与导航入口，方法层面的长文统一写进 `/notes`（笔记）。
+「研究」模块已下线：首页只留首屏与导航入口，方法层面的长文统一写进 `/notes`（笔记）；
+笔记模块当前由 `profile.yml` 的 `show_notes: false` 关闭（入口全隐藏、`/notes` 跳回首页）。
 
 ### 4.2 简历 — `src/data/cv.yml`
 
@@ -286,6 +288,12 @@ npx astro preview --port 4399      # 这个终端保持开着
 笔记 = 技术写作，回答「为什么这么做、试过什么、数对不对」。**写一篇 = 新建一个 `.mdx`**，
 文件名就是 URL（`gpu-particle-loop.mdx` → `/notes/gpu-particle-loop`），不用改任何页面代码。
 
+> **当前状态：笔记模块关闭。** `profile.yml` 里 `show_notes: false` 时，导航 / 首页 / 页脚 /
+> 简历 / 404 的「笔记」入口全部不渲染，`/notes` 用 `Astro.redirect('/')` 跳回首页（静态构建
+> 输出一张带 `meta refresh` 与 `noindex` 的跳转页），文章页不生成，`astro.config.mjs` 里
+> sitemap 的 `filter` 也不收录 `/notes`。
+> **要开放**：把 `show_notes` 改成 `true`，并删掉 sitemap 里那几行 `filter`。
+
 ```mdx
 ---
 title: 接触界面：嵌入拉格朗日表面，还是点–面罚函数？
@@ -302,7 +310,7 @@ draft: false          # true = 不进列表、不生成路由
   某条写完后，把对应条目从 `planned` 删掉即可。
 - `src/content/notes/draft-template.mdx` 是一份 `draft: true` 的模板，复制改名再写内容；
   它不会出现在站点上。
-- 中文首页保持精简：只在首屏链接行留「笔记」入口；`/en/` 会自动列出最新笔记（无笔记时整块不渲染）。
+- 中文首页保持精简：首屏链接行只在 `show_notes: true` 时留「笔记」入口；`/en/` 会自动列出最新笔记（无笔记或关闭时整块不渲染）。
 
 要插图，在正文里用组件（MDX 需要先 `import`）：
 
@@ -418,7 +426,7 @@ ffmpeg -ss 1 -i OUT.mp4 -frames:v 1 -vf "scale=1280:-2" -q:v 3 OUT.jpg
 - [ ] `publications.yml`：换成真实论文（含 BibTeX）
 - [ ] 软件详情页的 6 条案例 `caption`：`software.yml` 里现在留空，补一句说明（主展文案列与小卡说明都用它）
 - [ ] 首页算例短片：`cut3d1.mp4` 保持 4K 原片（约 10 MB，首页与详情页主展共用）；若首屏嫌重，再单独压一版 1080p 给首页
-- [ ] 技术笔记：把 `/notes` 里「在写」的四条逐个写成 `src/content/notes/*.mdx`，写完从 `planned` 删掉
+- [ ] 技术笔记：把 `/notes` 里「在写」的四条逐个写成 `src/content/notes/*.mdx`，写完从 `planned` 删掉；第一篇发布时把 `profile.yml` 的 `show_notes` 改回 `true`，并删掉 `astro.config.mjs` 里 sitemap 的 notes `filter`
 - [ ] `software.yml`：`specs` / `matrix` 核对一遍；`cases[]` 的 `video` / `poster` / `ratio` 核对一遍（留空即占位）
 - [ ] `software.yml` 的 `application.open`：试用正式开放时改成 `true`，页面文案自动从「即将开启」切到「申请试用」
 - [ ] `public/og-image.svg` 的文案（改完跑 `npm run og`）

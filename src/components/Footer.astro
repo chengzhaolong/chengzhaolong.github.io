@@ -35,7 +35,7 @@ const contacts = [
             <li><a href="/">主页</a></li>
             <li><a href="/software">软件</a></li>
             <li><a href="/publications">论文</a></li>
-            <li><a href="/notes">笔记</a></li>
+            {profile.show_notes && <li><a href="/notes">笔记</a></li>}
             <li><a href="/about">简历</a></li>
             <li><a href="/en/" hreflang="en">English</a></li>
           </ul>

@@ -12,7 +12,8 @@ const links = [
   { href: '/', label: '主页' },
   { href: '/software', label: '软件' },
   { href: '/publications', label: '论文' },
-  { href: '/notes', label: '笔记' },
+  // 笔记模块由 profile.yml 的 show_notes 控制（关闭时不渲染这一项）
+  ...(profile.show_notes ? [{ href: '/notes', label: '笔记' }] : []),
   { href: '/about', label: '简历' },
 ];
 

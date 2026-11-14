@@ -1,8 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getCollection, render } from 'astro:content';
+import { getCollection, getEntry, render } from 'astro:content';
 
 export async function getStaticPaths() {
+  // 笔记模块关闭时（profile.yml → show_notes: false）不生成任何文章页
+  const profile = (await getEntry('profile', 'main'))?.data;
+  if (!profile?.show_notes) return [];
+
   const posts = (await getCollection('notes'))
     .filter((n) => !n.data.draft)
     .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());

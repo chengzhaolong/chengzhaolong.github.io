@@ -32,8 +32,14 @@ const portrait = profile.photo ?? '/media/portrait.svg';
         <p class="hero__lede">{profile.tagline_zh}</p>
 
         <p class="link-row">
-          <a href="/notes">笔记</a>
-          <span class="link-row__sep" aria-hidden="true">·</span>
+          {
+            profile.show_notes && (
+              <>
+                <a href="/notes">笔记</a>
+                <span class="link-row__sep" aria-hidden="true">·</span>
+              </>
+            )
+          }
           <a href="/software">软件</a>
           <span class="link-row__sep" aria-hidden="true">·</span>
           <a href="/publications">论文</a>

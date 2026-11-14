@@ -182,7 +182,7 @@ const cuspicLabel = cuspicUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '');
       <p class="cv-links mono">
         <a href="/publications">论文列表 →</a>
         <a href="/software">软件 →</a>
-        <a href="/notes">笔记 →</a>
+        {profile.show_notes && <a href="/notes">笔记 →</a>}
       </p>
     </div>
   </section>

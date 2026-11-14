@@ -196,6 +196,8 @@ const profile = defineCollection({
   loader: file('./src/data/profile.yml'),
   schema: z.object({
     demo: z.boolean().default(false),
+    /** 站点模块开关：false 时「笔记」入口全部隐藏，/notes 跳回首页 */
+    show_notes: z.boolean().default(true),
     name: z.string(),
     name_en: z.string(),
     latin: z.string(),

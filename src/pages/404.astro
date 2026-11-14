@@ -1,5 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getEntry } from 'astro:content';
+
+const profile = (await getEntry('profile', 'main'))!.data;
 ---
 
 <Base title="404 · 页面不存在" noindex>
@@ -12,7 +15,7 @@ import Base from '../layouts/Base.astro';
       </p>
       <div class="cluster" style="margin-top:2rem;justify-content:center">
         <a class="btn" href="/">回到首页</a>
-        <a class="btn btn--ghost" href="/notes">笔记</a>
+        {profile.show_notes && <a class="btn btn--ghost" href="/notes">笔记</a>}
         <a class="btn btn--ghost" href="/publications">论文</a>
       </div>
     </div>

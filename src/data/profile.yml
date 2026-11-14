@@ -8,6 +8,11 @@
 
   demo: true
 
+  # 笔记模块：false 时导航 / 首页 / 页脚 / 简历 / 404 的「笔记」入口全部隐藏，
+  # /notes 自动跳回首页且不进 sitemap；写好第一篇笔记后改成 true
+  # （同时删掉 astro.config.mjs 里 sitemap 的 notes 过滤）。
+  show_notes: false
+
   name: 成朝龙
   name_en: Zhaolong Cheng
   latin: ZHAOLONG CHENG

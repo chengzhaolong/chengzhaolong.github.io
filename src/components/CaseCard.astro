@@ -1,6 +1,8 @@
 ---
 import VideoCard from './VideoCard.astro';
 import FigureCard from './FigureCard.astro';
+import { langFromPath, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
 
 /** 案例数据（software.yml 的 cases 一项） */
 interface CaseItem {
@@ -22,9 +24,13 @@ interface Props {
   autoplay?: boolean;
   /** 由卡片自己渲染说明；主展的说明在右侧文案栏，传 false */
   showCaption?: boolean;
+  /** 语言；不传则按当前路径判断 */
+  lang?: Lang;
 }
 
 const { item, badge, autoplay = false, showCaption = true } = Astro.props;
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
 /** 没填 ratio 的按 16 / 9 出画面 */
 const ratio = item.ratio ?? '16 / 9';
 ---
@@ -32,6 +38,7 @@ const ratio = item.ratio ?? '16 / 9';
 {
   item.image && !item.video ? (
     <FigureCard
+      lang={lang}
       src={item.image}
       alt={item.title}
       ratio={ratio}
@@ -42,6 +49,7 @@ const ratio = item.ratio ?? '16 / 9';
     />
   ) : (
     <VideoCard
+      lang={lang}
       src={item.video}
       poster={item.poster}
       autoplay={autoplay}
@@ -50,7 +58,7 @@ const ratio = item.ratio ?? '16 / 9';
       title={showCaption ? item.title : undefined}
       caption={showCaption ? item.caption : undefined}
       meta={showCaption ? item.meta : undefined}
-      placeholderLabel={`${item.title}（mp4）`}
+      placeholderLabel={`${item.title}${t.common.mp4Suffix}`}
       ratio={ratio}
     />
   )

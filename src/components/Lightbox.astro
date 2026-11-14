@@ -1,9 +1,19 @@
 ---
 // 原生 <dialog> 图片放大：点任意 [data-zoom] 元素即可打开，零依赖
+import { langFromPath, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+
+interface Props {
+  /** 语言；不传则按当前路径判断 */
+  lang?: Lang;
+}
+
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
 ---
 
-<dialog class="lightbox" id="lightbox" aria-label="图片放大">
-  <button class="lightbox__close" type="button" data-close aria-label="关闭">✕</button>
+<dialog class="lightbox" id="lightbox" aria-label={t.a11y.lightbox}>
+  <button class="lightbox__close" type="button" data-close aria-label={t.a11y.close}>✕</button>
   <img class="lightbox__img" alt="" data-lightbox-img />
   <div class="lightbox__cap">
     <span data-lightbox-cap></span>

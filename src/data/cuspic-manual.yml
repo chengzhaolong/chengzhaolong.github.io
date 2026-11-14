@@ -88,3 +88,82 @@
       page: 82
       summary: FEM 六面体单单元冲击与 MPM 物质点流入两个算例全文、逐行讲解，附输入文件自查方法。
       keywords: [示例, 自查]
+
+  # ---------- 英文站覆盖 ----------
+  # 手册正文是中文：英文页只翻译标题、摘要与关键词，并在页面上注明这一点。
+  en:
+    title: CUSPIC User Manual
+    subtitle: Coupled Unified Solver with PIC-FEM — input file and usage guide
+    abstract: From the software overview and quick start to each of the thirty-odd keyword cards, with a full keyword index, a fixed-column quick reference and two complete worked examples.
+
+    chapters:
+      - no: '1'
+        title: Introduction
+        page: 5
+        summary: Positioning, the seven capability classes, runtime environment and delivery, licensing — read this chapter first to see whether it can solve your problem.
+        keywords: [Capability scope, Runtime, Licensing]
+      - no: '2'
+        title: Quick start
+        page: 7
+        summary: Four preparation steps, command-line options, a first run, and four actions for inspecting results in ParaView.
+        keywords: [Command line, mpm_inflow, VTU]
+      - no: '3'
+        title: Input file basics
+        page: 11
+        summary: Overall .cusp structure, comments and keyword headers, fixed-column rules, data start lines, ID reference checks, unit system.
+        keywords: [Fixed columns, Data start line, Units]
+      - no: '4'
+        title: Control cards
+        page: 16
+        summary: /BEGIN /TIME /OUTPUT /RESULT /END — the master switches for time stepping, output intervals and result fields.
+        keywords: [/TIME, /OUTPUT, /RESULT]
+      - no: '5'
+        title: Mesh and set cards
+        page: 20
+        summary: Column widths and usage for /NODE /GRNOD /SURF/SEG /BRICK /SHELL /MPMCEL /FUNCT /TETRA4.
+        keywords: [/NODE, /BRICK, /MPMCEL]
+      - no: '6'
+        title: Material and property cards
+        page: 28
+        summary: How /MAT /EOS /HEAT/MAT /PROP /PART relate, and what the constitutive, equation-of-state and element-property parameters mean.
+        keywords: [Johnson-Cook, Gruneisen, /PROP]
+      - no: '7'
+        title: Boundary and load cards
+        page: 39
+        summary: Common conventions for /BCS /BCR /CLOAD /GRAV /IMPDISP /IMPROTA /INIVEL /INITEMP and three more cards.
+        keywords: [/BCS, /CLOAD, Initial conditions]
+      - no: '8'
+        title: MPM cards
+        page: 47
+        summary: /MPMGRID /MPMINFLOW /MPMCONTACT /MPMBOXBCS /MPMWALLBCS /MPMVELBCS — background grid, inflow and boundaries.
+        keywords: [/MPMGRID, /MPMINFLOW, Box boundary]
+      - no: '9'
+        title: Contact cards
+        page: 55
+        summary: Slave and master surfaces, penalty parameters and thermo-mechanical bonding for NTS node-to-surface penalty contact (/INTER/PENA).
+        keywords: [/INTER/PENA, Penalty method, Thermo-mechanical bonding]
+      - no: '10'
+        title: Running and output
+        page: 59
+        summary: The seven-step solution flow, how to read the startup summary, the progress lines, the energy-history table and err(%) self-check in the log, plus parallel and stability advice.
+        keywords: [Startup summary, Energy balance, GPU]
+      - no: '11'
+        title: Troubleshooting
+        page: 64
+        summary: Error mechanism, error-code reference (RUN-5101 hourglass energy, 5102 negative volume …), symptom-based checks and common questions.
+        keywords: [Error codes, FAQ]
+      - no: A
+        title: Keyword index
+        page: 68
+        summary: Card-to-chapter lookup table — search it on demand instead of reading cover to cover.
+        keywords: [Index]
+      - no: B
+        title: Column-width reference
+        page: 70
+        summary: Column widths for every card under the fixed-column format, to copy from when writing an input file by hand.
+        keywords: [Column width, Fixed format]
+      - no: C
+        title: Complete examples
+        page: 82
+        summary: Full listing and line-by-line walkthrough of a single-element FEM brick impact case and an MPM material-point inflow case, plus a self-check method.
+        keywords: [Examples, Self-check]

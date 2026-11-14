@@ -75,3 +75,64 @@
       items: CUDA, MPI, OpenMP
     - group: 软件与工具
       items: ParaView, VTK, Git, Latex, Abaqus, Hypermesh
+
+  # ---------- 英文站覆盖 ----------
+  # 结构与上面三段相同；给哪段就整段替换，不给的段回退中文。
+  # 英文页缺这一段会直接漏出中文，加新经历时两边一起写。
+  en:
+    education:
+      - period: 2023.09 — present
+        school: Dalian University of Technology
+        major: Computational Mechanics
+        degree: Ph.D. student
+        points:
+          - Independently developed CUSPIC, a high-performance GPU explicit dynamics solver
+          - Led the development of CUSPER CuttingLab, a physical simulation application for machining processes
+          - Contributed to several CAE algorithm research and software development projects
+      - period: 2022.06 — 2022.09
+        school: Dalian Xingpai Technology Co., Ltd.
+        major: Structural FE algorithm engineer
+        degree: Internship
+        points:
+          - Preliminary research on steady-state, modal and frequency-sweep algorithms for the rotor dynamics module
+      - period: 2019.09 — 2023.06
+        school: Ningbo University
+        major: Engineering Mechanics (Top-notch Talent Innovation Class)
+        degree: B.Eng.
+        points:
+          - Recommended for postgraduate study without examination
+          - '2023 Outstanding Bachelor Thesis, Ningbo University: research on a 3D parallel explicit material point method based on convective particle domain interpolation'
+          - Developed PMPM-CPDI3D, an MPI-parallel non-linear large-deformation material point solver
+          - Finalist, 2022 Interdisciplinary Contest in Modeling (MCM/ICM)
+    projects:
+      - period: 2022.09 — present
+        name: CUSPIC high-performance explicit dynamics solver
+        role: Sole developer · C++ / CUDA
+        points:
+          - 'Architecture: designed the explicit dynamics solver for large-deformation, non-linear, multi-field coupled finite element–meshfree problems; the core now exceeds 40,000 lines of code'
+          - 'High-performance computing: CPU–GPU heterogeneous parallelism with CUDA and OpenMP, including efficient data structures and memory-conflict handling'
+          - 'Core algorithms: FEM (Tet4/Hex8/SRI/B-T shell) and several PIC meshfree formulations; multiple non-linear constitutive models, constraints and contact algorithms'
+      - period: 2026.04 — present
+        name: CUSPER CuttingLab machining process simulation application
+        role: Core developer · Python / C++
+        points:
+          - Built around the CUSPIC solver to give fast parametric pre/post-processing and process-parameter optimisation for complex cases
+          - Organised the solver capabilities into a deliverable machining simulation and optimisation workflow
+      - period: 2025.10 — present
+        name: JCCDXT digital prototype development and verification project
+        role: Contributor · C++ / CUDA
+        points:
+          - Developed a thermo-hydro-mechanical finite element–meshfree explicit dynamics solver for detailed lubrication simulation of reducer and clutch transmission systems
+          - Delivered the GPU heterogeneous parallel modules for the finite element and material point methods
+      - period: 2022.10 — 2025.10
+        name: 'National Key R&D Programme · 330 Project — nuclear engineering ***** technology research and software development'
+        role: Contributor · C++ / MPI
+        points:
+          - Developed a parallel non-linear finite element–meshfree explicit dynamics solver for efficient solution of large-deformation structural impact problems
+    skills:
+      - group: Languages
+        items: C++ / CUDA, Python, Matlab
+      - group: Parallel computing
+        items: CUDA, MPI, OpenMP
+      - group: Tools
+        items: ParaView, VTK, Git, LaTeX, Abaqus, Hypermesh

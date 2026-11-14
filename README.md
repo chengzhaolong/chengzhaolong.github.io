@@ -4,7 +4,7 @@
 **CUSPIC 求解器**与 **CUSPER CuttingLab** 软件的展示页。
 
 - 纯静态输出，无框架运行时、无追踪脚本，首屏无 JS 也能读正文
-- 中文为主（`/`），英文简版在 `/en/`
+- 中英双语、结构完全镜像：中文在 `/`，英文在 `/en/`，六个页面一一对应（维护约定见 4.7）
 - 内容与样式分离：改 YAML / MDX 就能更新全站，不用碰页面代码
 
 ---
@@ -33,24 +33,35 @@
 │     ├─ videos/             # 页面实际加载的 mp4（压缩版）+ jpg poster
 │     └─ docs/cv.pdf         # 简历 PDF（换简历就覆盖这个文件，见 4.2）
 ├─ scripts/make-og.mjs       # svg → png
+├─ scripts/check-i18n.mjs    # 英文站自检（中文残留 / 站内链接 / hreflang）
 ├─ src/
-│  ├─ content.config.ts      # 内容集合的 schema（字段校验）
+│  ├─ content.config.ts      # 内容集合的 schema（字段校验，含各集合的 en 覆盖块）
 │  ├─ content/notes/         # 笔记：一篇一个 .mdx（文件名即 URL）
 │  ├─ data/
-│  │  ├─ profile.yml         # 个人信息（姓名/单位/邮箱/照片/简介/关键词）
-│  │  ├─ cv.yml              # 简历（教育 / 项目 / 技能，写法见 4.2）
+│  │  ├─ profile.yml         # 个人信息（姓名/单位/邮箱/照片/简介/关键词，中英成对）
+│  │  ├─ cv.yml              # 简历（教育 / 项目 / 技能，写法见 4.2；含 en 覆盖块）
 │  │  ├─ publications.yml    # 论文列表（简历的「论文与专利」也读它）
-│  │  └─ software.yml        # 软件条目（cuspic / cuttinglab）
-│  ├─ components/            # Nav / Footer / FigureCard / VideoCard / PubItem …
-│  ├─ layouts/Base.astro     # <head>、SEO、导航、页脚、灯箱、入场动效
+│  │  ├─ software.yml        # 软件条目（cuspic / cuttinglab；含 en 覆盖块）
+│  │  └─ cuspic-manual.yml   # 用户手册元信息 + 章节索引（含 en 覆盖块）
+│  ├─ i18n/ui.ts             # 界面文案字典：zh / en 两套 key 完全同形
+│  ├─ utils/
+│  │  ├─ i18n.ts             # langFromPath / counterpartPath / withLang / isActive
+│  │  ├─ localize.ts         # 中文主体 + en 块的合并（含 profileText / localizePub）
+│  │  └─ trial.ts            # 试用申请的 mailto 模板
+│  ├─ components/
+│  │  ├─ HomeBody / CvSheet / PublicationsBody / SoftwareOverview /
+│  │  │  SoftwareDetail / NotesBody    # 中英共用的页面正文
+│  │  └─ Nav / Footer / PubItem / VideoCard / FigureCard / CaseGallery /
+│  │     ManualDocs / TrialApply / Lightbox …   # 都按 lang 取文案
+│  ├─ layouts/Base.astro     # <head>、SEO、hreflang、导航、页脚、灯箱、入场动效
 │  ├─ pages/
-│  │  ├─ index.astro         # 首页
-│  │  ├─ about.astro         # 简历页（单栏，内容读 cv.yml）
+│  │  ├─ index.astro         # 首页（正文在 HomeBody）
+│  │  ├─ about.astro         # 简历页（正文在 CvSheet）
 │  │  ├─ publications.astro
 │  │  ├─ notes/index.astro + [slug].astro
 │  │  ├─ software/index.astro + [slug].astro
-│  │  ├─ en/index.astro      # 英文单页
-│  │  └─ 404.astro
+│  │  ├─ en/                 # 英文镜像：index / about / publications / software / notes
+│  │  └─ 404.astro           # 中英双语同页
 │  └─ styles/global.css      # 设计系统（唯一 CSS 入口）
 └─ dist/                     # 构建产物（部署这个目录）
 ```
@@ -63,6 +74,7 @@ npm run dev          # http://localhost:4321
 npm run build        # 产物在 dist/
 npm run preview      # 本地预览构建结果
 npm run check        # astro check（TS / 模板类型检查）
+npm run check:i18n   # 英文站自检：中文残留 / 站内链接 / hreflang（需先 build）
 npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 ```
 
@@ -79,18 +91,20 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 | `show_notes` | 笔记模块开关。`false` 时导航 / 首页 / 页脚 / 简历 / 404 的「笔记」入口全部隐藏，`/notes` 跳回首页且不进 sitemap（默认 `true`） |
 | `name` / `name_en` / `latin` | 中文名 / 英文名 / 全大写英文名（页脚、导航用） |
 | `title` / `title_en` | 学术身份，用于结构化数据（JSON-LD 的 `jobTitle`）与 `/about` |
-| `role_short_en` | 英文页 `/en/` 身份行，如「CUSPIC author」；不填则用 `title_en` |
+| `role_short_en` | 预留：英文首屏的身份短标签（当前中英首页同一版式，不再单独放身份行） |
 | `site_suffix` | 浏览器标题后缀，如「个人主页」；不填则用 `title` |
+| `site_suffix_en` | 英文站标题后缀，如「Computational mechanics & CAE solvers」；不填则用 `title_en` |
 | `affiliation` / `affiliation_en` | 单位 / 学院 / 实验室（带〔〕的是占位，务必替换） |
+| `location` / `location_en` | 地点写法（中文「中国 · 大连」/ 英文「Dalian, China」）；`location_en` 不填则用 `location` |
 | `email` | 全站的联系入口都用它 |
 | `photo` | 首屏的小照片（3:4 竖图），放在 `public/media/` 下，填 `/media/portrait.jpg` |
 | `tagline_zh` / `tagline_en` | 首屏一句话 |
-| `intro_zh` / `intro_en` | 简介段落；用 `|-` 多行，空行分段 |
-| `interests` | 关键词，首页与 about 自动渲染 |
+| `intro_zh` / `intro_en` | 简介段落。**英文要逐句对应中文**，不要另写一份扩写版（中英首页共用同一个正文组件） |
+| `interests` / `interests_en` | 关键词，首页与 about 自动渲染；英文站读 `interests_en`（不填会漏出中文），逐条对应中文
 | `metrics` | 预留：首页算例指标（`k` / `v`），当前模板未使用，可留空 |
 | `links` | `scholar` / `orcid` / `github` / `researchgate` / `bilibili` / `cv`，**留空则不显示** |
 
-#### 首页结构（`src/pages/index.astro`）
+#### 首页结构（`src/components/HomeBody.astro`）
 
 顺序固定为 5 段，改文案直接改页面里的字符串，改数据改 YAML/MDX：
 
@@ -193,6 +207,12 @@ npx astro preview --port 4399      # 这个终端保持开着
 公开的这份只有邮箱和 ORCID；带手机号的求职版**别放 `public/`**（那目录部署后就是公开 URL），
 扔进已被 `.gitignore` 的 `_private/` 即可。
 
+英文站读 `cv.yml` 末尾的 `en:` 块（`education` / `projects` / `skills` 三段，结构完全相同）：
+
+- 给哪一段就**整段替换**（数组不做逐项合并），不给的段回退中文；
+- 加一条经历时两边一起写，否则英文页会漏出中文；
+- 简历 PDF 本身是中文，英文页会在联系方式下面自动加一句「The PDF CV is written in Chinese」。
+
 ### 4.3 加一篇论文 — `src/data/publications.yml`
 
 复制一段，改字段即可；页面按 `year` 自动分组、倒序排列，编号自动生成。
@@ -234,6 +254,16 @@ npx astro preview --port 4399      # 这个终端保持开着
     @patent{CN121031225B, ...}
 ```
 
+**中文题名 / 机构作者必须给英文对照**，否则英文页会漏中文（期刊论文的 `title` 本身就是英文，不用管）：
+
+| 字段 | 说明 |
+| --- | --- |
+| `title_en` | 英文页题名，仅中文题名（专利）需要 |
+| `authors_en` | 英文页作者行，仅机构作者（专利）需要 |
+| `venue_en` | 英文页的期刊 / 出版物名，留空即用 `venue` |
+| `status_en` | 英文页的状态角标，留空即用 `status` |
+| `tags_en` | 英文页标签，留空即用 `tags` |
+
 ### 4.4 软件 — `src/data/software.yml`
 
 两个条目：`cuspic`（求解器）与 `cuttinglab`（软件）。字段：
@@ -261,10 +291,15 @@ npx astro preview --port 4399      # 这个终端保持开着
 - `links[]`：`label` / `href` / `variant`（`primary` 实心、`ghost` 描边）/ `download`（`true` 时直接存盘）；
   同页锚点直接写 `'#access'`、`'#workflow'`
 
-详情页路由由 id 决定：`/software/cuspic`、`/software/cuttinglab`。
+英文站的文案在同一条目末尾的 `en:` 块里，写法是**整块覆盖**：只写需要换掉的字段（`tagline` / `summary` / `status` / `chips` / `spec_line` / `features` / `specs` / `matrix` / `cases` / `roadmap` / `application` / `links`），
+没写的键自动回退中文。数组一律整体替换，所以 `features` / `specs` / `cases` 里改一条中文就要同步改对应的英文条；
+`specs` 与 `matrix` 在英文块里用 YAML 锚点复用同一份（`specs: &cuspic_specs` + `matrix: *cuspic_specs`），改一处即可。
+**加新的英文字段时，中英两边一起写**；漏了就会在英文页上看到中文（`npm run build` 不会报错，用 4.7 的自检命令查）。
+
+详情页路由由 id 决定：`/software/cuspic`、`/software/cuttinglab`（英文在 `/en/software/…`）。
 若要加第三个软件，直接在 YAML 末尾追加一个条目即可，列表与详情页会自动生成。
 
-详情页（`src/pages/software/[slug].astro`）的段落顺序固定为：
+详情页（`src/components/SoftwareDetail.astro`，中英共用）的段落顺序固定为：
 
 ```
 页头（深色）
@@ -286,6 +321,8 @@ npx astro preview --port 4399      # 这个终端保持开着
    详情页 `#docs` 的深链按它生成 `file#page=N`。
 4. 软件页用 `ManualDocs` 的 `compact` 模式（只渲染「章 · 标题 · 页」目录，宽度够就自动分两栏），
    章节关键词只在需要完整目录时才出现；新增章节不用改页面代码。
+5. 手册正文是中文：英文站只翻译 `en:` 块里的 `title` / `subtitle` / `abstract` / `chapters`（标题、摘要、关键词），
+   并在页面上自动注明「The manual itself is written in Chinese」；`file` / `pages` / `size` 两个语言共用，不另做英文 PDF。
 
 ### 4.5 写笔记 — `src/content/notes/*.mdx`
 
@@ -310,8 +347,8 @@ draft: false          # true = 不进列表、不生成路由
 正文用普通 Markdown；`##` 二级标题会自动进入右侧目录。
 ```
 
-- 列表页 `/notes` 顶部是已发布文章，下面是页面里 `planned` 数组维护的「在写」选题；
-  某条写完后，把对应条目从 `planned` 删掉即可。
+- 列表页 `/notes` 顶部是已发布文章，下面是 `src/i18n/ui.ts` 里 `notes.planned` 维护的「在写」选题；
+  某条写完后，把对应条目从**中英两份** `planned` 里删掉即可（英文那份是同一批选题的英文标题）。
 - `src/content/notes/draft-template.mdx` 是一份 `draft: true` 的模板，复制改名再写内容；
   它不会出现在站点上。
 - 中文首页保持精简：首屏链接行只在 `show_notes: true` 时留「笔记」入口；`/en/` 会自动列出最新笔记（无笔记或关闭时整块不渲染）。
@@ -385,6 +422,41 @@ ffmpeg -i IN.mp4 -vf "setpts=PTS/1.4,fps=25,scale=-2:1080:flags=lanczos" -c:v li
 ffmpeg -ss 1 -i OUT.mp4 -frames:v 1 -vf "scale=1280:-2" -q:v 3 OUT.jpg
 ```
 
+### 4.7 英文站（`/en`）怎么维护
+
+英文站不是另写一套页面，而是**同一份正文组件的镜像**：`/`、`/about`、`/publications`、`/software`、
+`/software/[slug]`、`/notes` 六个页面各有一个 `src/pages/en/…` 薄壳，只传 `lang="en"`，
+正文仍由 `components/` 里那六个 `*Body` 组件渲染。所以**版面永远一致，中英不会各改各的**。
+
+改文案时按这三层找位置：
+
+| 改什么 | 改哪里 |
+| --- | --- |
+| 页面里的固定文案（标题、按钮、表头、aria） | `src/i18n/ui.ts`：`zh` 与 `en` 两套 key 必须同形（`en` 用 `typeof zh` 约束，少一个键会直接 type error） |
+| 数据内容（软件、简历、手册、论文） | 各自 YAML 里的 `en:` 块 / `*_en` 字段（见 4.2 / 4.3 / 4.4） |
+| 站点级信息（姓名、单位、简介、兴趣） | `profile.yml` 的 `name_en` / `affiliation_en` / `intro_en` / `interests_en` … |
+
+语言切换与 hreflang：
+
+- `src/utils/i18n.ts` 的 `MIRRORED` 列出**已做英文镜像**的中文路径；新增英文页时先登记，语言按钮才能停在「同一页」而不是退回首页；
+- 导航 / 页脚里的站内链接一律走 `withLang()` 加 `/en` 前缀；`Base.astro` 用 `counterpartPath()` 生成
+  `hreflang="zh-CN" / "en" / "x-default"`（`x-default` 指向中文）；
+- `astro.config.mjs` 里 `@astrojs/sitemap` 的 `i18n` 负责在 sitemap 里输出双向 `alternate`；
+- 404 是**中英双语同页**（静态托管只有一个 `404.html`），两段文案在 `ui.ts` 的 `notFoundCopy` 里；
+- 笔记正文目前只有中文：英文列表页的卡片直接链到中文原文，不另建英文详情页。
+
+构建后自检（三件事一次跑完，不过就以退出码 1 结束，可挂 CI）：
+
+```powershell
+npm run build
+npm run check:i18n   # scripts/check-i18n.mjs
+```
+
+它检查 `dist/en/**`：① 可见文本与 `alt` / `aria-label` / `title` 里没有中文；
+② 站内链接都带 `/en` 前缀；③ 每页 `hreflang="zh-CN" / "en" / "x-default"` 齐全且互相配对。
+
+两处「刻意例外」：语言切换按钮上的「中文」二字；专利的 `bibtex` 按学术惯例原样输出中文引文。
+
 ## 5. 样式怎么改
 
 所有设计变量在 `src/styles/global.css` 顶部 `:root` 里：
@@ -430,10 +502,13 @@ ffmpeg -ss 1 -i OUT.mp4 -frames:v 1 -vf "scale=1280:-2" -q:v 3 OUT.jpg
 - [ ] 简历 PDF → `public/media/docs/cv.pdf`，`profile.yml` 的 `links.cv` 填 `/media/docs/cv.pdf`
 - [ ] 个人照片 → 放到 `public/media/portrait.jpg`（3:4 竖图，长边 1200 px 以内），把 `profile.yml` 的 `photo` 改成 `/media/portrait.jpg`
 - [ ] `publications.yml`：换成真实论文（含 BibTeX）
+- [ ] `profile.yml` 的英文侧：`interests_en` / `site_suffix_en` / `location_en` / `intro_en` 与中文逐句对应
+- [ ] `cv.yml` / `software.yml` / `cuspic-manual.yml` 的 `en:` 块：改了中文记得同步英文（漏了会在英文页漏出中文，见 4.7 自检）
+- [ ] `src/i18n/ui.ts` 的 `en` 段与 `notes.planned` 英文标题：换选题、改按钮文案时两边一起改
 - [ ] CUSPIC 详情页的 6 条案例 `caption`：`software.yml` 里现在留空，补一句说明（主展文案列与小卡说明都用它）
 - [ ] CuttingLab 案例已就位：`cusper_2d_demo.mp4`（1080p / 3.4 MB）+ 同名 `.jpg` poster，两张截图在 `public/media/figures/`；换素材时按 4.6 的体积约定重压、重抽 poster，母版放 `media-src/videos/`
 - [ ] 首页算例短片：`cut3d1.mp4` 保持 4K 原片（约 10 MB，首页与详情页主展共用）；若首屏嫌重，再单独压一版 1080p 给首页
-- [ ] 技术笔记：把 `/notes` 里「在写」的四条逐个写成 `src/content/notes/*.mdx`，写完从 `planned` 删掉；第一篇发布时把 `profile.yml` 的 `show_notes` 改回 `true`，并删掉 `astro.config.mjs` 里 sitemap 的 notes `filter`
+- [ ] 技术笔记：把 `/notes` 里「在写」的四条逐个写成 `src/content/notes/*.mdx`，写完从中英两份 `planned`（`src/i18n/ui.ts`）里删掉；第一篇发布时把 `profile.yml` 的 `show_notes` 改回 `true`，并删掉 `astro.config.mjs` 里 sitemap 的 notes `filter`
 - [ ] `software.yml`：`specs` / `matrix` 核对一遍；`cases[]` 的 `video` / `poster` / `ratio` 核对一遍（留空即占位）
 - [ ] `software.yml` 的 `application.open`：试用正式开放时改成 `true`，页面文案自动从「即将开启」切到「申请试用」
 - [ ] `software.yml` 的 `cuttinglab.roadmap`：三维钻削 / 铣削 / 车削 / 冷却液工况推进后，把对应条目的 `state` 从 `plan` 改成 `wip` 或 `done`，`when` 同步改（如「进行中」→「已落地」）

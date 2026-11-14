@@ -1,118 +1,20 @@
 ---
+/**
+ * 笔记列表（中文）。正文在 components/NotesBody.astro，英文页 /en/notes 复用同一份结构。
+ */
 import Base from '../../layouts/Base.astro';
-import { getCollection, getEntry } from 'astro:content';
+import { getEntry } from 'astro:content';
+import NotesBody from '../../components/NotesBody.astro';
 
 const profile = (await getEntry('profile', 'main'))!.data;
 /** 笔记模块关闭时（profile.yml → show_notes: false）页面不对外，直接回首页。
  *  用 307（临时跳转）：Astro 对 302 会加 2 秒等待，307 是立即跳。 */
 if (!profile.show_notes) return Astro.redirect('/', 307);
-
-const posts = (await getCollection('notes'))
-  .filter((n) => !n.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-
-const fmt = (d: Date) => d.toISOString().slice(0, 10);
-
-/**
- * 「在写」清单：还没落笔的选题。写完一篇，就把对应条目挪进 src/content/notes/，
- * 它自然会出现在上面的列表里，这条再删掉即可。
- */
-const planned = [
-  {
-    title: '接触界面：嵌入拉格朗日表面，还是点–面罚函数？',
-    text: '为什么在多体接触 + 极端畸变下选了嵌入表面，代价是什么，和罚函数法在算例上差在哪。',
-    tags: ['MPM', '接触算法'],
-    status: '大纲',
-  },
-  {
-    title: '切屑分离到底发生在哪一步',
-    text: '粒子失效、网格重连、材料分离准则：三种做法在 FEM–MPM 里的实际表现与误差来源。',
-    tags: ['FEM–MPM', '切削'],
-    status: '资料',
-  },
-  {
-    title: '粒子循环搬上 GPU 之后撞到的三堵墙',
-    text: '访存、原子冲突、显存：单算例从 8 小时到 40 分钟，每一段加速是从哪来的。',
-    tags: ['GPU', '性能'],
-    status: '大纲',
-  },
-  {
-    title: '显式格式下的热力耦合时间步',
-    text: '温度场会不会被算成假的：热–力时间步不一致时，误差怎么累积、怎么验证。',
-    tags: ['热力耦合', '显式积分'],
-    status: '计划',
-  },
-];
 ---
 
 <Base
   title="笔记"
   description="技术笔记：求解器与切削仿真里那些论文写不进去的细节——设计取舍、失败的尝试、结果的验证。"
 >
-  <header class="page-head">
-    <div class="container">
-      <span class="eyebrow">Notes</span>
-      <h1 class="page-head__title">笔记</h1>
-      <p class="lead page-head__lede">
-        论文里写不进去的东西：为什么这么设计、试过哪些没成的方案、数字到底对不对。慢慢写，一篇一篇来。
-      </p>
-      <div class="cluster" style="margin-top:1.25rem">
-        <span class="badge badge--dot">已发布 {posts.length} 篇</span>
-        <span class="badge">在写 {planned.length} 篇</span>
-        <a class="badge" href="/publications">论文与专利 →</a>
-      </div>
-    </div>
-  </header>
-
-  <section class="section">
-    <div class="container">
-      {
-        posts.length > 0 ? (
-          <div class="card-grid card-grid--2">
-            {posts.map((post) => (
-              <a class="card card--accent" href={`/notes/${post.id}`} data-reveal>
-                <span class="card__meta mono">{fmt(post.data.date)}</span>
-                <span class="card__title">{post.data.title}</span>
-                <span class="card__text">{post.data.summary}</span>
-                <span class="card__cta">阅读</span>
-              </a>
-            ))}
-          </div>
-        ) : (
-          <p class="notice" style="max-width:62ch">
-            第一篇还在写。下面是正在整理的选题，写完一篇就会出现在这里。
-          </p>
-        )
-      }
-    </div>
-  </section>
-
-  <section class="section--tight section--line">
-    <div class="container">
-      <div class="section-head">
-        <div class="section-head__text">
-          <span class="eyebrow">In progress</span>
-          <h2 style="margin-top:.6rem">在写</h2>
-          <p>选题来自手上正在做的算例与踩过的坑，不做泛泛的科普。</p>
-        </div>
-      </div>
-
-      <div class="card-grid card-grid--2">
-        {
-          planned.map((item) => (
-            <article class="card card--static" data-reveal>
-              <span class="card__meta mono">在写 · {item.status}</span>
-              <span class="card__title">{item.title}</span>
-              <span class="card__text">{item.text}</span>
-              <span class="cluster" style="margin-top:.35rem">
-                {item.tags.map((t) => (
-                  <span class="badge">{t}</span>
-                ))}
-              </span>
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
+  <NotesBody lang="zh" />
 </Base>

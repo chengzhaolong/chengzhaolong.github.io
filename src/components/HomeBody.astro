@@ -1,0 +1,176 @@
+---
+/**
+ * 首页正文：中英两站共用这一份结构，文案走 ui 字典，数据走 en 覆盖块。
+ * 页面文件只剩 <Base> 与这个组件，中英永远不会走形。
+ */
+import { getCollection, getEntry } from 'astro:content';
+import VideoCard from './VideoCard.astro';
+import SoftwareCard from './SoftwareCard.astro';
+import PubItem from './PubItem.astro';
+import { langFromPath, withLang, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+import { localizePub, localizeSoftware, profileText } from '../utils/localize';
+
+interface Props {
+  lang?: Lang;
+}
+
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
+const link = (href: string) => withLang(href, lang);
+
+const profile = (await getEntry('profile', 'main'))!.data;
+const pt = profileText(profile, lang);
+const software = await getCollection('software');
+const pubs = (await getCollection('publications')).sort((a, b) => b.data.year - a.data.year);
+const featured = [...pubs.filter((p) => p.data.highlight), ...pubs.filter((p) => !p.data.highlight)].slice(0, 3);
+
+const contactHref = `mailto:${profile.email}`;
+const portrait = profile.photo ?? '/media/portrait.svg';
+---
+
+<!-- ============ 首屏：姓名退后，照片与工作在前 ============ -->
+<section class="hero">
+  <div class="hero__media">
+    <img src="/media/hero-contour.svg" alt="" width="1600" height="900" fetchpriority="high" />
+  </div>
+
+  <div class="hero__inner">
+    <div class="hero__text">
+      <p class="hero__eyebrow">{t.home.eyebrow}</p>
+      <h1 class="hero__title">{pt.name}</h1>
+      <p class="hero__lede">{pt.tagline}</p>
+
+      <p class="link-row">
+        {
+          profile.show_notes && (
+            <>
+              <a href={link('/notes')}>{t.nav.notes}</a>
+              <span class="link-row__sep" aria-hidden="true">·</span>
+            </>
+          )
+        }
+        <a href={link('/software')}>{t.nav.software}</a>
+        <span class="link-row__sep" aria-hidden="true">·</span>
+        <a href={link('/publications')}>{t.nav.publications}</a>
+        <span class="link-row__sep" aria-hidden="true">·</span>
+        <a href={contactHref}>{t.footer.email}</a>
+      </p>
+    </div>
+
+    <a class="hero__portrait" href={link('/about')} aria-label={t.home.portraitAria(pt.name)}>
+      <img src={portrait} alt={t.home.portraitAlt(pt.name)} width="600" height="800" />
+    </a>
+  </div>
+</section>
+
+<!-- ============ 简介 + 算例（视频代替简历摘要） ============ -->
+<section class="section" id="intro">
+  <div class="container">
+    <div class="split split--top">
+      <div data-reveal>
+        <span class="eyebrow">{t.home.introEyebrow}</span>
+        <p class="lead" style="margin-top:1rem">{pt.intro}</p>
+        <div class="cluster" style="margin-top:1.35rem">
+          {pt.interests.map((i) => <span class="badge">{i}</span>)}
+        </div>
+        <p style="margin-top:1.5rem">
+          <a class="link-quiet" href={link('/about')}>{t.home.aboutLink}</a>
+        </p>
+      </div>
+
+      <div class="case-mini" data-reveal style="--d:.08s">
+        <span class="eyebrow">{t.home.caseEyebrow}</span>
+        <VideoCard
+          lang={lang}
+          src="/media/videos/cut3d1.mp4"
+          poster="/media/videos/cut3d1.jpg"
+          autoplay
+          alt={t.home.caseAlt}
+          badge="cuspic"
+          caption={t.home.caseCaption}
+          meta={t.home.caseMeta}
+          placeholder="c"
+          placeholderLabel={t.home.casePlaceholder}
+          ratio="16 / 9"
+        />
+
+        <p class="case-mini__link">
+          <a class="link-quiet" href={link('/software/cuspic')}>{t.home.caseLink}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 自研工具（深色） ============ -->
+<section class="media-band">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow eyebrow--media">{t.home.softwareEyebrow}</span>
+        <h2 style="margin-top:.65rem">{t.home.softwareTitle}</h2>
+        <p>{t.home.softwareLede}</p>
+      </div>
+      <a class="btn btn--media-ghost" href={link('/software')}>{t.home.softwareAll}</a>
+    </div>
+
+    <div class="card-grid card-grid--2">
+      {
+        software.map((s) => (
+          <SoftwareCard
+            lang={lang}
+            item={{ ...localizeSoftware(s.data, lang), id: s.id }}
+            href={link(`/software/${s.id}`)}
+            tone="media"
+          />
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ============ 论文 ============ -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow">{t.home.pubsEyebrow}</span>
+        <h2 style="margin-top:.65rem">{t.home.pubsTitle}</h2>
+      </div>
+      <a class="btn btn--ghost" href={link('/publications')}>{t.home.pubsAll}</a>
+    </div>
+
+    <ul class="pub-list">
+      {
+        featured.map((p, i) => (
+          <PubItem lang={lang} pub={{ ...localizePub(p.data, lang), id: p.id }} index={i + 1} />
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 联系（一行，不用大 CTA） ============ -->
+<section style="padding-block:0">
+  <div class="container">
+    <div class="contact-strip">
+      <span class="contact-strip__label">{t.common.contact}</span>
+      <a href={contactHref}>{profile.email}</a>
+      {
+        profile.links?.cv && (
+          <>
+            <span class="contact-strip__sep" aria-hidden="true">
+              ·
+            </span>
+            <a href={profile.links.cv} download>
+              {t.home.cv}
+            </a>
+          </>
+        )
+      }
+      <span class="contact-strip__sep" aria-hidden="true">·</span>
+      <a href={link('/software/cuttinglab#access')}>{t.home.cuttinglabCta}</a>
+    </div>
+  </div>
+</section>

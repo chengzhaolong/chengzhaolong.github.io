@@ -1,0 +1,21 @@
+---
+/**
+ * Notes list (English). 正文用与 /notes 同一个 NotesBody。
+ * 笔记正文目前只有中文，所以卡片直接链到中文原文（见 NotesBody）。
+ */
+import Base from '../../../layouts/Base.astro';
+import { getEntry } from 'astro:content';
+import NotesBody from '../../../components/NotesBody.astro';
+
+const profile = (await getEntry('profile', 'main'))!.data;
+/** 笔记模块关闭时（profile.yml → show_notes: false）英文列表页也回英文首页 */
+if (!profile.show_notes) return Astro.redirect('/en/', 307);
+---
+
+<Base
+  lang="en"
+  title="Notes"
+  description="Technical notes on solvers and cutting simulation: design trade-offs, failed attempts and how results were verified."
+>
+  <NotesBody lang="en" />
+</Base>

@@ -9,12 +9,16 @@ import Footer from '../components/Footer.astro';
 import Lightbox from '../components/Lightbox.astro';
 import Motion from '../components/Motion.astro';
 import { getEntry } from 'astro:content';
+import { counterpartPath, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+import { profileText } from '../utils/localize';
 
 interface Props {
   /** 页面标题，会自动拼成「标题 · 姓名」 */
   title?: string;
   description?: string;
-  lang?: string;
+  /** zh-CN（默认）/ en：决定 <html lang>、文案语言与 hreflang 配对 */
+  lang?: 'zh-CN' | 'en';
   /** OG 图，默认 /og-image.png */
   image?: string;
   noindex?: boolean;
@@ -23,7 +27,7 @@ interface Props {
 const {
   title,
   description,
-  lang = 'zh-CN',
+  lang: rawLang = 'zh-CN',
   image = '/og-image.png',
   noindex = false,
 } = Astro.props;
@@ -34,27 +38,36 @@ if (!entry) {
 }
 const profile = entry.data;
 
-const siteName = lang === 'en' ? profile.name_en : profile.name;
-const suffix = profile.site_suffix || profile.title;
+const lang: Lang = rawLang === 'en' ? 'en' : 'zh';
+const htmlLang = lang === 'en' ? 'en' : 'zh-CN';
+const t = ui[lang];
+const pt = profileText(profile, lang);
+
+const siteName = pt.name;
+const suffix = pt.siteSuffix;
 const pageTitle = title ? `${title} · ${siteName}` : `${siteName} · ${suffix}`;
 const desc =
-  description ?? `${profile.tagline_zh}。${profile.interests.join('、')}。`;
+  description ??
+  (lang === 'en'
+    ? `${pt.tagline}. ${pt.interests.join(', ')}.`
+    : `${profile.tagline_zh}。${profile.interests.join('、')}。`);
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL(image, Astro.site).href;
-const zhHref = new URL('/', Astro.site).href;
-const enHref = new URL('/en/', Astro.site).href;
+/** hreflang 互相配对：有英文镜像就指到同一页，没有则退回对应语言首页 */
+const zhHref = new URL(counterpartPath(Astro.url.pathname, 'zh'), Astro.site).href;
+const enHref = new URL(counterpartPath(Astro.url.pathname, 'en'), Astro.site).href;
 
 const personLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
-  name: profile.name,
-  alternateName: profile.name_en,
-  jobTitle: profile.title,
-  affiliation: { '@type': 'Organization', name: profile.affiliation },
+  name: pt.name,
+  alternateName: lang === 'en' ? profile.name : profile.name_en,
+  jobTitle: pt.title,
+  affiliation: { '@type': 'Organization', name: pt.affiliation },
   url: canonical,
   email: profile.email ? `mailto:${profile.email}` : undefined,
-  knowsAbout: profile.interests,
+  knowsAbout: pt.interests,
   // sameAs 只收绝对 URL（schema.org 语义）：站内相对路径如 /media/docs/cv.pdf 不能放进来
   sameAs: Object.values(profile.links ?? {}).filter(
     (v): v is string => typeof v === 'string' && /^https?:\/\//.test(v)
@@ -63,7 +76,7 @@ const personLd = {
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={htmlLang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -84,7 +97,7 @@ const personLd = {
     <link rel="alternate" hreflang="x-default" href={zhHref} />
 
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={`${profile.name} · ${profile.name_en}`} />
+    <meta property="og:site_name" content={lang === 'en' ? profile.name_en : `${profile.name} · ${profile.name_en}`} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={desc} />
     <meta property="og:url" content={canonical} />
@@ -104,13 +117,13 @@ const personLd = {
     </noscript>
   </head>
   <body>
-    <a class="skip-link" href="#main">跳到正文</a>
-    <Nav />
+    <a class="skip-link" href="#main">{t.a11y.skip}</a>
+    <Nav lang={lang} />
     <main id="main">
       <slot />
     </main>
-    <Footer />
-    <Lightbox />
+    <Footer lang={lang} />
+    <Lightbox lang={lang} />
     <Motion />
   </body>
 </html>

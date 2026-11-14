@@ -1,4 +1,7 @@
 ---
+import { langFromPath, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+
 interface Props {
   pub: {
     id: string;
@@ -18,11 +21,21 @@ interface Props {
   /** 本人英文名，会被自动加粗 */
   me?: string;
   showBibtex?: boolean;
+  /** 语言；不传则按当前路径判断 */
+  lang?: Lang;
 }
 
 const { pub, index, me = 'Chaolong Cheng', showBibtex = true } = Astro.props;
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
 
-const typeLabel = { journal: '期刊', conference: '会议', preprint: '预印本', patent: '专利' }[pub.type] ?? '论文';
+const typeLabel =
+  {
+    journal: t.pub.typeJournal,
+    conference: t.pub.typeConference,
+    preprint: t.pub.typePreprint,
+    patent: t.pub.typePatent,
+  }[pub.type] ?? t.pub.typePaper;
 
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -65,8 +78,8 @@ const badges = [
     <div class="pub__foot">
       {badges.map((b) => <a class="badge" href={b.href} target="_blank" rel="noopener">{b.label} ↗</a>)}
       {showBibtex && pub.bibtex && (
-        <button class="badge badge--copy" type="button" data-bibtex={pub.bibtex}>
-          复制 BibTeX
+        <button class="badge badge--copy" type="button" data-bibtex={pub.bibtex} data-copied={t.pub.copied}>
+          {t.pub.copyBibtex}
         </button>
       )}
       {pub.status && <span class="badge badge--dot badge--new">{pub.status}</span>}
@@ -83,7 +96,7 @@ const badges = [
     const original = btn.textContent ?? '';
     try {
       await navigator.clipboard.writeText(text);
-      btn.textContent = '已复制 ✓';
+      btn.textContent = btn.dataset.copied ?? '已复制 ✓';
     } catch {
       // 非 HTTPS 或权限受限时的兜底
       const ta = document.createElement('textarea');
@@ -95,7 +108,7 @@ const badges = [
       // 旧浏览器兜底；execCommand 已废弃但仍是唯一广泛可用的同步方案
       (document as unknown as { execCommand(cmd: string): void }).execCommand('copy');
       ta.remove();
-      btn.textContent = '已复制 ✓';
+      btn.textContent = btn.dataset.copied ?? '已复制 ✓';
     }
     window.setTimeout(() => {
       btn.textContent = original;

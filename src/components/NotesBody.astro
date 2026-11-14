@@ -1,0 +1,90 @@
+---
+/**
+ * 笔记列表（/notes 与 /en/notes 共用）。
+ * 笔记正文目前只有中文：英文页的卡片直接链到中文原文，不另建英文详情页。
+ */
+import { getCollection } from 'astro:content';
+import { langFromPath, withLang, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+
+interface Props {
+  lang?: Lang;
+}
+
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
+const link = (href: string) => withLang(href, lang);
+
+const posts = (await getCollection('notes'))
+  .filter((n) => !n.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const fmt = (d: Date) => d.toISOString().slice(0, 10);
+/** 「在写」清单在字典里：写完一篇就把它挪进 src/content/notes/，这里删掉对应条目 */
+const planned = t.notes.planned;
+---
+
+<header class="page-head">
+  <div class="container">
+    <span class="eyebrow">Notes</span>
+    <h1 class="page-head__title">{t.notes.heading}</h1>
+    <p class="lead page-head__lede">{t.notes.lede}</p>
+    <div class="cluster" style="margin-top:1.25rem">
+      <span class="badge badge--dot">{t.notes.published(posts.length)}</span>
+      <span class="badge">{t.notes.inProgress(planned.length)}</span>
+      <a class="badge" href={link('/publications')}>{t.notes.pubsLink}</a>
+    </div>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    {
+      posts.length > 0 ? (
+        <div class="card-grid card-grid--2">
+          {posts.map((post) => (
+            <a class="card card--accent" href={`/notes/${post.id}`} data-reveal>
+              <span class="card__meta mono">{fmt(post.data.date)}</span>
+              <span class="card__title">{post.data.title}</span>
+              <span class="card__text">{post.data.summary}</span>
+              <span class="card__cta">{t.notes.read}</span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="notice" style="max-width:62ch">
+          {t.notes.empty}
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<section class="section--tight section--line">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow">{t.notes.inProgressEyebrow}</span>
+        <h2 style="margin-top:.6rem">{t.notes.inProgressTitle}</h2>
+        <p>{t.notes.inProgressLede}</p>
+      </div>
+    </div>
+
+    <div class="card-grid card-grid--2">
+      {
+        planned.map((item) => (
+          <article class="card card--static" data-reveal>
+            <span class="card__meta mono">{t.notes.statusPrefix(item.status)}</span>
+            <span class="card__title">{item.title}</span>
+            <span class="card__text">{item.text}</span>
+            <span class="cluster" style="margin-top:.35rem">
+              {item.tags.map((tag) => (
+                <span class="badge">{tag}</span>
+              ))}
+            </span>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

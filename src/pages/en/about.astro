@@ -1,0 +1,20 @@
+---
+/**
+ * CV (English). 正文用与 /about 同一个 CvSheet。
+ */
+import Base from '../../layouts/Base.astro';
+import { getEntry } from 'astro:content';
+import CvSheet from '../../components/CvSheet.astro';
+import { profileText } from '../../utils/localize';
+
+const profile = (await getEntry('profile', 'main'))!.data;
+const pt = profileText(profile, 'en');
+---
+
+<Base
+  lang="en"
+  title="CV"
+  description={`${pt.name}, ${pt.title}, ${pt.affiliation}. CV: education, projects, publications and patents, skills.`}
+>
+  <CvSheet lang="en" />
+</Base>

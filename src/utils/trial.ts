@@ -9,10 +9,11 @@ export interface TrialApplication {
 /**
  * 生成 mailto 链接：必填项列在正文最前面，可选项跟在一条分隔线下面。
  * 用户点开后只需在冒号后面填值，不用自己记要写什么。
+ * 分隔符随语言变（中文全角冒号 / 英文半角冒号加空格）。
  */
-export function buildTrialMailto(app: TrialApplication): string {
-  const required = app.fields.map((f) => `${f.k}：`);
-  const optional = (app.extra_lines ?? []).map((line) => `${line}：`);
+export function buildTrialMailto(app: TrialApplication, separator = '：'): string {
+  const required = app.fields.map((f) => `${f.k}${separator}`);
+  const optional = (app.extra_lines ?? []).map((line) => `${line}${separator}`);
   const body = [...required, '', ...optional].join('\n');
   return `mailto:${app.email}?subject=${encodeURIComponent(app.subject)}&body=${encodeURIComponent(body)}`;
 }

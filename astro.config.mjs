@@ -9,6 +9,11 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
+      // 中英双向 hreflang：中文是默认语言（无前缀），英文在 /en 下
+      i18n: {
+        defaultLocale: 'zh-CN',
+        locales: { 'zh-CN': 'zh-CN', en: 'en' },
+      },
       // 笔记模块暂未开放（profile.yml → show_notes: false）：不收录 /notes。
       // 写好第一篇笔记后删掉这个 filter。
       filter: (page) => !/\/notes(\/|$)/.test(page),

@@ -1,4 +1,7 @@
 ---
+import { langFromPath, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+
 interface Props {
   /** mp4 路径（public/media/videos/…）；留空则只显示 poster 占位 */
   src?: string;
@@ -18,6 +21,8 @@ interface Props {
   placeholderLabel?: string;
   /** 画面比例，默认 16 / 9；宽幅可传 "21 / 9" */
   ratio?: string;
+  /** 语言；不传则按当前路径判断 */
+  lang?: Lang;
 }
 
 const {
@@ -31,9 +36,14 @@ const {
   badge,
   autoplay = true,
   placeholder = 'c',
-  placeholderLabel = '仿真动画（mp4，720p，<3 MB）',
+  placeholderLabel,
   ratio = '16 / 9',
 } = Astro.props;
+
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
+/** 占位卡片上的提示行（默认值随语言变，所以不能写在解构默认值里） */
+const label = placeholderLabel ?? t.a11y.placeholderVideo;
 
 const phClass = placeholder === 'b' ? 'media-placeholder--b' : placeholder === 'c' ? 'media-placeholder--c' : '';
 ---
@@ -67,8 +77,8 @@ const phClass = placeholder === 'b' ? 'media-placeholder--b' : placeholder === '
         >
           <span class="media-placeholder__grid" aria-hidden="true"></span>
           <span class="media-placeholder__label">
-            <b>待替换</b>
-            {placeholderLabel}
+            <b>{t.a11y.placeholder}</b>
+            {label}
           </span>
         </div>
       )

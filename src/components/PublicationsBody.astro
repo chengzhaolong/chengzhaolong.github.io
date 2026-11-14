@@ -1,0 +1,81 @@
+---
+/** 论文与专利列表（/publications 与 /en/publications 共用） */
+import { getCollection, getEntry } from 'astro:content';
+import PubItem from './PubItem.astro';
+import { langFromPath, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+import { localizePub } from '../utils/localize';
+
+interface Props {
+  lang?: Lang;
+}
+
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
+
+const profile = (await getEntry('profile', 'main'))!.data;
+
+const pubs = (await getCollection('publications')).sort(
+  (a, b) => b.data.year - a.data.year || Number(b.data.highlight) - Number(a.data.highlight)
+);
+
+const years = [...new Set(pubs.map((p) => p.data.year))].sort((a, b) => b - a);
+const counts = {
+  journal: pubs.filter((p) => p.data.type === 'journal').length,
+  conference: pubs.filter((p) => p.data.type === 'conference').length,
+  preprint: pubs.filter((p) => p.data.type === 'preprint').length,
+  patent: pubs.filter((p) => p.data.type === 'patent').length,
+};
+
+// 连续编号（跨年份）
+let n = 0;
+const numbered = pubs.map((p) => ({ pub: localizePub(p.data, lang), id: p.id, index: ++n }));
+---
+
+<header class="page-head">
+  <div class="container">
+    <span class="eyebrow">Publications</span>
+    <h1 class="page-head__title">{t.pub.heading}</h1>
+    <div class="pub-summary">
+      <span class="badge badge--dot">{t.pub.total(pubs.length)}</span>
+      <span class="badge">{t.pub.journal(counts.journal)}</span>
+      <span class="badge">{t.pub.conference(counts.conference)}</span>
+      <span class="badge">{t.pub.preprint(counts.preprint)}</span>
+      {counts.patent > 0 && <span class="badge">{t.pub.patent(counts.patent)}</span>}
+    </div>
+
+    <div class="cluster" style="margin-top:1rem">
+      {years.map((y) => <a class="badge" href={`#year-${y}`}>{y}</a>)}
+    </div>
+
+    {profile.demo && <p class="notice" style="margin-top:1.5rem;max-width:62ch">{t.pub.demoNotice}</p>}
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    {
+      years.map((year) => {
+        const group = numbered.filter((item) => item.pub.year === year);
+        return (
+          <div class="pub-group" id={`year-${year}`}>
+            <div class="pub-year">
+              <span class="pub-year__num">{year}</span>
+              <span class="pub-year__line" aria-hidden="true" />
+              <span class="card__meta">{t.pub.groupCount(group.length)}</span>
+            </div>
+            <ul class="pub-list">
+              {group.map(({ pub, id, index }) => (
+                <PubItem lang={lang} pub={{ ...pub, id }} index={index} me={profile.name_en} />
+              ))}
+            </ul>
+          </div>
+        );
+      })
+    }
+
+    <p class="muted" style="margin-top:3rem;font-size:var(--fs-sm)">
+      {t.pub.askPre}<a href={`mailto:${profile.email}`}>{t.pub.askLink}</a>{t.pub.askPost}
+    </p>
+  </div>
+</section>

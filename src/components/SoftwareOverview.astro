@@ -1,0 +1,185 @@
+---
+/** 软件总览（/software 与 /en/software 共用） */
+import { getCollection, getEntry } from 'astro:content';
+import { langFromPath, withLang, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+import { localizeManual, localizeSoftware } from '../utils/localize';
+
+interface Props {
+  lang?: Lang;
+}
+
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
+const link = (href: string) => withLang(href, lang);
+
+const software = await getCollection('software');
+const [cuspic, cuttinglab] = [
+  localizeSoftware(software.find((s) => s.id === 'cuspic')!.data, lang),
+  localizeSoftware(software.find((s) => s.id === 'cuttinglab')!.data, lang),
+];
+/** CUSPIC 用户手册：版本号、页数与下载地址都在 cuspic-manual.yml */
+const manualEntry = (await getEntry('manual', 'cuspic'))?.data;
+const manual = manualEntry ? localizeManual(manualEntry, lang) : undefined;
+/** 两者的分工表在字典里（中英各一份，同一套行序） */
+const compare = t.software.compare;
+---
+
+<header class="page-head page-head--media">
+  <div class="hero__media">
+    <img src="/media/hero-contour.svg" alt="" width="1600" height="900" />
+  </div>
+  <div class="container page-head__inner">
+    <span class="eyebrow eyebrow--media">Software</span>
+    <h1 class="page-head__title">{t.software.overviewTitle}</h1>
+    <p class="page-head__lede">{t.software.overviewLede}</p>
+  </div>
+</header>
+
+<section class="section" id="cuspic">
+  <div class="container">
+    <div class="split split--top">
+      <div data-reveal>
+        <span class="card__meta">{cuspic.kicker} · {cuspic.version}</span>
+        <h2 style="margin-top:.6rem;font-size:var(--fs-h2)">{t.software.cuspicHeading}</h2>
+        <p class="lead" style="margin-top:.75rem">{cuspic.tagline}</p>
+        <p style="margin-top:1rem;color:var(--ink-2)">{cuspic.summary}</p>
+        <div class="cluster" style="margin-top:1.25rem">
+          {cuspic.features.slice(0, 4).map((f) => <span class="badge">{f.title}</span>)}
+        </div>
+        <div class="cluster" style="margin-top:1.5rem">
+          <a class="btn" href={link('/software/cuspic')}>{t.software.cuspicDetail}</a>
+          {
+            manual && (
+              <a class="btn btn--ghost" href={manual.file} download>
+                {t.software.manualLink(manual.size ?? '')}
+              </a>
+            )
+          }
+        </div>
+      </div>
+      <div data-reveal style="--d:.08s">
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th scope="col">{t.software.capabilityCol}</th>
+                <th scope="col">{t.software.scopeCol}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                cuspic.matrix.map((row) => (
+                  <tr>
+                    <th scope="row" style="background:transparent">
+                      {row.k}
+                    </th>
+                    <td>{row.v}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs);line-height:1.7">
+          {t.software.matrixNote.pre}<a href={link('/software/cuspic#docs')}>{t.software.matrixNote.manual}</a
+            >{t.software.matrixNote.mid}<a href={link('/software/cuspic#cases')}>{t.software.matrixNote.detail}</a
+            >{t.software.matrixNote.post}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section--tight">
+  <div class="container">
+    <div class="split split--top split--media-first" id="cuttinglab">
+      <div data-reveal>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th scope="col">{t.software.specCol}</th>
+                <th scope="col">{t.software.specNoteCol}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                cuttinglab.specs.map((row) => (
+                  <tr>
+                    <th scope="row" style="background:transparent">
+                      {row.k}
+                    </th>
+                    <td>{row.v}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div data-reveal style="--d:.08s">
+        <span class="card__meta">{cuttinglab.kicker}</span>
+        <h2 style="margin-top:.6rem;font-size:var(--fs-h2)">{t.software.cuttinglabHeading}</h2>
+        <p class="lead" style="margin-top:.75rem">{cuttinglab.tagline}</p>
+        <p style="margin-top:1rem;color:var(--ink-2)">{cuttinglab.summary}</p>
+        <div class="cluster" style="margin-top:1.25rem">
+          {cuttinglab.features.map((f) => <span class="badge">{f.title}</span>)}
+        </div>
+        <div class="cluster" style="margin-top:1.5rem">
+          <a class="btn" href={link('/software/cuttinglab#access')}>{t.software.register}</a>
+          <a class="btn btn--ghost" href={link('/software/cuttinglab')}>{t.software.cuttinglabDetail}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="media-band" id="compare">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__text">
+        <span class="eyebrow eyebrow--media">Compare</span>
+        <h2 style="margin-top:.65rem">{t.software.compareTitle}</h2>
+        <p>{t.software.compareLede}</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th scope="col">{t.software.compareCol}</th>
+            <th scope="col" style="text-transform:none">CUSPIC</th>
+            <th scope="col" style="text-transform:none">CUSPER CuttingLab</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            compare.map((r) => (
+              <tr>
+                <th scope="row" style="background:transparent">{r.k}</th>
+                <td>{r.a}</td>
+                <td>{r.b}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="apply" data-reveal>
+      <span class="eyebrow">Get started</span>
+      <h2 style="margin-top:.65rem">{t.software.getStartedTitle}</h2>
+      <p style="margin-top:.75rem;max-width:62ch">{t.software.getStartedText}</p>
+      <div class="cluster" style="margin-top:1.5rem">
+        <a class="btn" href={link('/software/cuttinglab#access')}>{t.software.getStartedCta}</a>
+        <a class="btn btn--ghost" href={link('/software/cuspic')}>{t.software.cuspicDetail}</a>
+      </div>
+    </div>
+  </div>
+</section>

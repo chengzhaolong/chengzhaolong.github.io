@@ -110,6 +110,88 @@
       href: mailto:chengzhaolong@mail.dlut.edu.cn
       variant: ghost
 
+  # ---------- 英文站覆盖 ----------
+  # 只写需要换掉的字段：数组整体替换（不做逐项合并），没给的键回退中文。
+  en:
+    tagline: High-performance FEM–MPM explicit dynamics solver for non-linear, large-deformation thermo-mechanical problems
+    summary: |-
+      CUSPIC (Coupled Unified Solver with PIC-FEM) is a high-performance explicit dynamics solver built on FEM–PIC coupling, aimed at large-deformation, strongly non-linear thermo-mechanical problems.
+      With GPU-accelerated parallelism it solves structural impact, penetration, cutting and other extreme large-deformation thermo-mechanical cases stably and efficiently, giving reliable solving capability for complex engineering problems.
+    status: Internal development
+    chips: [FEM–MPM coupling, Thermo-mechanical, GPU parallel]
+    spec_line: FEM–MPM · thermo-mechanical · explicit integration · GPU parallel
+    features:
+      - title: FEM–PIC coupled analysis
+        text: Large- and moderate-deformation regions are discretised separately with PIC and FEM, so extreme distortion is handled stably.
+      - title: Non-linear treatment
+        text: Several non-linear material models, thermo-mechanical contact algorithms and friction models cover a wide range of operating conditions.
+      - title: Parallel computing
+        text: GPU and OpenMP parallelism run large models efficiently on a desktop machine.
+      - title: Multi-field coupling
+        text: Supports thermo-mechanical–fluid coupling for cutting, impact, free-surface fluid cooling and other complex cases.
+      - title: Convenient pre-processing
+        text: The input format partly inherits the Hypermesh rad layout; clear card-style keywords make it easy to drive modelling with an LLM.
+    specs: &cuspic_specs
+      - k: System
+        v: win64 / linux64
+      - k: FEM elements
+        v: BRICK8R / BRICK8SRI / TETRA4 / B-T SHELL4
+      - k: Particle method
+        v: B-Spline MPM · FLIP-PIC · APIC / PolyPIC
+      - k: Materials
+        v: Linear elastic / Johnson-Cook / Tanh-Johnson-Cook / Newtonian liquid / Drucker-Prager
+      - k: Equations of state
+        v: Gruneisen / Monaghan
+      - k: Contact and interfaces
+        v: NTS penalty contact · bonded and finite-sliding thermo-mechanical contact for FEM-FEM / FEM-MPM / MPM-MPM · high-temperature friction interface softening · Coulomb friction · pressure-dependent Tresca friction · pressure-dependent contact conductance · multi-field mesh contact algorithm
+      - k: Boundaries and loads
+        v: Prescribed displacement / temperature / heat flux / velocity / force / rotation / radial constraint / MPM box and wall boundaries; gravity and initial velocity
+      - k: Parallelism
+        v: OpenMP threads / GPU heterogeneous computing (linux64 only at present)
+      - k: Output
+        v: Binary VTU result files + terminal progress + automatic log
+    # 与 specs 同一张表（YAML 锚点复用，改一处即可）
+    matrix: *cuspic_specs
+    cases:
+      - title: 3D micro-milling of Ti-6Al-4V
+        meta: 3D micro-milling · FEM–MPM
+        video: /media/videos/cut3d1.mp4
+        poster: /media/videos/cut3d1.jpg
+        ratio: "16 / 9"
+      - title: 2D orthogonal cutting of Ti-6Al-4V
+        meta: 2D orthogonal cutting · Force / Temperature
+        video: /media/videos/cut2d.mp4
+        poster: /media/videos/cut2d.jpg
+        ratio: "16 / 9"
+      - title: Helical gear lubrication in a marine multi-stage reducer
+        meta: Helical gears · Contact
+        video: /media/videos/gear.mp4
+        poster: /media/videos/gear.jpg
+        ratio: "16 / 9"
+      - title: 3D turning of AISI 4340 steel
+        meta: 3D turning · PEEQ
+        video: /media/videos/turning3d.mp4
+        poster: /media/videos/turning3d.jpg
+        ratio: "1 / 1"
+      - title: Large-scale block stacking collapse
+        meta: Block stacking · Contact
+        video: /media/videos/block.mp4
+        poster: /media/videos/block.jpg
+        ratio: "4 / 3"
+      - title: Free-surface fluid flow
+        meta: MPM inflow · Chip flow
+        video: /media/videos/inflow.mp4
+        poster: /media/videos/inflow.jpg
+        ratio: "7 / 6"
+    links:
+      - label: User manual (PDF)
+        href: /media/docs/cuspic-manual-v3.0.0.pdf
+        variant: primary
+        download: true
+      - label: Email
+        href: mailto:chengzhaolong@mail.dlut.edu.cn
+        variant: ghost
+
 - id: cuttinglab
   name: CUSPER CuttingLab
   kicker: Application
@@ -212,3 +294,100 @@
     - label: 路线图 ↓
       href: '#roadmap'
       variant: ghost
+
+  # ---------- 英文站覆盖 ----------
+  en:
+    tagline: An integrated machining simulation application built around CUSPIC
+    summary: |-
+      CUSPER CuttingLab already covers the complete 2D orthogonal cutting chain: parametric modelling → meshing → CUSPIC input file generation → live post-processing, with the cutting-force history refreshing as the run proceeds and no pre-processing scripts to maintain.
+      3D drilling is parameterised and meshed, with the solve and post-processing steps in development; milling, turning and coolant-assisted cases follow, then tool-wear analysis, LLM-driven parameter sweeps and tool-shape optimisation, and automatic simulation reports.
+    status: 2D orthogonal cutting · full chain in beta
+    chips: [Parametric modelling, Live post-processing, Force history]
+    spec_line: Full 2D orthogonal cutting chain · 3D drilling in development
+    features:
+      - title: Parametric modelling
+        text: Workpiece, tool and tool-tip geometry are parameterised; material models (Johnson-Cook plasticity) and friction are set in one place, so a parameter change rebuilds the case.
+      - title: Meshing
+        text: Background grid and material points are generated automatically with local refinement in the cutting zone; the 3D drilling mesher is already available.
+      - title: Solver input generation
+        text: Writes the keyword input file CUSPIC reads directly — no hand-written cards, no pre-processing scripts.
+      - title: Live post-processing
+        text: Contours and the cutting-force history refresh during the run, so trends are visible as they develop; results export as images and data.
+    specs:
+      - k: Solver core
+        v: CUSPIC v3.0.0 (FEM–MPM)
+      - k: Supported now
+        v: 2D orthogonal cutting (full chain)
+      - k: Working steps
+        v: Parametric modelling / meshing / CUSPIC input generation / live post-processing / cutting-force history
+      - k: 3D progress
+        v: Drilling — modelling and meshing done, solve and post-processing in development
+      - k: Platforms
+        v: Windows / Linux (subject to the beta build)
+      - k: Availability
+        v: Email registration; accounts are issued once the trial opens
+    cases:
+      - title: 2D orthogonal cutting, end to end
+        meta: 2D orthogonal cutting · Modeling → Solve → Post
+        caption: 'One complete case: parametric modelling and meshing, CUSPIC input generation, then live post-processing — all in a single run.'
+        video: /media/videos/cusper_2d_demo.mp4
+        poster: /media/videos/cusper_2d_demo.jpg
+        ratio: "16 / 9"
+      - title: 2D solver interface
+        meta: 2D solver · UI
+        caption: The solve starts inside the interface — progress, time step and terminal log on one screen, with the force history one click away.
+        image: /media/figures/cuttinglab-2d-solver.png
+        ratio: "2092 / 1281"
+      - title: 3D drilling mesh
+        meta: 3D drilling · Mesh
+        caption: Parametric modelling and meshing are done for drilling; the solve and post-processing are in development.
+        image: /media/figures/cuttinglab-3d-drilling-mesh.png
+        ratio: "2098 / 1266"
+    roadmap:
+      - when: Now
+        what: 2D orthogonal cutting · full chain
+        state: done
+        desc: Parametric modelling, meshing, CUSPIC input generation, live post-processing and the cutting-force history are all available.
+      - when: In progress
+        what: 3D drilling · parametric modelling and meshing
+        state: wip
+        desc: The modelling and meshing modules are complete; the solve and post-processing are in development.
+      - when: "2027.06"
+        what: All five process types connected
+        state: plan
+        desc: 2D orthogonal cutting, 3D drilling, 3D milling, 3D turning and coolant-assisted cutting, with pre-processing, solve and post-processing fully connected.
+      - when: Later
+        what: Tool wear analysis
+        state: plan
+        desc: Tool-wear computation and analysis for 2D orthogonal cutting.
+      - when: Later
+        what: LLM-driven parameter sweeps and tool-shape optimisation
+        state: plan
+        desc: The LLM organises batch parameter sweeps, interprets the results and suggests tool-shape improvements.
+      - when: Later
+        what: Automatic simulation reports
+        state: plan
+        desc: A report with contours, curves and conclusions is generated as soon as a case finishes.
+    application:
+      open: false
+      email: chengzhaolong@mail.dlut.edu.cn
+      subject: CUSPER CuttingLab trial request
+      lead: Interested in CUSPER CuttingLab? Fill in the details below so we can let you know as soon as the trial opens.
+      fields:
+        - k: Name
+          hint: Your name or how you would like to be addressed
+        - k: Affiliation
+          hint: University / group / company
+        - k: Physical MAC address
+          hint: e.g. 00-1A-2B-3C-4D-5E
+      extra_lines: [Material / workpiece, Cutting conditions (speed / feed / depth), Results you care about, Available hardware (CPU / GPU)]
+    links:
+      - label: Trial opening soon ↓
+        href: '#access'
+        variant: primary
+      - label: Workflow ↓
+        href: '#workflow'
+        variant: ghost
+      - label: Roadmap ↓
+        href: '#roadmap'
+        variant: ghost

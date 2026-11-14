@@ -1,14 +1,26 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { langFromPath, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
 
 interface Props {
-  /** cuspic-manual.yml 的数据（collection: manual） */
+  /** manual 数据；英文页传 localizeManual 之后的版本（章节已翻成英文） */
   manual: CollectionEntry<'manual'>['data'];
   /** 精简模式：目录只留「章 · 标题 · 页」，标题与摘要照留（软件页用） */
   compact?: boolean;
+  /** 语言；不传则按当前路径判断 */
+  lang?: Lang;
 }
 
 const { manual, compact = false } = Astro.props;
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
+/**
+ * 手册正文是中文，英文页只翻译了章节标题 —— 必须写在页面上，
+ * 否则访客打开 PDF 会以为拿错了文件。
+ */
+const LANG_NOTE =
+  'The manual itself is written in Chinese; the chapter titles and summaries on this page are translated.';
 /** 章节深链：PDF 的 #page=N 是物理页，和页脚「第 N 页」一致 */
 const at = (page: number) => `${manual.file}#page=${page}`;
 ---
@@ -17,12 +29,9 @@ const at = (page: number) => `${manual.file}#page=${page}`;
   <div class="container">
     <div class="section-head">
       <div class="section-head__text">
-        <span class="eyebrow">Documentation</span>
-        <h2 style="margin-top:.6rem">用户手册</h2>
-        <p>
-          输入文件的每一张卡片、错误码与两个完整算例都在这本册子里。下面每一条直接跳到对应章节，
-          其余部分按需下载翻看。
-        </p>
+        <span class="eyebrow">{t.manual.eyebrow}</span>
+        <h2 style="margin-top:.6rem">{t.manual.heading}</h2>
+        <p>{t.manual.lede}</p>
       </div>
       <span class="badge badge--dot">{manual.version}</span>
     </div>
@@ -30,20 +39,27 @@ const at = (page: number) => `${manual.file}#page=${page}`;
     <div class="split split--top">
       <div data-reveal>
         <p class="card__meta mono">
-          {manual.version} · {manual.pages} 页 · {manual.size} · {manual.date}
+          {manual.version} · {t.manual.meta(manual.pages)} · {manual.size} · {manual.date}
         </p>
         <h3 style="margin-top:.6rem;font-size:var(--fs-h2)">{manual.title}</h3>
         {manual.subtitle && <p class="muted" style="margin-top:.5rem">{manual.subtitle}</p>}
         {manual.abstract && <p style="margin-top:1rem;color:var(--ink-2)">{manual.abstract}</p>}
 
         <div class="cluster" style="margin-top:1.5rem">
-          <a class="btn" href={manual.file} download>下载 PDF（{manual.size}）</a>
-          <a class="btn btn--ghost" href={at(1)} target="_blank" rel="noopener">在浏览器中打开 ↗</a>
+          <a class="btn" href={manual.file} download>{t.manual.download(manual.size ?? '')}</a>
+          <a class="btn btn--ghost" href={at(1)} target="_blank" rel="noopener">{t.manual.open}</a>
         </div>
 
+        {
+          lang === 'en' && (
+            <p class="notice" style="margin-top:1.25rem;max-width:58ch;font-size:var(--fs-xs)">
+              {LANG_NOTE}
+            </p>
+          )
+        }
+
         <p class="muted" style="margin-top:1.25rem;font-size:var(--fs-xs);line-height:1.7">
-          章节链接带 <code class="mono">#page=</code> 片段，Chrome / Edge / Firefox 会直接翻到那一页；
-          手册本身也带可点的目录。PDF 由同一套输入文件生成，改版后版本号会写进文件名。
+          {t.manual.note}
         </p>
       </div>
 
@@ -65,9 +81,9 @@ const at = (page: number) => `${manual.file}#page=${page}`;
             <table class="data">
               <thead>
                 <tr>
-                  <th scope="col">章</th>
-                  <th scope="col">标题与内容</th>
-                  <th scope="col">页</th>
+                  <th scope="col">{t.manual.colNo}</th>
+                  <th scope="col">{t.manual.colTitle}</th>
+                  <th scope="col">{t.manual.colPage}</th>
                 </tr>
               </thead>
               <tbody>

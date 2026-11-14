@@ -1,23 +1,40 @@
 ---
+/**
+ * 404 是中英双语同页：静态托管只有一个 404.html，
+ * 所以两种语言各给一段与入口，两边都能落地。
+ */
 import Base from '../layouts/Base.astro';
 import { getEntry } from 'astro:content';
+import { notFoundCopy } from '../i18n/ui';
 
 const profile = (await getEntry('profile', 'main'))!.data;
+const zh = notFoundCopy.zh;
+const en = notFoundCopy.en;
 ---
 
 <Base title="404 · 页面不存在" noindex>
   <section class="section" style="min-height:68vh;display:grid;place-items:center;text-align:center">
     <div class="container--narrow">
-      <p class="eyebrow" style="justify-content:center">Error 404</p>
-      <h1 class="display" style="margin-top:1rem">这条路径没有解</h1>
-      <p class="lead" style="margin-top:1.1rem">
-        页面可能被移动、改名，或者从来没存在过。要不换个初始条件重新算一次？
-      </p>
+      <p class="eyebrow" style="justify-content:center">{zh.eyebrow}</p>
+      <h1 class="display" style="margin-top:1rem">{zh.title}</h1>
+      <p class="lead" style="margin-top:1.1rem">{zh.text}</p>
       <div class="cluster" style="margin-top:2rem;justify-content:center">
-        <a class="btn" href="/">回到首页</a>
-        {profile.show_notes && <a class="btn btn--ghost" href="/notes">笔记</a>}
-        <a class="btn btn--ghost" href="/publications">论文</a>
+        <a class="btn" href="/">{zh.home}</a>
+        {profile.show_notes && <a class="btn btn--ghost" href="/notes">{zh.notes}</a>}
+        <a class="btn btn--ghost" href="/publications">{zh.publications}</a>
+      </div>
+
+      <span class="accent-rule" style="margin:3rem auto 0;max-width:8rem" aria-hidden="true"></span>
+
+      <p class="eyebrow" style="justify-content:center;margin-top:3rem">{en.eyebrow}</p>
+      <h2 class="display" style="margin-top:1rem">{en.title}</h2>
+      <p class="lead" style="margin-top:1.1rem">{en.text}</p>
+      <div class="cluster" style="margin-top:2rem;justify-content:center">
+        <a class="btn" href="/en/">{en.home}</a>
+        <a class="btn btn--ghost" href="/en/software">{en.software}</a>
+        <a class="btn btn--ghost" href="/en/publications">{en.publications}</a>
       </div>
     </div>
   </section>
 </Base>
+

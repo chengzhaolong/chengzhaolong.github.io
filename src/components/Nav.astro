@@ -1,66 +1,72 @@
 ---
 import { getEntry } from 'astro:content';
+import { counterpartPath, isActive, langFromPath, withLang, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+import { profileText } from '../utils/localize';
+
+interface Props {
+  /** 语言；不传则按当前路径判断（/en/* 视为英文） */
+  lang?: Lang;
+}
 
 const entry = await getEntry('profile', 'main');
 const profile = entry?.data;
 if (!profile) throw new Error('Nav 需要 profile 数据');
 
-const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
-const isEn = path.startsWith('/en');
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
+const pt = profileText(profile, lang);
+/** 另一个语言：语言切换按钮显示它的名字 */
+const other: Lang = lang === 'en' ? 'zh' : 'en';
+const switchHref = counterpartPath(Astro.url.pathname, other);
 
-const links = [
-  { href: '/', label: '主页' },
-  { href: '/software', label: '软件' },
-  { href: '/publications', label: '论文' },
+const allLinks = [
+  { href: '/', label: t.nav.home },
+  { href: '/software', label: t.nav.software },
+  { href: '/publications', label: t.nav.publications },
   // 笔记模块由 profile.yml 的 show_notes 控制（关闭时不渲染这一项）
-  ...(profile.show_notes ? [{ href: '/notes', label: '笔记' }] : []),
-  { href: '/about', label: '简历' },
+  ...(profile.show_notes ? [{ href: '/notes', label: t.nav.notes }] : []),
+  { href: '/about', label: t.nav.cv },
 ];
-
-const isActive = (href: string) => {
-  if (href === '/') return path === '/';
-  return path === href || path.startsWith(`${href}/`);
-};
+/** 站内链接统一按语言加前缀，中英两站因此永远指向同一套路径 */
+const links = allLinks.map((l) => ({ ...l, href: withLang(l.href, lang) }));
 ---
 
 <header class="site-header" data-header>
   <div class="container site-header__inner">
-    <a class="brand" href={isEn ? '/en/' : '/'}>
-      {profile.name}
+    <a class="brand" href={withLang('/', lang)}>
+      {pt.name}
       <span class="brand__latin">{profile.name_en}</span>
     </a>
 
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
-      <span class="sr-only">菜单</span>
+      <span class="sr-only">{t.a11y.menu}</span>
       <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
         <path d="M1 1h18M1 7h18M1 13h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
       </svg>
     </button>
 
-    <nav class="nav" id="site-nav" aria-label="主导航">
+    <nav class="nav" id="site-nav" aria-label={t.a11y.primaryNav}>
       {
         links.map((l) => (
           <a
             class="nav__link"
             href={l.href}
-            aria-current={!isEn && isActive(l.href) ? 'page' : undefined}
+            aria-current={isActive(Astro.url.pathname, l.href) ? 'page' : undefined}
           >
             {l.label}
           </a>
         ))
       }
       <span class="nav__divider" aria-hidden="true"></span>
-      {
-        isEn ? (
-          <a class="lang-switch" href="/" hreflang="zh-CN" lang="zh-CN">
-            中文
-          </a>
-        ) : (
-          <a class="lang-switch" href="/en/" hreflang="en" lang="en">
-            EN
-          </a>
-        )
-      }
+      <a
+        class="lang-switch"
+        href={switchHref}
+        hreflang={other === 'en' ? 'en' : 'zh-CN'}
+        lang={other === 'en' ? 'en' : 'zh-CN'}
+      >
+        {t.nav.switchLabel}
+      </a>
     </nav>
   </div>
 </header>

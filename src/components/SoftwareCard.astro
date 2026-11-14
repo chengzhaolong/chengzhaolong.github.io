@@ -1,4 +1,7 @@
 ---
+import { langFromPath, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+
 interface Props {
   item: {
     id: string;
@@ -15,9 +18,13 @@ interface Props {
   href: string;
   /** 是否使用深色卡片（深色媒体区里用） */
   tone?: 'light' | 'media';
+  /** 语言；不传则按当前路径判断 */
+  lang?: Lang;
 }
 
 const { item, href, tone = 'light' } = Astro.props;
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
 ---
 
 <a
@@ -35,5 +42,5 @@ const { item, href, tone = 'light' } = Astro.props;
 
   {item.spec_line && <span class="card__spec">{item.spec_line}</span>}
 
-  <span class="card__cta">了解详情</span>
+  <span class="card__cta">{t.common.cardDetails}</span>
 </a>

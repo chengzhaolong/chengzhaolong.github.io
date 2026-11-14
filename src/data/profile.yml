@@ -25,11 +25,14 @@
 
   # 浏览器标题后缀（写技术定位）
   site_suffix: 个人主页
+  # 英文站标题后缀（不填则用 title_en）
+  site_suffix_en: Computational mechanics & CAE solvers
 
   # 单位 / 实验室
   affiliation: 大连理工大学 · 力学与航空航天学院 · 工业装备结构分析优化与CAE软件全国重点实验室
   affiliation_en: Dalian University of Technology
   location: 中国 · 大连
+  location_en: Dalian, China
 
   # 首屏小照片（3:4 竖图）。换成自己的照片后，把这里改成 /media/portrait.jpg
   photo: /media/portrait.jpg
@@ -48,9 +51,14 @@
     并以CUSPIC为核心设计了CUSPER CuttingLab 软件, 用于机械加工工艺物理仿真及工艺优化。
     求解器和软件功能还在持续完善中, 希望和大家一起交流学习, 探索 CAE 技术赋能工业的更多可能。
 
+  # 英文首页简介：与 intro_zh 逐句对应，不要在这里另写一份扩写版
   intro_en: |-
-    I am a Ph.D. candidate in computational mechanics. My research targets metal cutting processes dominated by large deformation, strong non-linearity and thermo-mechanical coupling: the finite element method resolves the continuum response of workpiece and tool, the material point method handles chip separation and extreme distortion, and a FEM–MPM coupling scheme together with GPU parallelism makes industrial-scale cutting simulation both accurate and affordable. I build and maintain the CUSPIC solver and the CUSPER CuttingLab application.
+    My research covers thermo-mechanical finite element–meshfree algorithms, contact algorithms and their high-performance implementations.
+    I develop CUSPIC (Coupled Unified Solver with PIC-FEM), a high-performance explicit dynamics solver that solves extreme large-deformation, non-linear thermo-mechanical problems efficiently on GPUs.
+    Around CUSPIC I designed the CUSPER CuttingLab application for physical simulation and optimisation of machining processes.
+    Solver and application are both still being improved — I am glad to exchange ideas and to explore more ways CAE technology can serve industry.
 
+  # 兴趣标签：英文页用 interests_en（逐条对应，缺了会漏中文）
   interests:
     - 大变形热力耦合
     - FEM–MPM耦合
@@ -58,6 +66,13 @@
     - 热力接触与摩擦
     - 热流固耦合问题
     - 金属切削加工仿真
+  interests_en:
+    - Large-deformation thermo-mechanical coupling
+    - FEM–MPM coupling
+    - High-performance / GPU computing
+    - Thermo-mechanical contact and friction
+    - Thermo-hydro-mechanical coupling
+    - Metal cutting simulation
 
   # 只填你有的，留空则不显示
   links:

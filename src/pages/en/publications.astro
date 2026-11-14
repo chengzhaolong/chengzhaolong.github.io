@@ -1,0 +1,20 @@
+---
+/**
+ * Publications (English). 正文用与 /publications 同一个 PublicationsBody。
+ */
+import Base from '../../layouts/Base.astro';
+import { getEntry } from 'astro:content';
+import PublicationsBody from '../../components/PublicationsBody.astro';
+import { profileText } from '../../utils/localize';
+
+const profile = (await getEntry('profile', 'main'))!.data;
+const pt = profileText(profile, 'en');
+---
+
+<Base
+  lang="en"
+  title="Publications"
+  description={`${pt.name}: papers and patents on large-deformation thermo-mechanical coupling, FEM–MPM coupling and GPU computing.`}
+>
+  <PublicationsBody lang="en" />
+</Base>

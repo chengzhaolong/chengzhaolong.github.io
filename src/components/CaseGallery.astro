@@ -1,5 +1,6 @@
 ---
 import CaseCard from './CaseCard.astro';
+import { langFromPath, type Lang } from '../utils/i18n';
 
 interface Props {
   /**
@@ -19,9 +20,12 @@ interface Props {
   }[];
   /** 视频左上角角标，一般传软件名 */
   badge?: string;
+  /** 语言；不传则按当前路径判断 */
+  lang?: Lang;
 }
 
 const { cases, badge } = Astro.props;
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
 
 const [hero, ...rest] = cases;
 const halves = rest.slice(0, 2);
@@ -43,7 +47,7 @@ const slots = [
         {isHero ? (
           <div class="case-hero">
             <div class="case-hero__media">
-              <CaseCard item={item} badge={badge} autoplay showCaption={false} />
+              <CaseCard item={item} badge={badge} autoplay showCaption={false} lang={lang} />
             </div>
             <div class="case-hero__text">
               <span class="mono case-hero__index">
@@ -55,7 +59,7 @@ const slots = [
             </div>
           </div>
         ) : (
-          <CaseCard item={item} badge={badge} autoplay />
+          <CaseCard item={item} badge={badge} autoplay lang={lang} />
         )}
       </div>
     ))

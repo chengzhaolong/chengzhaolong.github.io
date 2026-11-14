@@ -1,20 +1,41 @@
 ---
 import { getEntry } from 'astro:content';
+import { counterpartPath, langFromPath, withLang, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+import { profileText } from '../utils/localize';
+
+interface Props {
+  /** 语言；不传则按当前路径判断（/en/* 视为英文） */
+  lang?: Lang;
+}
 
 const entry = await getEntry('profile', 'main');
 const profile = entry?.data;
 if (!profile) throw new Error('Footer 需要 profile 数据');
 
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
+const pt = profileText(profile, lang);
+
 const year = new Date().getFullYear();
-const isEn = Astro.url.pathname.startsWith('/en');
-const displayName = isEn ? profile.name_en : profile.name;
+/** 另一个语言：页脚的语言入口显示它的全称（导航里是简写） */
+const other: Lang = lang === 'en' ? 'zh' : 'en';
+const otherLabel = other === 'en' ? 'English' : '中文';
+
+const navLinks = [
+  { href: '/', label: t.nav.home },
+  { href: '/software', label: t.nav.software },
+  { href: '/publications', label: t.nav.publications },
+  ...(profile.show_notes ? [{ href: '/notes', label: t.nav.notes }] : []),
+  { href: '/about', label: t.nav.cv },
+].map((l) => ({ ...l, href: withLang(l.href, lang) }));
 
 const contacts = [
-  { label: '邮箱', value: profile.email, href: `mailto:${profile.email}` },
-  { label: 'Google Scholar', value: '论文主页', href: profile.links?.scholar },
-  { label: 'ORCID', value: 'ORCID iD', href: profile.links?.orcid },
-  { label: 'GitHub', value: '代码', href: profile.links?.github },
-  { label: 'Bilibili', value: '仿真视频', href: profile.links?.bilibili },
+  { label: t.footer.email, href: `mailto:${profile.email}` },
+  { label: t.footer.scholar, href: profile.links?.scholar },
+  { label: t.footer.orcid, href: profile.links?.orcid },
+  { label: t.footer.github, href: profile.links?.github },
+  { label: t.footer.bilibili, href: profile.links?.bilibili },
 ].filter((c) => c.href);
 ---
 
@@ -22,26 +43,26 @@ const contacts = [
   <div class="container">
     <div class="site-footer__top">
       <div>
-        <p class="site-footer__name">{displayName}</p>
+        <p class="site-footer__name">{pt.name}</p>
         <p class="site-footer__lede mono" style="font-size:0.8rem;color:#6f6f7a">
-          {profile.affiliation}
+          {pt.affiliation}
         </p>
       </div>
 
       <div class="site-footer__cols">
         <div class="site-footer__col">
-          <h3>导航</h3>
+          <h3>{t.footer.navHeading}</h3>
           <ul>
-            <li><a href="/">主页</a></li>
-            <li><a href="/software">软件</a></li>
-            <li><a href="/publications">论文</a></li>
-            {profile.show_notes && <li><a href="/notes">笔记</a></li>}
-            <li><a href="/about">简历</a></li>
-            <li><a href="/en/" hreflang="en">English</a></li>
+            {navLinks.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+            <li>
+              <a href={counterpartPath(Astro.url.pathname, other)} hreflang={other === 'en' ? 'en' : 'zh-CN'}>
+                {otherLabel}
+              </a>
+            </li>
           </ul>
         </div>
         <div class="site-footer__col">
-          <h3>联系</h3>
+          <h3>{t.footer.contactHeading}</h3>
           <ul>
             {
               contacts.map((c) => (
@@ -51,7 +72,7 @@ const contacts = [
               ))
             }
             {profile.links?.cv && (
-              <li><a href={profile.links.cv} download>CV（PDF）</a></li>
+              <li><a href={profile.links.cv} download>{t.footer.cv}</a></li>
             )}
           </ul>
         </div>
@@ -59,9 +80,9 @@ const contacts = [
     </div>
 
     <div class="site-footer__bottom">
-      <span>© {year} · 内容、图表与代码版权归作者所有</span>
+      <span>{t.footer.copyright(year)}</span>
       <span class="accent-rule" aria-hidden="true"></span>
-      <span>Built with Astro · 静态输出，无追踪脚本</span>
+      <span>{t.footer.builtWith}</span>
     </div>
   </div>
 </footer>

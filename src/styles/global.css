@@ -2370,36 +2370,6 @@ button.badge:hover {
   margin-top: 1.25rem;
 }
 
-.en-pubs {
-  list-style: none;
-  display: grid;
-  gap: 1.15rem;
-}
-
-.en-pubs li {
-  padding-bottom: 1.15rem;
-  border-bottom: 1px solid var(--media-line);
-}
-
-.en-pubs li:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-
-.en-pubs__title {
-  font-family: var(--f-display);
-  font-size: 1.05rem;
-  font-weight: 600;
-  line-height: 1.45;
-  color: var(--media-ink);
-}
-
-.en-pubs__meta {
-  margin-top: 0.25rem;
-  font-size: var(--fs-sm);
-  color: var(--media-ink-2);
-}
-
 .media-band code {
   padding: 0.1em 0.35em;
   border-radius: 4px;

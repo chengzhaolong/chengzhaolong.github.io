@@ -1,0 +1,248 @@
+---
+/**
+ * 软件详情页（/software/[slug] 与 /en/software/[slug] 共用）。
+ * 标题与描述取自数据本身，所以页面文件里只剩 getStaticPaths。
+ */
+import Base from '../layouts/Base.astro';
+import { getEntry, type CollectionEntry } from 'astro:content';
+import CaseGallery from './CaseGallery.astro';
+import ManualDocs from './ManualDocs.astro';
+import TrialApply from './TrialApply.astro';
+import { langFromPath, withLang, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+import { localizeManual, localizeSoftware } from '../utils/localize';
+
+interface Props {
+  entry: CollectionEntry<'software'>;
+  lang?: Lang;
+}
+
+const { entry } = Astro.props;
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
+const link = (href: string) => withLang(href, lang);
+
+const s = localizeSoftware(entry.data, lang);
+const profile = (await getEntry('profile', 'main'))!.data;
+const email = profile.email;
+/** CUSPIC 配一本 86 页用户手册；CuttingLab 暂无 */
+const manualEntry = entry.id === 'cuspic' ? (await getEntry('manual', 'cuspic'))?.data : undefined;
+const manual = manualEntry ? localizeManual(manualEntry, lang) : undefined;
+/** 〔待填〕的行不上页面 */
+const specs = s.specs.filter((row) => !row.v.includes('〔'));
+/** CuttingLab 的工作流五步：文案在字典里（中英同一套顺序） */
+const workflow = t.software.workflow;
+---
+
+<Base lang={lang === 'en' ? 'en' : 'zh-CN'} title={s.name} description={s.tagline}>
+  <header class="page-head page-head--media">
+    <div class="hero__media">
+      <img src="/media/hero-contour.svg" alt="" width="1600" height="900" />
+    </div>
+    <div class="container page-head__inner">
+      <nav class="crumb" aria-label={t.a11y.breadcrumb}>
+        <a href={link('/')}>{t.software.crumbHome}</a>
+        <span aria-hidden="true">/</span>
+        <a href={link('/software')}>{t.software.crumbSoftware}</a>
+      </nav>
+      <p class="eyebrow eyebrow--media" style="margin-top:1.25rem">{s.kicker}{s.version && ` · ${s.version}`}</p>
+      <h1 class="page-head__title">{s.name}</h1>
+      <p class="page-head__lede">{s.tagline}</p>
+      <div class="cluster" style="margin-top:1.25rem">
+        {s.status && <span class="badge badge--media badge--dot">{s.status}</span>}
+        {s.chips.map((chip) => <span class="badge badge--media">{chip}</span>)}
+      </div>
+      <div class="cluster" style="margin-top:1.5rem">
+        {s.links.map((l) => (
+          <a
+            class:list={['btn', l.variant === 'primary' ? 'btn--media' : 'btn--media-ghost']}
+            href={l.href}
+            download={l.download || undefined}
+          >
+            {l.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="split split--top">
+        <div class="prose" data-reveal>
+          <h2 style="margin-top:0">{t.software.overview}</h2>
+          <p>{s.summary}</p>
+          <p class="muted" style="margin-top:1rem;font-size:var(--fs-xs)">
+            {manual ? (
+              <>
+                {t.software.manualNote.pre}
+                <a href="#docs">{t.software.manualNote.link(manual.version)}</a>
+                {t.software.manualNote.post(manual.pages)}
+              </>
+            ) : (
+              <>{t.software.betaNote}</>
+            )}
+          </p>
+        </div>
+
+        <div data-reveal style="--d:.08s">
+          <h2 style="margin-top:0">{t.software.capabilities}</h2>
+          <dl class="cap-list">
+            {s.features.map((f) => (
+              <div class="cap-list__row">
+                <dt>{f.title}</dt>
+                <dd>{f.text}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    s.cases.length > 0 && (
+      <section class="media-band" id="cases">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-head__text">
+              <span class="eyebrow eyebrow--media">Showcase</span>
+              <h2 style="margin-top:.65rem">{t.software.cases}</h2>
+            </div>
+          </div>
+          <CaseGallery lang={lang} cases={s.cases} badge={s.name} />
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section--tight section--line" id="specs">
+    <div class="container">
+      <div class="split split--top">
+        <div data-reveal>
+          <span class="eyebrow">Specifications</span>
+          <h2 style="margin-top:.6rem">{t.software.specsTitle}</h2>
+          <p class="muted" style="margin-top:.6rem;font-size:var(--fs-sm);line-height:1.7">
+            {manual ? (
+              <>
+                {t.software.specsNote.pre}
+                <a href="#docs">{t.software.specsNote.link}</a>
+                {t.software.specsNote.post}
+              </>
+            ) : (
+              <>{t.software.specsBeta}</>
+            )}
+          </p>
+        </div>
+        <div class="table-wrap" data-reveal style="--d:.08s">
+          <table class="data">
+            <thead>
+              <tr>
+                <th scope="col">{t.software.colItem}</th>
+                <th scope="col">{t.software.colDesc}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {specs.map((row) => (
+                <tr>
+                  <th scope="row" style="background:transparent">
+                    {row.k}
+                  </th>
+                  <td>{row.v}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {manual && <ManualDocs manual={manual} compact lang={lang} />}
+
+  {
+    entry.id === 'cuttinglab' && (
+      <section class="section" id="workflow">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-head__text">
+              <span class="eyebrow">Workflow</span>
+              <h2 style="margin-top:.6rem">{t.software.workflowTitle}</h2>
+              <p>{t.software.workflowLede}</p>
+            </div>
+          </div>
+
+          <ol class="timeline">
+            {workflow.map((w) => (
+              <li class="timeline__item" data-reveal>
+                <span class="timeline__when">{w.when}</span>
+                <p class="timeline__what">{w.what}</p>
+                <p class="timeline__desc">{w.desc}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    entry.id === 'cuttinglab' && s.roadmap.length > 0 && (
+      <section class="section--tight section--line" id="roadmap">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-head__text">
+              <span class="eyebrow">Roadmap</span>
+              <h2 style="margin-top:.6rem">{t.software.roadmapTitle}</h2>
+              <p>{t.software.roadmapLede}</p>
+            </div>
+          </div>
+
+          <ol class="timeline">
+            {s.roadmap.map((r) => (
+              <li class="timeline__item" data-reveal>
+                <span class="timeline__when">{r.when}</span>
+                <p class="timeline__what">
+                  {r.what}
+                  <span class:list={['timeline__state', `timeline__state--${r.state}`]}>
+                    {t.software.roadmapState[r.state]}
+                  </span>
+                </p>
+                {r.desc && <p class="timeline__desc">{r.desc}</p>}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    entry.id === 'cuspic' ? (
+      <section class="section--tight">
+        <div class="container">
+          <div class="contact-strip">
+            <span class="contact-strip__label">{t.common.contact}</span>
+            <a href={`mailto:${email}`}>{email}</a>
+            {manual && (
+              <>
+                <span class="contact-strip__sep" aria-hidden="true">
+                  ·
+                </span>
+                <a href={manual.file} download>
+                  {t.software.manualLink(manual.size ?? '')}
+                </a>
+              </>
+            )}
+            <span class="contact-strip__sep" aria-hidden="true">
+              ·
+            </span>
+            <a href={link('/software')}>{t.software.allSoftware}</a>
+          </div>
+        </div>
+      </section>
+    ) : (
+      s.application && <TrialApply lang={lang} app={s.application} product={s.name} />
+    )
+  }
+</Base>

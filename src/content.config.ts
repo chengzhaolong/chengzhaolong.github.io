@@ -26,8 +26,14 @@ const publications = defineCollection({
     title: z.string(),
     /** 中文译名，可选；列表里作为副标题显示 */
     title_zh: z.string().optional(),
+    /** 英文页的题名：只有中文题名（如专利）才需要填，留空即用 title */
+    title_en: z.string().optional(),
     authors: z.array(z.string()),
+    /** 英文页的作者行：机构作者（专利）才需要，留空即用 authors */
+    authors_en: z.array(z.string()).optional(),
     venue: z.string(),
+    /** 英文页的期刊 / 出版物名，留空即用 venue */
+    venue_en: z.string().optional(),
     venue_short: z.string().optional(),
     year: z.number(),
     type: z.enum(['journal', 'conference', 'preprint', 'patent']).default('journal'),
@@ -35,6 +41,8 @@ const publications = defineCollection({
     highlight: z.boolean().default(false),
     /** 例如 "in press" / "under review" */
     status: z.string().optional(),
+    /** 英文页的状态说明，留空即用 status */
+    status_en: z.string().optional(),
     links: z
       .object({
         pdf: z.string().optional(),
@@ -45,13 +53,16 @@ const publications = defineCollection({
       .default({}),
     bibtex: z.string().optional(),
     tags: z.array(z.string()).default([]),
+    /** 英文页的标签，留空即用 tags */
+    tags_en: z.array(z.string()).optional(),
   }),
 });
 
-/** 软件：CUSPIC 求解器 + CUSPER CuttingLab */
-const software = defineCollection({
-  loader: file('./src/data/software.yml'),
-  schema: z.object({
+/**
+ * 软件条目的主体字段（中文站直接读这些字段）。
+ * 英文站在 YAML 里写一个 en 块，只给需要改的项 —— 缺项自动回退中文（见 utils/localize.ts）。
+ */
+const softwareBody = z.object({
     /** 产品名：卡片标题、详情页 h1 与 <title>，写短名不带后缀（CUSPIC / CUSPER CuttingLab） */
     name: z.string(),
     kicker: z.string(),
@@ -134,13 +145,18 @@ const software = defineCollection({
         })
       )
       .default([]),
+});
+
+const software = defineCollection({
+  loader: file('./src/data/software.yml'),
+  schema: softwareBody.extend({
+    /** 英文覆盖块：只写英文页需要换掉的项；数组整体替换，不做逐项合并 */
+    en: softwareBody.partial().optional(),
   }),
 });
 
 /** CUSPIC 用户手册：元信息 + 章节索引（手册本体在 public/media/docs/） */
-const manual = defineCollection({
-  loader: file('./src/data/cuspic-manual.yml'),
-  schema: z.object({
+const manualBody = z.object({
     title: z.string(),
     subtitle: z.string().optional(),
     version: z.string(),
@@ -164,13 +180,15 @@ const manual = defineCollection({
         })
       )
       .default([]),
-  }),
+});
+
+const manual = defineCollection({
+  loader: file('./src/data/cuspic-manual.yml'),
+  schema: manualBody.extend({ en: manualBody.partial().optional() }),
 });
 
 /** 简历：改 src/data/cv.yml 即可，/about 页自动渲染 */
-const cv = defineCollection({
-  loader: file('./src/data/cv.yml'),
-  schema: z.object({
+const cvBody = z.object({
     /** 教育背景：一行「学校，专业，学位」+ 右侧日期，points 是下面的项目符号 */
     education: z
       .array(
@@ -203,7 +221,11 @@ const cv = defineCollection({
     skills: z
       .array(z.object({ group: z.string(), items: z.string() }).strict())
       .default([]),
-  }),
+});
+
+const cv = defineCollection({
+  loader: file('./src/data/cv.yml'),
+  schema: cvBody.extend({ en: cvBody.partial().optional() }),
 });
 
 const profile = defineCollection({
@@ -221,9 +243,13 @@ const profile = defineCollection({
     role_short_en: z.string().optional(),
     /** 浏览器标题后缀，写技术定位而不是头衔；不填则退回 title */
     site_suffix: z.string().optional(),
+    /** 英文站浏览器标题后缀，不填则退回 title_en */
+    site_suffix_en: z.string().optional(),
     affiliation: z.string(),
     affiliation_en: z.string(),
     location: z.string(),
+    /** 英文站的地点写法，不填则用 location */
+    location_en: z.string().optional(),
     /** 首屏小照片（3:4 竖图）；不给则用 /media/portrait.svg 占位 */
     photo: z.string().optional(),
     email: z.string(),
@@ -232,6 +258,8 @@ const profile = defineCollection({
     intro_zh: z.string(),
     intro_en: z.string(),
     interests: z.array(z.string()).default([]),
+    /** 英文站的兴趣标签，留空则用 interests（英文页会漏中文，建议填上） */
+    interests_en: z.array(z.string()).optional(),
     links: z
       .object({
         scholar: z.string().optional(),

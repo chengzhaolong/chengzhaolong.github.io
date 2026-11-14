@@ -1,0 +1,209 @@
+﻿---
+/**
+ * 简历正文（/about 与 /en/about 共用）。
+ * 数据：cv.yml 的 education / projects / skills + publications.yml 全量论文。
+ */
+import { getCollection, getEntry } from 'astro:content';
+import { langFromPath, withLang, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
+import { localizeCv, localizePub, profileText } from '../utils/localize';
+
+interface Props {
+  lang?: Lang;
+}
+
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
+const link = (href: string) => withLang(href, lang);
+
+const profile = (await getEntry('profile', 'main'))!.data;
+const pt = profileText(profile, lang);
+const cv = localizeCv((await getEntry('cv', 'main'))!.data, lang);
+
+/** 论文与专利：和 /publications 同一份数据，年份倒序、置顶优先，简历里全列 */
+const pubs = (await getCollection('publications'))
+  .sort((a, b) => b.data.year - a.data.year || Number(b.data.highlight) - Number(a.data.highlight))
+  .map((p) => localizePub(p.data, lang));
+
+/** 作者行：本人姓名加粗（先转义再拼 HTML，写法同 PubItem） */
+const me = profile.name_en;
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const authorsHtml = (authors: string[]) =>
+  authors.map((a) => (a.trim() === me ? `<b class="cv-pub__me">${esc(a)}</b>` : esc(a))).join(', ');
+
+/** 期刊用短名（IJNME），专利写成「中国发明专利（CN121031225B）」 */
+const venueOf = (p: (typeof pubs)[number]) => {
+  if (p.type === 'patent' && p.venue_short) {
+    return lang === 'en' ? `${p.venue} (${p.venue_short})` : `${p.venue}（${p.venue_short}）`;
+  }
+  return p.venue_short ?? p.venue;
+};
+
+/** 姓名下面第一行：身份 · 单位 · 地点 */
+const meta = [pt.affiliation].filter(Boolean);
+
+/** 姓名下面第二行：只渲染填了的联系方式 */
+const contacts = [
+  { label: profile.email, href: `mailto:${profile.email}`, download: false },
+  { label: t.cv.orcid, href: profile.links?.orcid, download: false },
+  { label: t.cv.scholar, href: profile.links?.scholar, download: false },
+  { label: t.cv.github, href: profile.links?.github, download: false },
+  { label: t.cv.bilibili, href: profile.links?.bilibili, download: false },
+  // 简历 PDF 走下载而不是浏览器预览（文件在 public/media/docs/cv.pdf）
+  { label: t.cv.download, href: profile.links?.cv, download: true },
+].filter((c) => c.href);
+
+/** 页首「想了解更多」那行：只在打印出的 PDF 里出现，网址去掉 https:// 好排版 */
+const cuspicUrl = profile.links?.cuspic;
+const cuspicLabel = cuspicUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '');
+/** 简历 PDF 的正文是中文，英文页要说一句 */
+const CV_LANG_NOTE = 'The PDF CV is written in Chinese; this page is the English version.';
+---
+
+<header class="cv-head">
+  <div class="container--cv cv-head__inner">
+    <div class="cv-head__main">
+      <h1 class="cv-name">{pt.name}</h1>
+      <p class="cv-line">{meta.join(' · ')}</p>
+      <p class="cv-line cv-line--links">
+        {
+          contacts.map((c, i) => (
+            <>
+              {i > 0 && (
+                <span aria-hidden="true" class={c.download ? 'cv-line__sep--cv' : undefined}>
+                  ·
+                </span>
+              )}
+              <a href={c.href} download={c.download} class={c.download ? 'cv-line__cv' : undefined}>
+                {c.label}
+              </a>
+            </>
+          ))
+        }
+      </p>
+      {
+        cuspicUrl && (
+          <p class="cv-line cv-line--home">
+            {t.cv.homeLine}
+            <a class="cv-home__url" href={cuspicUrl}>
+              {cuspicLabel}
+            </a>
+          </p>
+        )
+      }
+      {
+        lang === 'en' && (
+          <p class="cv-line muted" style="font-size:var(--fs-xs)">
+            {CV_LANG_NOTE}
+          </p>
+        )
+      }
+    </div>
+    {
+      profile.photo && (
+        /* 照片只出现在打印出的 PDF 里：屏幕上 display:none，不占位 */
+        <img class="cv-photo" src={profile.photo} alt={t.cv.photoAlt(pt.name)} width="88" height="118" />
+      )
+    }
+  </div>
+</header>
+
+<section class="cv-body">
+  <div class="container--cv">
+    {
+      cv.education.length > 0 && (
+        <section class="cv-block">
+          <h2 class="cv-block__title">{t.cv.education}</h2>
+          {cv.education.map((e) => (
+            <div class="cv-entry">
+              <div class="cv-entry__head">
+                <p class="cv-entry__title">{[e.school, e.major, e.degree].filter(Boolean).join(t.cv.sep)}</p>
+                <span class="cv-entry__when">{e.period}</span>
+              </div>
+              {e.points.length > 0 && (
+                <ul class="cv-list">
+                  {e.points.map((text) => (
+                    <li>{text}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </section>
+      )
+    }
+
+    {
+      cv.projects.length > 0 && (
+        <section class="cv-block">
+          <h2 class="cv-block__title">{t.cv.projects}</h2>
+          {cv.projects.map((p) => (
+            <div class="cv-entry">
+              <div class="cv-entry__head">
+                <p class="cv-entry__title">
+                  {p.name}
+                  {p.role && <span class="cv-entry__role">{p.role}</span>}
+                </p>
+                <span class="cv-entry__when">{p.period}</span>
+              </div>
+              {p.points.length > 0 && (
+                <ul class="cv-list">
+                  {p.points.map((text) => (
+                    <li>{text}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </section>
+      )
+    }
+
+    {
+      pubs.length > 0 && (
+        <section class="cv-block">
+          <h2 class="cv-block__title">{t.cv.publications}</h2>
+          <ol class="cv-pubs">
+            {pubs.map((d) => {
+              const isPatent = d.type === 'patent';
+              const venue = venueOf(d);
+              return (
+                <li>
+                  <span set:html={authorsHtml(d.authors)} />.{' '}
+                  {d.title}.{' '}
+                  {isPatent && <span class="cv-pub__tag">{t.cv.patentTag}</span>}
+                  <span class="cv-pub__venue">
+                    {isPatent ? venue : <em>{venue}</em>}, {d.year}
+                  </span>
+                  {d.status && <span class="cv-pub__note"> · {d.status}</span>}
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      )
+    }
+
+    {
+      cv.skills.length > 0 && (
+        <section class="cv-block">
+          <h2 class="cv-block__title">{t.cv.skills}</h2>
+          <dl class="cv-skills">
+            {cv.skills.map((s) => (
+              <>
+                <dt>{s.group}</dt>
+                <dd>{s.items}</dd>
+              </>
+            ))}
+          </dl>
+        </section>
+      )
+    }
+
+    <p class="cv-links mono">
+      <a href={link('/publications')}>{t.cv.links.pubs}</a>
+      <a href={link('/software')}>{t.cv.links.software}</a>
+      {profile.show_notes && <a href={link('/notes')}>{t.cv.links.notes}</a>}
+    </p>
+  </div>
+</section>

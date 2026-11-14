@@ -27,6 +27,7 @@
   type: journal
   highlight: true
   status: MPM接触算法
+  status_en: MPM contact algorithm
   links:
     doi: https://doi.org/10.1002/nme.70260
     pdf: ''
@@ -42,19 +43,29 @@
   tags:
     - MPM
     - 表面嵌入接触算法
+  tags_en:
+    - MPM
+    - Embedded-surface contact
 
 # 专利：type 写 patent，作者栏可直接写专利权人（单位）
 - id: zhang2026-patent-embedded-contact
   title: 一种用于多体接触问题的表面嵌入物质点方法
+  # 英文页题名（中文题名必须给英文对照，否则英文页会漏中文）
+  title_en: A surface-embedded material point method for multi-body contact problems
   authors:
     - 大连理工大学
     - 中国核电工程有限公司
+  authors_en:
+    - Dalian University of Technology
+    - China Nuclear Power Engineering Co., Ltd.
   venue: 中国发明专利
+  venue_en: Chinese invention patent
   venue_short: CN121031225B
   year: 2026
   type: patent
   highlight: false
   status: 已授权
+  status_en: Granted
   links:
     pdf: ''
     doi: ''

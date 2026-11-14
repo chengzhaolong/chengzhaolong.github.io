@@ -1,8 +1,10 @@
 ---
 import { buildTrialMailto } from '../utils/trial';
+import { langFromPath, withLang, type Lang } from '../utils/i18n';
+import { ui } from '../i18n/ui';
 
 interface Props {
-  /** software.yml 的 application */
+  /** software.yml 的 application（英文页传 en 块里的那份） */
   app: {
     open: boolean;
     email: string;
@@ -15,15 +17,18 @@ interface Props {
   };
   /** 软件名，用在标题里 */
   product: string;
+  /** 语言；不传则按当前路径判断 */
+  lang?: Lang;
 }
 
 const { app, product } = Astro.props;
-const href = buildTrialMailto(app);
-const heading = app.open ? `申请 ${product} 试用` : `${product} 试用即将开启`;
+const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
+const t = ui[lang];
+
+const href = buildTrialMailto(app, lang === 'en' ? ': ' : '：');
+const heading = app.open ? t.trial.headingOpen(product) : t.trial.headingSoon(product);
 /** 开启后给一句「要准备什么」；还没开启时不写发放说明 */
-const intro = app.open
-  ? '试用申请需要提供下面三项信息；点按钮会把模板填好，补齐冒号后面的内容即可。'
-  : '';
+const intro = app.open ? t.trial.intro : '';
 /** 三块灰字都没有就整块不渲染，免得留一段空白 */
 const hasNote = Boolean(intro || app.note || app.mac_help.length > 0);
 ---
@@ -47,8 +52,8 @@ const hasNote = Boolean(intro || app.note || app.mac_help.length > 0);
       </dl>
 
       <div class="cluster" style="margin-top:1.75rem">
-        <a class="btn" href={href}>{app.open ? '发邮件申请' : '发邮件登记'}</a>
-        <a class="btn btn--ghost" href="/software">返回软件总览</a>
+        <a class="btn" href={href}>{app.open ? t.trial.apply : t.trial.register}</a>
+        <a class="btn btn--ghost" href={withLang('/software', lang)}>{t.trial.back}</a>
       </div>
 
       {
@@ -59,7 +64,7 @@ const hasNote = Boolean(intro || app.note || app.mac_help.length > 0);
             {
               app.mac_help.length > 0 && (
                 <ul>
-                  <li>物理 MAC 怎么查：</li>
+                  <li>{t.trial.macHelp}</li>
                   {app.mac_help.map((line) => (
                     <li>{line}</li>
                   ))}

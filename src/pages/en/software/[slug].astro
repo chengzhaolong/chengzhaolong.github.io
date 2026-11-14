@@ -1,0 +1,16 @@
+---
+/**
+ * Software detail (English). 正文用与 /software/[slug] 同一个 SoftwareDetail。
+ */
+import { getCollection } from 'astro:content';
+import SoftwareDetail from '../../../components/SoftwareDetail.astro';
+
+export async function getStaticPaths() {
+  const items = await getCollection('software');
+  return items.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+---
+
+<SoftwareDetail lang="en" entry={entry} />

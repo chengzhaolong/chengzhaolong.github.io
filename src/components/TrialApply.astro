@@ -1,0 +1,67 @@
+---
+import { buildTrialMailto } from '../utils/trial';
+
+interface Props {
+  /** software.yml 的 application */
+  app: {
+    open: boolean;
+    email: string;
+    subject: string;
+    lead?: string;
+    fields: { k: string; hint?: string }[];
+    extra_lines: string[];
+    note?: string;
+    mac_help: string[];
+  };
+  /** 软件名，用在标题里 */
+  product: string;
+}
+
+const { app, product } = Astro.props;
+const href = buildTrialMailto(app);
+const heading = app.open ? `申请 ${product} 试用` : `${product} 试用即将开启`;
+const intro = app.open
+  ? '试用申请需要提供下面三项信息；点按钮会把模板填好，补齐冒号后面的内容即可。'
+  : '试用开启后按下面三项签发 license，可以先准备起来；开放时按登记顺序发放。';
+---
+
+<section class="section--tight section--line" id="access">
+  <div class="container">
+    <div class="apply" data-reveal>
+      <span class="eyebrow">Access</span>
+      <h2 style="margin-top:.65rem">{heading}</h2>
+      {app.lead && <p style="margin-top:.75rem;max-width:62ch">{app.lead}</p>}
+
+      <dl class="apply__fields">
+        {
+          app.fields.map((f) => (
+            <div>
+              <dt>{f.k}</dt>
+              {f.hint && <dd>{f.hint}</dd>}
+            </div>
+          ))
+        }
+      </dl>
+
+      <div class="cluster" style="margin-top:1.75rem">
+        <a class="btn" href={href}>{app.open ? '发邮件申请' : '发邮件登记'}</a>
+        <a class="btn btn--ghost" href="/software">返回软件总览</a>
+      </div>
+
+      <div class="apply__note">
+        <p>{intro}</p>
+        {app.note && <p>{app.note}</p>}
+        {
+          app.mac_help.length > 0 && (
+            <ul>
+              <li>物理 MAC 怎么查：</li>
+              {app.mac_help.map((line) => (
+                <li>{line}</li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>

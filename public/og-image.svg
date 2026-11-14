@@ -39,7 +39,7 @@
     <text x="78" y="300" fill="#ffffff" font-size="86" font-weight="700" letter-spacing="2">成朝龙</text>
     <text x="80" y="356" fill="#d4d4d8" font-size="30" letter-spacing="4">CHAOLONG CHENG</text>
     <text x="80" y="430" fill="#a1a1aa" font-size="26">大变形热力耦合 · FEM–MPM 耦合 · GPU 并行</text>
-    <text x="80" y="500" fill="#a1a1aa" font-size="24" font-family="Consolas, monospace">solver cuspic  ·  Cusper CuttingLab</text>
+    <text x="80" y="500" fill="#a1a1aa" font-size="24" font-family="Consolas, monospace">solver CUSPIC  ·  CUSPER CuttingLab</text>
   </g>
 
   <rect x="80" y="540" width="120" height="4" rx="2" fill="url(#strip)" />

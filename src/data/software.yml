@@ -1,125 +1,150 @@
 # ==========================================================
-# 软件 —— 两个条目：cuspic（求解器）与 Cusper CuttingLab（软件）
+# 软件 —— 两个条目：cuspic（求解器）与 CUSPER CuttingLab（软件）
 # 带 〔 〕 的是待填占位
 # ==========================================================
 
 - id: cuspic
   name: CUSPIC
-  name_zh: CUSPIC 求解器
   kicker: Solver
   tagline: 面向冲击动力学与大变形热力耦合的 FEM–MPM 高性能显式动力学求解器
   summary: |-
-    CUSPIC（Coupled Unified Solver with PIC-FEM）把有限元与物质点法放进同一套显式时间推进框架：常规区域用六面体、四面体或壳单元求解，大变形与材料流动区域用物质点描述并追踪其历史，两者之间可耦合、可接触。所有能力都由 .cusp 输入文件里的关键字卡片控制；CPU 多线程是默认配置，Linux 版可加 --gpu 走 GPU 加速。
+    CUSPIC（Coupled Unified Solver with PIC-FEM）把有限元与物质点法放进同一套显式时间推进框架：常规区域用单元求解，大变形与材料流动区域交给物质点并追踪其历史，两者可耦合、可接触。适合冲击侵彻、金属切削、高速成形这类网格会被撕开的问题。
   version: v3.0.0
-  status: 内部研发 · 邮件申请试用
-  license: 许可证绑定机器码（含用户、有效期、最大核心数、GPU 数量）
+  status: 内部研发
+  chips: [FEM–MPM 耦合, 热力耦合, GPU 并行, 关键字驱动]
   spec_line: FEM–MPM · 热力耦合 · 显式积分 · GPU 并行
   features:
     - title: FEM 与 MPM 同模型
-      text: 六面体（8 节点）、TET4、四边形壳与 B-T 壳按需混用；材料流动与极端畸变交给物质点，避免网格畸变导致的单元失效。
-    - title: MPM 高阶传递
-      text: 二次 B 样条插值、FLIP-PIC 混合方案、APIC / PolyPIC 高阶传递，兼顾低数值耗散与稳定性；物质点流入按质量流量函数持续生成粒子。
+      text: 常规区域用单元、大变形区域用物质点，同一个模型里混用，避免网格畸变压垮计算。
     - title: 材料与状态方程
-      text: 线弹性、Johnson-Cook（热软化 / 应变率 / 失效与损伤）、JC-Tanh、牛顿流体、Drucker-Prager，配 Gruneisen / Monaghan 状态方程与热材料库。
+      text: Johnson-Cook（含失效）、JC-Tanh、Drucker-Prager 与牛顿流体，配 Gruneisen / Monaghan 状态方程。
     - title: 接触与热力绑定
-      text: NTS 节点–面罚接触，FEM-FEM、FEM-MPM、MPM-MPM 三类热力绑定，刚性 / 粘性库伦摩擦，障碍函数支持变刚度与常刚度。
-    - title: 边界与载荷
-      text: 节点位移 / 速度 / 力边界、径向边界、MPM 盒与墙边界；重力、集中力、强制位移与转动、初始速度与温度、面切向力、温度载荷。
-    - title: 并行与性能
-      text: OpenMP 多线程可指定线程数，Linux 版支持 GPU 加速；计算平台信息打印在启动摘要的 Platform 组，便于确认是否用上了预期硬件。
-    - title: 输出与自查
-      text: 按 /RESULT 选择字段输出 VTU（二进制或 ASCII），终端按固定间隔打印四行进度，日志末尾附能量历史表与 err(%) 守恒自查。
+      text: NTS 罚接触，FEM-FEM、FEM-MPM、MPM-MPM 三类热力绑定，摩擦生热与热传导一起算。
+    - title: 全流程关键字驱动
+      text: 网格、材料、边界、载荷到输出都由 .cusp 关键字卡片控制，一套输入文件即可复现算例。
+    - title: 显式并行求解
+      text: OpenMP 多线程为默认，Linux 版可开 GPU 加速；实际使用的硬件与线程数打印在启动摘要。
+    - title: 结果直出 ParaView
+      text: 按间隔输出 VTU 场数据（二进制 / ASCII），拖进 ParaView 就能看切屑与温度场的演化。
   specs:
     - k: 核心方法
       v: FEM–MPM 耦合，显式时间积分
     - k: 单元类型
       v: 六面体（8 节点）/ TET4 / 四边形壳 / B-T 壳
-    - k: MPM 方案
-      v: 二次 B 样条 · FLIP-PIC · APIC / PolyPIC
-    - k: 材料库
-      v: 线弹性 · Johnson-Cook（含失效）· JC-Tanh · Drucker-Prager · 牛顿流体
-    - k: 状态方程
-      v: Gruneisen · Monaghan
+    - k: 材料与状态方程
+      v: Johnson-Cook（含失效）· JC-Tanh · Drucker-Prager；Gruneisen / Monaghan
     - k: 接触
       v: NTS 罚接触；FEM-FEM / FEM-MPM / MPM-MPM 热力绑定
-    - k: 并行方式
-      v: OpenMP 多线程；GPU（Linux 版，--gpu）
+    - k: 并行
+      v: OpenMP 多线程；GPU 加速（Linux 版）
     - k: 实现语言
       v: C++ / CUDA
-    - k: 输出格式
-      v: VTU（Binary / ASCII）+ 日志（含能量历史表）
+    - k: 输出
+      v: VTU 场数据（Binary / ASCII）+ 运行日志
     - k: 运行平台
       v: Linux（CPU + GPU）/ Windows（仅 CPU）
-    - k: 硬件建议
-      v: x86-64；百万单元级 16 GB 以上；NVIDIA 计算能力 7.5 / 8.0 / 8.6 / 8.9
-    - k: 许可
-      v: license.lic 绑定机器码，换机器需重新申请
-    - k: 文档
-      v: CUSPIC 用户手册 v3.0.0（86 页）
-  # 能力矩阵：/software 与 /software/cuspic 共用（手册 1.2 功能范围）
+  # 能力矩阵：/software 与 /software/cuspic 共用，一行一类，只写短语
   matrix:
     - k: FEM 单元
-      v: 六面体（8 节点）与 TET4 体单元、四边形（4 节点）壳与 B-T 壳；六面体减缩积分配 F-B 沙漏控制，可选 SRI；支持热力耦合。
+      v: 六面体 / TET4 / 四边形壳 / B-T 壳；减缩积分配沙漏控制
     - k: MPM 方法
-      v: 二次 B 样条插值、FLIP-PIC 混合方案、APIC / PolyPIC 高阶传递；物质点流入按质量流量函数持续生成粒子。
-    - k: 材料与状态方程
-      v: 线弹性、Johnson-Cook（热软化 / 应变率 / 失效与损伤）、JC-Tanh、牛顿流体、Drucker-Prager；Gruneisen 与 Monaghan 状态方程；热材料库支持温度场演化。
+      v: 二次 B 样条 · FLIP-PIC · APIC / PolyPIC；支持物质点流入
+    - k: 材料
+      v: 线弹性 / Johnson-Cook（含失效）/ JC-Tanh / 牛顿流体 / Drucker-Prager
+    - k: 状态方程
+      v: Gruneisen / Monaghan；热材料库支持温度场演化
     - k: 接触与界面
-      v: NTS 节点–面罚接触；FEM-FEM、FEM-MPM、MPM-MPM 热力绑定；刚性 / 粘性库伦摩擦；障碍函数支持变刚度与常刚度。
+      v: NTS 罚接触；FEM-FEM / FEM-MPM / MPM-MPM 三类热力绑定
     - k: 边界与载荷
-      v: 节点位移 / 速度 / 力边界、径向边界、MPM 盒边界与墙边界；重力、集中节点力、强制位移与转动、初始速度与温度、面切向力、温度载荷。
-    - k: 并行与性能
-      v: OpenMP 多线程（线程数可指定，且不超过许可证允许的最大核心数）；Linux 版可选 GPU 加速。
+      v: 位移 / 速度 / 力 / 径向 / MPM 盒与墙边界；重力、初始条件
+    - k: 并行
+      v: OpenMP 多线程（受许可核心数限制）；Linux 版 GPU
     - k: 输出
-      v: VTU 结果文件（二进制 / ASCII）、终端求解进度表、自动日志（含能量历史表）。
-    - k: 输入方式
-      v: 全部能力由 .cusp 文件里的关键字卡片控制；卡片按固定列格式书写，ID 引用在读取时统一校验，报错一次给全。
+      v: VTU 结果文件 + 终端进度 + 自动日志
+  # 案例位：video 留空即显示「待替换」占位，后面补上 mp4 路径即可；
+  #         第一条整行展示，其余两条并排
+  cases:
+    - title: 三维微铣削
+      meta: 3D micro-milling · FEM–MPM
+      caption: 工件用物质点、刀具有限元，NTS 罚接触；切屑成形、材料堆积与温度场同步演化。
+      video: /media/videos/cut3d1.mp4
+      poster: /media/videos/cut3d1.png
+    - title: 高速冲击 / 侵彻
+      meta: Impact · FEM–MPM
+      caption: 金属靶板侵彻：单元畸变区自动转为物质点，不必手动删单元。
+    - title: MPM 大变形流动
+      meta: MPM inflow
+      caption: 物质点流入算例：极端变形下的稳定推进。
   links:
-    - label: 申请试用 / 技术交流
-      href: mailto:chengzhaolong@mail.dlut.edu.cn
-      variant: primary
     - label: 用户手册（PDF）
       href: /media/docs/cuspic-manual-v3.0.0.pdf
-      variant: ghost
+      variant: primary
       download: true
+    - label: 邮件联系
+      href: mailto:chengzhaolong@mail.dlut.edu.cn
+      variant: ghost
 
 - id: cuttinglab
   name: CUSPER CuttingLab
-  name_zh: CUSPER CuttingLab
   kicker: Application
-  tagline: 以CUSPIC为核心的金属切削加工仿真的一体化软件
+  tagline: 以 CUSPIC 为核心的金属切削加工仿真一体化软件
   summary: |-
-    CUSPER CuttingLab 是建立在 CUSPIC 之上的图形化仿真软件，目标是把「几何与材料准备 → 工艺参数设置 → 求解 → 结果分析」这条链做成不写代码也能跑通的流程。面向切削工艺研究与小批量工艺试算，把参数扫描和结果对比从前处理脚本里解放出来。
-  version: 〔v0.1〕
-  status: 〔内测 / 演示版，待填〕
-  license: 〔许可与商用条款待定〕
-  spec_line: 几何–工艺–求解–后处理 · 工艺优化 · 切削力 · 刀具温度 · 刀具磨损预测
+    CUSPER CuttingLab 把「几何与材料准备 → 工艺参数设置 → 求解 → 结果分析」做成不写代码也能跑通的流程。面向切削工艺研究与小批量工艺试算：参数扫描、结果对比与图表输出都在界面里完成，不用再回头写前处理脚本。
+  status: 即将开启试用
+  chips: [一键求解, 参数扫描, 结果对比]
+  spec_line: 几何–工艺–求解–后处理 · 工艺优化 · 切削力 · 刀具温度
   features:
     - title: 几何与材料
       text: 导入工件与刀具几何，建立材料本构（JC 类塑性、温度相关参数）与摩擦模型。
     - title: 工艺参数
-      text: 切削速度、进给量、切深、刀尖几何与冷却条件集中设置，支持参数组合批量提交。
+      text: 切削速度、进给量、切深、刀尖几何与冷却条件集中设置，可保存成参数组批量提交。
     - title: 一键求解
-      text: 内部调用 cuspic，自动完成网格与粒子布置、时间步控制与任务调度。
+      text: 内部调用 CUSPIC，自动完成背景网格与物质点布置、时间步控制与任务调度。
     - title: 结果后处理
       text: 应力 / 应变 / 温度云图、切屑形态演化、切削力与温度曲线，支持导出图与数据。
   specs:
     - k: 底层求解器
       v: CUSPIC v3.0.0（FEM–MPM）
-    - k: 运行平台
-      v: 〔Windows / Linux，待填〕
     - k: 典型输出
       v: 云图 / 视频 / 力–位移曲线 / 温度曲线
-    - k: 硬件建议
-      v: 〔NVIDIA GPU + 显存建议，待填〕
+    - k: 运行平台
+      v: Windows / Linux（以内测版本为准）
     - k: 获取方式
-      v: 邮件申请试用
-    - k: 文档
-      v: 〔使用手册 / 教程视频，待补〕
+      v: 邮件登记，试用开启后按登记顺序发放
+  # 案例位：video / poster 留空即显示「待替换」占位
+  cases:
+    - title: 主界面与工艺参数
+      meta: UI · Parameter setup
+      caption: 界面截图或一段操作录屏。
+    - title: 切削力与温度曲线
+      meta: Result · Force / Temperature
+      caption: 后处理曲线与云图。
+    - title: 切屑形态演化
+      meta: Result · Chip morphology
+      caption: 多帧切屑演化对比。
+  # 试用申请：open 改成 true 就自动从「即将开启」切换到「申请试用」文案
+  application:
+    open: false
+    email: chengzhaolong@mail.dlut.edu.cn
+    subject: CUSPER CuttingLab 试用申请
+    lead: 试用面向切削工艺研究与教学，先开放小批量内测名额；开启后按登记顺序发放，并附一份上手指引与示例参数组。
+    fields:
+      - k: 用户名
+        hint: 姓名或称呼
+      - k: 单位
+        hint: 学校 / 课题组 / 公司
+      - k: 物理 MAC 地址
+        hint: 如 00-1A-2B-3C-4D-5E
+    extra_lines: [材料 / 工件, 切削工况（速度 / 进给 / 切深）, 关注的结果, 可用硬件（CPU / GPU）]
+    note: 许可证按机器码签发，换机器、加卡或延期都要重新申请；虚拟网卡与随机 MAC 无法签发。
+    mac_help:
+      - Windows：命令提示符里 ipconfig /all →「物理地址」
+      - Linux：ip link 或 cat /sys/class/net/*/address
+      - macOS：ifconfig en0 | grep ether
   links:
-    - label: 邮件申请试用
-      href: mailto:chengzhaolong@mail.dlut.edu.cn
+    - label: 试用即将开启 ↓
+      href: '#access'
       variant: primary
-    - label: 功能与工作流
-      href: /software/cuttinglab
+    - label: 工作流 ↓
+      href: '#workflow'
       variant: ghost

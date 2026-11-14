@@ -10,23 +10,20 @@ const [cuspic, cuttinglab] = [
 /** CUSPIC 用户手册：版本号、页数与下载地址都在 cuspic-manual.yml */
 const manual = (await getEntry('manual', 'cuspic'))?.data;
 
-/** CuttingLab 的规格里还留着〔待填〕的条目，总览只展示已知的部分 */
-const labSpecs = cuttinglab.data.specs.filter((r) => !r.v.includes('〔'));
-
 const compare = [
   { k: '定位', a: '求解器内核', b: '图形化仿真软件' },
   { k: '使用者', a: '研究 / 算法开发', b: '工艺研究、工程试算' },
-  { k: '操作方式', a: '.cusp 输入文件 + 命令行', b: '界面操作，一键求解' },
+  { k: '操作方式', a: '.cusp 输入文件', b: '界面操作，一键求解' },
   { k: '物理能力', a: 'FEM–MPM · 热力耦合 · 接触', b: '面向切削工艺的材料与工况模板' },
   { k: '并行', a: 'OpenMP 多线程 + GPU（Linux 版）', b: '继承 CUSPIC 的求解设置' },
   { k: '输出', a: 'VTU 场数据 + 日志', b: '云图 / 曲线 / 报告' },
-  { k: '获取', a: '邮件申请 + 用户手册', b: '邮件申请试用' },
+  { k: '获取', a: '邮件联系 + 用户手册', b: '试用即将开启（邮件登记）' },
 ];
 ---
 
 <Base
   title="软件"
-  description="自研 FEM–MPM 显式动力学求解器 CUSPIC 与金属切削仿真软件 Cusper CuttingLab：能力矩阵、运行环境、命令行与用户手册。"
+  description="自研 FEM–MPM 显式动力学求解器 CUSPIC 与金属切削仿真软件 CUSPER CuttingLab：能力矩阵、案例演示与用户手册。"
 >
   <header class="page-head page-head--media">
     <div class="hero__media">
@@ -37,7 +34,7 @@ const compare = [
       <h1 class="page-head__title">求解器与软件</h1>
       <p class="page-head__lede">
         研究里的算法不会自己变成可用的工具。CUSPIC 把 FEM–MPM 耦合与 GPU 并行做成可靠的求解内核，
-        Cusper CuttingLab 把它包装成工艺研究能直接使用的流程。
+        CUSPER CuttingLab 把它包装成工艺研究能直接使用的流程。
       </p>
     </div>
   </header>
@@ -88,8 +85,9 @@ const compare = [
             </table>
           </div>
           <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs);line-height:1.7">
-            当前版本边界：<code class="mono">/TETRA10</code> 不支持，GPU 加速仅 Linux 版，接触只有 NTS 罚函数一种；
-            用法、卡片与算例见<a href="/software/cuspic#docs">用户手册</a>。
+            用法与算例见<a href="/software/cuspic#docs">用户手册</a>，演示见<a href="/software/cuspic#cases"
+              >详情页</a
+            >。
           </p>
         </div>
       </div>
@@ -102,9 +100,15 @@ const compare = [
         <div data-reveal>
           <div class="table-wrap">
             <table class="data">
+              <thead>
+                <tr>
+                  <th scope="col">规格</th>
+                  <th scope="col">说明</th>
+                </tr>
+              </thead>
               <tbody>
                 {
-                  labSpecs.map((row) => (
+                  cuttinglab.data.specs.map((row) => (
                     <tr>
                       <th scope="row" style="background:transparent">
                         {row.k}
@@ -117,13 +121,13 @@ const compare = [
             </table>
           </div>
           <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs);line-height:1.7">
-            界面截图与操作视频尚在整理，先在详情页看工作流。
+            界面与案例陆续更新，试用开启后按登记顺序发放。
           </p>
         </div>
         <div data-reveal style="--d:.08s">
-          <span class="card__meta">{cuttinglab.data.kicker} · {cuttinglab.data.version}</span>
+          <span class="card__meta">{cuttinglab.data.kicker}</span>
           <h2 style="margin-top:.6rem;font-size:var(--fs-h2)">
-            Cusper CuttingLab —— 金属切削加工仿真软件
+            CUSPER CuttingLab —— 金属切削加工仿真软件
           </h2>
           <p class="lead" style="margin-top:.75rem">{cuttinglab.data.tagline}</p>
           <p style="margin-top:1rem;color:var(--ink-2)">{cuttinglab.data.summary}</p>
@@ -131,8 +135,8 @@ const compare = [
             {cuttinglab.data.features.map((f) => <span class="badge">{f.title}</span>)}
           </div>
           <div class="cluster" style="margin-top:1.5rem">
-            <a class="btn" href="/software/cuttinglab">CuttingLab 详情 →</a>
-            <a class="btn btn--ghost" href="/software/cuttinglab#access">申请试用</a>
+            <a class="btn" href="/software/cuttinglab#access">登记试用 →</a>
+            <a class="btn btn--ghost" href="/software/cuttinglab">CuttingLab 详情 →</a>
           </div>
         </div>
       </div>
@@ -154,8 +158,8 @@ const compare = [
           <thead>
             <tr>
               <th scope="col">维度</th>
-              <th scope="col">cuspic</th>
-              <th scope="col">Cusper CuttingLab</th>
+              <th scope="col" style="text-transform:none">CUSPIC</th>
+              <th scope="col" style="text-transform:none">CUSPER CuttingLab</th>
             </tr>
           </thead>
           <tbody>
@@ -176,17 +180,15 @@ const compare = [
 
   <section class="section">
     <div class="container">
-      <div class="cta">
-        <div>
-          <span class="eyebrow">Get started</span>
-          <h2 style="margin-top:.7rem;font-size:var(--fs-h2)">想在自己的算例上试一下？</h2>
-          <p class="muted" style="margin-top:.6rem;max-width:54ch">
-            写明材料、工况与关注的物理量，并说明可用的硬件；我会回复可运行的算例模板与手册对应章节。
-          </p>
-        </div>
-        <div class="cluster">
-          <a class="btn" href={`mailto:${cuspic.data.links[0]?.href.replace('mailto:', '') ?? ''}`}>申请试用</a>
-          <a class="btn btn--ghost" href="/publications">先看相关工作 →</a>
+      <div class="apply" data-reveal>
+        <span class="eyebrow">Get started</span>
+        <h2 style="margin-top:.65rem">想在自己的算例上跑一遍？</h2>
+        <p style="margin-top:.75rem;max-width:62ch">
+          CUSPIC 通过邮件沟通算例与许可；CUSPER CuttingLab 的试用即将开启，可以先按登记顺序排队。
+        </p>
+        <div class="cluster" style="margin-top:1.5rem">
+          <a class="btn" href="/software/cuttinglab#access">登记 CUSPER CuttingLab 试用 →</a>
+          <a class="btn btn--ghost" href="/software/cuspic">CUSPIC 详情 →</a>
         </div>
       </div>
     </div>

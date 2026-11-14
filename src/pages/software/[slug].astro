@@ -1,7 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection, getEntry } from 'astro:content';
-import CuspicDetails from '../../components/CuspicDetails.astro';
+import CaseGallery from '../../components/CaseGallery.astro';
+import ManualDocs from '../../components/ManualDocs.astro';
+import TrialApply from '../../components/TrialApply.astro';
 
 export async function getStaticPaths() {
   const items = await getCollection('software');
@@ -12,15 +14,20 @@ const { entry } = Astro.props;
 const s = entry.data;
 const profile = (await getEntry('profile', 'main'))!.data;
 const email = profile.email;
+/** CUSPIC 配一本 86 页用户手册；CuttingLab 暂无 */
+const manual = entry.id === 'cuspic' ? (await getEntry('manual', 'cuspic'))?.data : undefined;
+/** 〔待填〕的行不上页面 */
+const specs = s.specs.filter((row) => !row.v.includes('〔'));
+/** 4 条用两列，6 条用三列 */
+const featureCols = s.features.length > 4 ? 'card-grid card-grid--3' : 'card-grid card-grid--2';
 
 const workflow = [
   { when: 'Step 1', what: '几何与材料', desc: '导入工件与刀具几何，选择本构与摩擦模型，设定初始温度场。' },
   { when: 'Step 2', what: '工艺参数', desc: '切削速度、进给量、切深、刀尖几何与冷却条件；可保存为参数组批量提交。' },
-  { when: 'Step 3', what: '离散与求解', desc: '自动布置背景网格与物质点，调用 cuspic 求解，失败算例给出定位信息。' },
+  { when: 'Step 3', what: '离散与求解', desc: '自动布置背景网格与物质点，调用 CUSPIC 求解，失败算例给出定位信息。' },
   { when: 'Step 4', what: '结果分析', desc: '云图、切屑形态演化、力与温度曲线；支持导出图片与数据表。' },
   { when: 'Step 5', what: '对比与报告', desc: '多组参数结果并列比较，生成可交付的图表与说明。' },
 ];
-
 ---
 
 <Base title={s.name} description={s.tagline}>
@@ -39,7 +46,7 @@ const workflow = [
       <p class="page-head__lede">{s.tagline}</p>
       <div class="cluster" style="margin-top:1.25rem">
         {s.status && <span class="badge badge--media badge--dot">{s.status}</span>}
-        {s.license && <span class="badge badge--media">{s.license}</span>}
+        {s.chips.map((chip) => <span class="badge badge--media">{chip}</span>)}
       </div>
       <div class="cluster" style="margin-top:1.5rem">
         {s.links.map((l) => (
@@ -73,7 +80,7 @@ const workflow = [
                 </tr>
               </thead>
               <tbody>
-                {s.specs.map((row) => (
+                {specs.map((row) => (
                   <tr>
                     <th scope="row" style="background:transparent">{row.k}</th>
                     <td>{row.v}</td>
@@ -83,9 +90,13 @@ const workflow = [
             </table>
           </div>
           <p class="muted" style="margin-top:.75rem;font-size:var(--fs-xs)">
-            规格取自 <code class="mono">src/data/software.yml</code>{entry.id === 'cuspic'
-              ? ' 与 CUSPIC 用户手册 v3.0.0'
-              : ''}。
+            {manual ? (
+              <>
+                完整能力、关键字与算例见 <a href="#docs">用户手册 v{manual.version}</a>（{manual.pages} 页）。
+              </>
+            ) : (
+              <>以试用版本为准，界面与输出仍在调整。</>
+            )}
           </p>
         </div>
       </div>
@@ -100,7 +111,7 @@ const workflow = [
           <h2 style="margin-top:.6rem">能做什么</h2>
         </div>
       </div>
-      <div class="card-grid card-grid--2">
+      <div class={featureCols}>
         {s.features.map((f) => (
           <div class="feature" data-reveal>
             <h3>{f.title}</h3>
@@ -111,15 +122,37 @@ const workflow = [
     </div>
   </section>
 
-  {entry.id === 'cuspic' ? (
-    <CuspicDetails />
-    ) : (
-      <section class="section">
+  {
+    s.cases.length > 0 && (
+      <section class="media-band" id="cases">
+        <div class="container">
+          <div class="section-head">
+            <div class="section-head__text">
+              <span class="eyebrow eyebrow--media">Showcase</span>
+              <h2 style="margin-top:.65rem">界面与案例</h2>
+              <p>
+                {entry.id === 'cuspic'
+                  ? '真实算例的演化过程：切屑怎么卷、材料怎么堆、温度怎么升。'
+                  : '界面截图与操作录屏陆续补上，先看形态与输出。'}
+              </p>
+            </div>
+          </div>
+          <CaseGallery cases={s.cases} badge={s.name} />
+        </div>
+      </section>
+    )
+  }
+
+  {manual && <ManualDocs manual={manual} compact />}
+
+  {
+    entry.id === 'cuttinglab' && (
+      <section class="section" id="workflow">
         <div class="container">
           <div class="section-head">
             <div class="section-head__text">
               <span class="eyebrow">Workflow</span>
-              <h2 style="margin-top:.6rem">工作流</h2>
+              <h2 style="margin-top:.6rem">五步走完一个算例</h2>
               <p>从几何到报告，一条不需要写代码的路径。</p>
             </div>
           </div>
@@ -138,23 +171,32 @@ const workflow = [
     )
   }
 
-  <section class="section--tight" id="access">
-    <div class="container">
-      <div class="cta">
-        <div>
-          <span class="eyebrow">Access</span>
-          <h2 style="margin-top:.7rem;font-size:var(--fs-h2)">
-            {entry.id === 'cuspic' ? '讨论算例或合作' : '申请 Cusper CuttingLab 试用'}
-          </h2>
-          <p class="muted" style="margin-top:.6rem;max-width:54ch">
-            邮件里说明：材料与工件、切削工况、想得到的结论（力 / 温度 / 切屑形态 / 残余应力），以及可用硬件。
-          </p>
+  {
+    entry.id === 'cuspic' ? (
+      <section class="section--tight">
+        <div class="container">
+          <div class="contact-strip">
+            <span class="contact-strip__label">联系</span>
+            <a href={`mailto:${email}`}>{email}</a>
+            {manual && (
+              <>
+                <span class="contact-strip__sep" aria-hidden="true">
+                  ·
+                </span>
+                <a href={manual.file} download>
+                  用户手册（PDF，{manual.size}）
+                </a>
+              </>
+            )}
+            <span class="contact-strip__sep" aria-hidden="true">
+              ·
+            </span>
+            <a href="/software">软件总览</a>
+          </div>
         </div>
-        <div class="cluster">
-          <a class="btn" href={`mailto:${email}`}>发邮件</a>
-          <a class="btn btn--ghost" href="/software">返回软件总览</a>
-        </div>
-      </div>
-    </div>
-  </section>
+      </section>
+    ) : (
+      s.application && <TrialApply app={s.application} product={s.name} />
+    )
+  }
 </Base>

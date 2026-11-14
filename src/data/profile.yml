@@ -40,11 +40,11 @@
     我的研究方向是热力耦合有限元-无网格算法、接触算法及其高性能计算实现。
     独立开发了CUSPIC (Coupled Unified Solver with PIC-FEM) 高性能显式动力求解器, 
     能够基于GPU实现极端大变形非线性热力耦合问题的高效求解。
-    并以CUSPIC为核心开发了CUSPER-CuttingLab软件, 用于机械加工工艺物理仿真及工艺优化。
+    并以CUSPIC为核心开发了CUSPER CuttingLab 软件, 用于机械加工工艺物理仿真及工艺优化。
     希望和大家一起交流学习, 探索 CAE 技术赋能工业的更多可能。
 
   intro_en: |-
-    I am a Ph.D. candidate in computational mechanics. My research targets metal cutting processes dominated by large deformation, strong non-linearity and thermo-mechanical coupling: the finite element method resolves the continuum response of workpiece and tool, the material point method handles chip separation and extreme distortion, and a FEM–MPM coupling scheme together with GPU parallelism makes industrial-scale cutting simulation both accurate and affordable. I build and maintain the cuspic solver and the Cusper CuttingLab application.
+    I am a Ph.D. candidate in computational mechanics. My research targets metal cutting processes dominated by large deformation, strong non-linearity and thermo-mechanical coupling: the finite element method resolves the continuum response of workpiece and tool, the material point method handles chip separation and extreme distortion, and a FEM–MPM coupling scheme together with GPU parallelism makes industrial-scale cutting simulation both accurate and affordable. I build and maintain the CUSPIC solver and the CUSPER CuttingLab application.
 
   interests:
     - 大变形热力耦合

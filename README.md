@@ -1,7 +1,7 @@
 # 成朝龙 · 个人学术主页
 
 计算力学方向（大变形热力耦合 / FEM–MPM 耦合 / 高性能计算）的个人主页，同时作为
-**cuspic 求解器**与 **Cusper CuttingLab** 软件的展示页。
+**CUSPIC 求解器**与 **CUSPER CuttingLab** 软件的展示页。
 
 - 纯静态输出，无框架运行时、无追踪脚本，首屏无 JS 也能读正文
 - 中文为主（`/`），英文简版在 `/en/`
@@ -92,7 +92,7 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 顺序固定为 5 段，改文案直接改页面里的字符串，改数据改 YAML/MDX：
 
 1. **首屏（矮）**：`eyebrow` + 姓名 + 一句话 + 四个文本链接；右侧是 `profile.photo` 的小照片（点击进 `/about`）。`profile.name` 是唯一的 `h1`，不重复放身份行。
-2. **简介 + 算例**：左栏 `intro_zh` + `interests` + 「完整介绍与简历 →」；右栏一个算例短片（`VideoCard`，16:9），下面一行 `metrics` 指标，最后一行小字「了解 cuspic 求解器 →」。
+2. **简介 + 算例**：左栏 `intro_zh` + `interests` + 「完整介绍与简历 →」；右栏一个算例短片（`VideoCard`，16:9），下面一行小字「了解 CUSPIC 求解器 →」（跳详情页）。
 3. **自研工具**：深色区，自动读取 `software.yml`；卡片底部一行 `spec_line`。
 4. **论文**：取 3 条（`highlight: true` 优先）。
 5. **联系**：页面底部一行「联系」条；页脚只出现一次姓名。
@@ -229,13 +229,21 @@ npx astro preview --port 4399      # 这个终端保持开着
 
 两个条目：`cuspic`（求解器）与 `cuttinglab`（软件）。字段：
 
+- `name`：产品名（卡片标题、详情页 `h1` 与 `<title>`），写短名，不带「求解器 / 软件」后缀
 - `kicker` / `tagline` / `summary`：卡片与详情页首屏文案
-- `version` / `status` / `license`：版本、状态、许可（会以徽章显示）
+- `version` / `status`：版本、状态（`status` 以徽章显示在首屏；没填 `version` 就不显示版本）
+- `chips[]`：首屏那一行小标签（FEM–MPM 耦合、GPU 并行…），4 个以内
 - `spec_line`：首页卡片底部那一行等宽字体的技术规格，一句话，别超过 30 个字符
-- `features[]`：`title` + `text`，详情页两列卡片，首页只取前 3 个 `title`
-- `specs[]`：`k` + `v`，详情页右侧「技术规格」表
-- `matrix[]`：`k` + `v`，能力矩阵，`/software` 与 `/software/cuspic` 共用（改一处两边同步）
-- `links[]`：`label` / `href` / `variant`（`primary` 实心、`ghost` 描边）/ `download`（`true` 时直接存盘）
+- `features[]`：`title` + `text`，详情页卡片（4 条走两列，6 条走三列），首页只取前 3 个 `title`
+- `specs[]`：`k` + `v`，详情页右侧「技术规格」表；`v` 里带〔…〕的行不上页面
+- `matrix[]`：`k` + `v`，能力矩阵，只在 `/software` 总览里出现（详情页用 `specs`，避免两张表重复）
+- `cases[]`：`title` / `meta` / `caption` / `video` / `poster` / `image` / `badge`，详情页深色区「界面与案例」，
+  **第一条整行、其余两条并排**；`video` 留空即显示「待替换」占位，补上 mp4 路径就自动换成播放器
+- `application`：**只有 CuttingLab 有**，`/software/cuttinglab#access` 的试用申请块：
+  `open`（`false` = 「试用即将开启」，`true` = 「申请试用」，文案自动切换）/ `email` / `subject` /
+  `lead` / `fields[]`（`k` + `hint`，必填三项）/ `extra_lines[]`（邮件模板里的可选项）/ `note` / `mac_help[]`
+- `links[]`：`label` / `href` / `variant`（`primary` 实心、`ghost` 描边）/ `download`（`true` 时直接存盘）；
+  同页锚点直接写 `'#access'`、`'#workflow'`
 
 详情页路由由 id 决定：`/software/cuspic`、`/software/cuttinglab`。
 若要加第三个软件，直接在 YAML 末尾追加一个条目即可，列表与详情页会自动生成。
@@ -249,8 +257,8 @@ npx astro preview --port 4399      # 这个终端保持开着
 2. 改 `cuspic-manual.yml` 的 `version` / `pages` / `size` / `date` / `file`。
 3. 章节页码变了就改 `chapters[].page`——`page` 是 PDF **物理页**，要和页脚「第 N 页」对得上，
    详情页 `#docs` 的深链按它生成 `file#page=N`。
-4. 页面里的算例、命令行、进度输出是手抄进组件的（`src/components/CuspicDetails.astro`），
-   手册若改了这些示例，同步改那几处常量。
+4. 软件页用 `ManualDocs` 的 `compact` 模式（只渲染「章 · 标题 · 页」目录，宽度够就自动分两栏），
+   章节关键词只在需要完整目录时才出现；新增章节不用改页面代码。
 
 ### 4.5 写笔记 — `src/content/notes/*.mdx`
 
@@ -365,10 +373,10 @@ import peeq from '../assets/figures/peeq.png';
 - [ ] 简历 PDF → `public/media/docs/cv.pdf`，`profile.yml` 的 `links.cv` 填 `/media/docs/cv.pdf`
 - [ ] 个人照片 → 放到 `public/media/portrait.jpg`（3:4 竖图，长边 1200 px 以内），把 `profile.yml` 的 `photo` 改成 `/media/portrait.jpg`
 - [ ] `publications.yml`：换成真实论文（含 BibTeX）
-- [ ] 首页算例短片：`index.astro` 里 `VideoCard` 填 `src`（mp4，5–10 s，3 MB 以内），并删掉 `placeholderLabel`；`metrics` 换成实测值
+- [ ] 首页算例短片：`cut3d1.mp4` 现在约 10 MB，建议压到 3 MB 以内（720p、5–10 s）；替换后把 `index.astro` 里 `VideoCard` 的 `placeholderLabel` 一并改成对应的说明
 - [ ] 技术笔记：把 `/notes` 里「在写」的四条逐个写成 `src/content/notes/*.mdx`，写完从 `planned` 删掉
-- [ ] `software.yml`：版本、许可、平台、输出格式
-- [ ] `src/components/CuspicDetails.astro`：算例全文、命令行选项、进度输出是手抄进组件的常量，对着手册核对一遍
+- [ ] `software.yml`：`specs` / `matrix` 核对一遍；`cases[].video` 与 `poster` 补上真实文件（留空即占位）
+- [ ] `software.yml` 的 `application.open`：试用正式开放时改成 `true`，页面文案自动从「即将开启」切到「申请试用」
 - [ ] `public/og-image.svg` 的文案（改完跑 `npm run og`）
 
 ## 8. 常见问题

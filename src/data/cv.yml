@@ -16,7 +16,7 @@
       degree: 博士研究生
       points:
         - 独立开发CUSPIC高性能GPU显式动力学求解器
-        - 主导开发CUSPER-CuttingLab机械加工工艺物理仿真软件
+        - 主导开发CUSPER CuttingLab 机械加工工艺物理仿真软件
         - 深度参与多项CAE算法研究及软件开发项目
 
     - period: 〔2022.06 — 2022.09〕
@@ -47,7 +47,7 @@
         - 核心算法：实现 FEM（Tet4/Hex8/SRI/B-T壳）与多种 PIC 无网格格式；支持多种非线性本构、约束及接触算法
 
     - period: 〔2026.04 — 至今〕
-      name: CUSPER-CuttingLab 机械加工工艺物理仿真软件
+      name: CUSPER CuttingLab 机械加工工艺物理仿真软件
       role: 核心开发者 · Python / C++
       points:
         - 以 CUSPIC 求解器为核心，实现复杂工况的快速参数化前后处理与工艺参数分析优化

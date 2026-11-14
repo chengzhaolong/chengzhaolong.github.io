@@ -4,9 +4,11 @@ import type { CollectionEntry } from 'astro:content';
 interface Props {
   /** cuspic-manual.yml 的数据（collection: manual） */
   manual: CollectionEntry<'manual'>['data'];
+  /** 精简模式：目录只留「章 · 标题 · 页」，标题与摘要照留（软件页用） */
+  compact?: boolean;
 }
 
-const { manual } = Astro.props;
+const { manual, compact = false } = Astro.props;
 /** 章节深链：PDF 的 #page=N 是物理页，和页脚「第 N 页」一致 */
 const at = (page: number) => `${manual.file}#page=${page}`;
 ---
@@ -45,49 +47,63 @@ const at = (page: number) => `${manual.file}#page=${page}`;
         </p>
       </div>
 
-      <div class="table-wrap" data-reveal style="--d:.08s">
-        <table class="data">
-          <thead>
-            <tr>
-              <th scope="col">章</th>
-              <th scope="col">标题与内容</th>
-              <th scope="col">页</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              manual.chapters.map((c) => (
+      {
+        compact ? (
+          <ol class="manual-toc" data-reveal style="--d:.08s">
+            {manual.chapters.map((c) => (
+              <li>
+                <a href={at(c.page)} target="_blank" rel="noopener">
+                  <span class="no">{c.no}</span>
+                  <span>{c.title}</span>
+                  <span class="pg">{c.page}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <div class="table-wrap" data-reveal style="--d:.08s">
+            <table class="data">
+              <thead>
                 <tr>
-                  <td class="num">{c.no}</td>
-                  <td>
-                    <a href={at(c.page)} target="_blank" rel="noopener">
-                      {c.title}
-                    </a>
-                    {c.summary && (
-                      <span
-                        class="muted"
-                        style="display:block;margin-top:.25rem;font-size:var(--fs-xs);line-height:1.65"
-                      >
-                        {c.summary}
-                      </span>
-                    )}
-                    {c.keywords.length > 0 && (
-                      <span class="cluster" style="margin-top:.45rem;gap:.3rem">
-                        {c.keywords.map((k) => (
-                          <span class="badge" style="font-size:.66rem;padding:.1rem .45rem">
-                            {k}
-                          </span>
-                        ))}
-                      </span>
-                    )}
-                  </td>
-                  <td class="num">{c.page}</td>
+                  <th scope="col">章</th>
+                  <th scope="col">标题与内容</th>
+                  <th scope="col">页</th>
                 </tr>
-              ))
-            }
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody>
+                {manual.chapters.map((c) => (
+                  <tr>
+                    <td class="num">{c.no}</td>
+                    <td>
+                      <a href={at(c.page)} target="_blank" rel="noopener">
+                        {c.title}
+                      </a>
+                      {c.summary && (
+                        <span
+                          class="muted"
+                          style="display:block;margin-top:.25rem;font-size:var(--fs-xs);line-height:1.65"
+                        >
+                          {c.summary}
+                        </span>
+                      )}
+                      {c.keywords.length > 0 && (
+                        <span class="cluster" style="margin-top:.45rem;gap:.3rem">
+                          {c.keywords.map((k) => (
+                            <span class="badge" style="font-size:.66rem;padding:.1rem .45rem">
+                              {k}
+                            </span>
+                          ))}
+                        </span>
+                      )}
+                    </td>
+                    <td class="num">{c.page}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      }
     </div>
   </div>
 </section>

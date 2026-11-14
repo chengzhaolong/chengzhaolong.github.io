@@ -182,14 +182,6 @@ ol {
   max-width: var(--measure);
 }
 
-.stack > * + * {
-  margin-top: 1rem;
-}
-
-.stack-lg > * + * {
-  margin-top: 1.75rem;
-}
-
 .cluster {
   display: flex;
   flex-wrap: wrap;
@@ -1230,6 +1222,122 @@ a:focus-visible .figure__zoom {
   user-select: none;
 }
 
+/* 窄屏必然折行，行尾那条孤零零的「·」不如不要：去掉分隔符，靠换行与间距分开 */
+@media (max-width: 720px) {
+  .contact-strip {
+    gap: 0.35rem 1rem;
+  }
+
+  .contact-strip__sep {
+    display: none;
+  }
+}
+
+/* ---------- 12f. 试用申请块（CuttingLab #access） ---------- */
+.apply {
+  padding: clamp(1.5rem, 3.4vw, 2.75rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elev);
+  box-shadow: var(--shadow-1);
+}
+
+/* 三项必填信息：横向铺开，窄屏自动折行 */
+.apply__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1.15rem 1.75rem;
+  margin: 1.75rem 0 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.apply__fields dt {
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.apply__fields dd {
+  margin: 0.4rem 0 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* 按钮下面的灰色说明：为什么只要这三项、MAC 怎么查 */
+.apply__note {
+  margin-top: 1.5rem;
+  max-width: 74ch;
+  font-size: var(--fs-xs);
+  line-height: 1.8;
+  color: var(--ink-3);
+}
+
+.apply__note p + p {
+  margin-top: 0.4rem;
+}
+
+.apply__note ul {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.apply__note li:first-child {
+  color: var(--ink-2);
+}
+
+/* 手册目录（软件页用 compact 模式：只留 章 · 标题 · 页）
+   列数按可用宽度自适应：16rem 一条的下限，窄了自动回到单栏，
+   避免在 /software 的双栏里被挤成两条 200px 的窄条 */
+.manual-toc {
+  columns: 2 16rem;
+  column-gap: clamp(1.25rem, 3vw, 2.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.manual-toc li {
+  break-inside: avoid;
+  border-bottom: 1px solid var(--line);
+}
+
+.manual-toc a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding-block: 0.55rem;
+  font-size: var(--fs-sm);
+  color: var(--ink);
+  text-decoration: none;
+  transition: color 0.2s var(--ease);
+}
+
+.manual-toc a:hover {
+  color: var(--accent);
+}
+
+.manual-toc .no {
+  min-width: 1.25rem;
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+}
+
+.manual-toc .pg {
+  margin-left: auto;
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+}
+
 /* 低调文本链接（替代按钮） */
 .link-quiet {
   display: inline-flex;
@@ -1462,75 +1570,6 @@ table.data td.num {
   white-space: nowrap;
 }
 
-/* 「参数 + 说明」两列表格：窄屏竖排，避免说明列被挤成三四个字一行 */
-@media (max-width: 620px) {
-  table.data--stack,
-  table.data--stack tbody,
-  table.data--stack tr,
-  table.data--stack th,
-  table.data--stack td {
-    display: block;
-  }
-
-  table.data--stack thead {
-    display: none;
-  }
-
-  table.data--stack tr {
-    padding-block: 0.55rem;
-    border-bottom: 1px solid var(--line);
-  }
-
-  table.data--stack tr:last-child {
-    border-bottom: 0;
-  }
-
-  table.data--stack th,
-  table.data--stack td {
-    padding: 0.15rem 1rem;
-    border: 0;
-    white-space: normal;
-  }
-
-  table.data--stack th {
-    padding-bottom: 0;
-    background: transparent;
-    text-transform: none;
-  }
-}
-
-/* ---------- 15b. 代码块（命令行 / 输入文件，可独立于 .prose 使用） ---------- */
-.code-block {
-  margin: 0;
-  padding: 1rem 1.15rem;
-  border: 1px solid var(--media-line);
-  border-radius: var(--radius);
-  background: #0f0f13;
-  color: #d9d9e0;
-  font-family: var(--f-mono);
-  font-size: 0.8rem;
-  line-height: 1.75;
-  overflow-x: auto;
-  tab-size: 2;
-}
-
-.code-block code {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font-family: inherit;
-  font-size: inherit;
-}
-
-@media (max-width: 620px) {
-  /* 固定列格式的输入文件一行较长，窄屏缩一号字，尽量少横向滚动 */
-  .code-block {
-    padding: 0.85rem 0.9rem;
-    font-size: 0.72rem;
-  }
-}
-
 /* ---------- 15c. 时间线（软件页的求解流程 / 工作流） ---------- */
 .timeline {
   list-style: none;
@@ -1746,6 +1785,11 @@ table.data td.num {
   .split,
   .split--media-first {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* 单栏时按阅读顺序排：先标题与说明，再看表格，避免先撞见一张没有上下文的表 */
+  .split--media-first > :first-child {
+    order: 2;
   }
 }
 

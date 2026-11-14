@@ -1,0 +1,52 @@
+---
+import VideoCard from './VideoCard.astro';
+import FigureCard from './FigureCard.astro';
+
+interface Props {
+  /** software.yml 的 cases：第一条整行，其余两条并排 */
+  cases: {
+    title: string;
+    caption?: string;
+    meta?: string;
+    video?: string;
+    poster?: string;
+    image?: string;
+    badge?: string;
+  }[];
+  /** 视频左上角角标，一般传软件名 */
+  badge?: string;
+}
+
+const { cases, badge } = Astro.props;
+---
+
+<div class="media-grid">
+  {
+    cases.map((c, i) => (
+      <div class={i === 0 ? 'span-12' : 'span-6'} data-reveal style={`--d:${(0.06 * i).toFixed(2)}s`}>
+        {c.image && !c.video ? (
+          <FigureCard
+            src={c.image}
+            alt={c.title}
+            caption={c.caption}
+            meta={c.meta}
+            placeholderLabel={c.title}
+            ratio="16 / 9"
+          />
+        ) : (
+          <VideoCard
+            src={c.video}
+            poster={c.poster}
+            autoplay={i === 0}
+            alt={c.title}
+            badge={c.badge ?? badge}
+            caption={c.caption}
+            meta={c.meta}
+            placeholderLabel={`${c.title}（mp4，720p，<3 MB）`}
+            ratio="16 / 9"
+          />
+        )}
+      </div>
+    ))
+  }
+</div>

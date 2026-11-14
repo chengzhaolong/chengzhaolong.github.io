@@ -48,24 +48,64 @@ const publications = defineCollection({
   }),
 });
 
-/** 软件：cuspic 求解器 + Cusper CuttingLab */
+/** 软件：CUSPIC 求解器 + CUSPER CuttingLab */
 const software = defineCollection({
   loader: file('./src/data/software.yml'),
   schema: z.object({
+    /** 产品名：卡片标题、详情页 h1 与 <title>，写短名不带后缀（CUSPIC / CUSPER CuttingLab） */
     name: z.string(),
-    name_zh: z.string(),
     kicker: z.string(),
     tagline: z.string(),
     summary: z.string(),
     version: z.string().optional(),
     status: z.string().optional(),
-    license: z.string().optional(),
     /** 卡片底部的一行技术规格（首页/总览卡用） */
     spec_line: z.string().optional(),
+    /** 首屏标签：能力关键词，一行小徽章 */
+    chips: z.array(z.string()).default([]),
     features: z.array(z.object({ title: z.string(), text: z.string() })).default([]),
     specs: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
-    /** 能力矩阵：/software 与 /software/cuspic 共用，一行一类 */
+    /** 能力矩阵：只在 /software 总览里用，一行一类 */
     matrix: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
+    /**
+     * 案例位：第一条整行展示，其余两条并排。
+     * video 留空即渲染「待替换」占位（见 VideoCard），后面补 mp4 路径即可。
+     */
+    cases: z
+      .array(
+        z.object({
+          title: z.string(),
+          caption: z.string().optional(),
+          meta: z.string().optional(),
+          /** mp4 路径（public 下），留空显示占位 */
+          video: z.string().optional(),
+          /** 视频首帧图 */
+          poster: z.string().optional(),
+          /** 静态截图（给图不给视频时用） */
+          image: z.string().optional(),
+          badge: z.string().optional(),
+        })
+      )
+      .default([]),
+    /**
+     * 试用申请：只有 CuttingLab 有。
+     * open=false 时页面写「试用即将开启」，true 时写「申请试用」，其余文案共用。
+     */
+    application: z
+      .object({
+        open: z.boolean().default(false),
+        email: z.string(),
+        subject: z.string(),
+        lead: z.string().optional(),
+        /** 必填项：按钮上方逐条列出，也用来生成邮件模板 */
+        fields: z.array(z.object({ k: z.string(), hint: z.string().optional() })).default([]),
+        /** 邮件模板里补充的可选项 */
+        extra_lines: z.array(z.string()).default([]),
+        note: z.string().optional(),
+        /** 灰色小字里的「怎么查物理 MAC」三行 */
+        mac_help: z.array(z.string()).default([]),
+      })
+      .optional(),
     links: z
       .array(
         z.object({
@@ -184,8 +224,6 @@ const profile = defineCollection({
     intro_zh: z.string(),
     intro_en: z.string(),
     interests: z.array(z.string()).default([]),
-    /** 首页算例区的实测指标 */
-    metrics: z.array(z.object({ k: z.string(), v: z.string() })).default([]),
     links: z
       .object({
         scholar: z.string().optional(),

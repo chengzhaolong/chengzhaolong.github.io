@@ -6,9 +6,10 @@
 - id: cuspic
   name: CUSPIC
   kicker: Solver
-  tagline: 面向冲击动力学与大变形热力耦合的 FEM–MPM 高性能显式动力学求解器
+  tagline: 面向非线性大变形热力耦合的 FEM–MPM 高性能显式动力学求解器
   summary: |-
-    CUSPIC（Coupled Unified Solver with PIC-FEM）把有限元与物质点法放进同一套显式时间推进框架：常规区域用单元求解，大变形与材料流动区域交给物质点并追踪其历史，两者可耦合、可接触。适合冲击侵彻、金属切削、高速成形这类网格会被撕开的问题。
+    CUSPIC（Coupled Unified Solver with PIC-FEM）是一款基于FEM-PIC耦合的高性能显式动力学求解器，适合处理大变形、强非线性热力耦合问题。
+    CUSPIC能够基于GPU高性能并行计算，高效稳定的处理结构冲击、侵彻、切削等极端大变形热力耦合问题，为复杂大变形工程问题提供可靠的求解能力。
   version: v3.0.0
   status: 内部研发
   chips: [FEM–MPM 耦合, 热力耦合, GPU 并行, 关键字驱动]
@@ -45,22 +46,24 @@
       v: Linux（CPU + GPU）/ Windows（仅 CPU）
   # 能力矩阵：/software 与 /software/cuspic 共用，一行一类，只写短语
   matrix:
+    - k: 系统
+      v: win64 / linux64
     - k: FEM 单元
-      v: 六面体 / TET4 / 四边形壳 / B-T 壳；减缩积分配沙漏控制
-    - k: MPM 方法
-      v: 二次 B 样条 · FLIP-PIC · APIC / PolyPIC；支持物质点流入
+      v: BRICK8R / BRICK8SRI / TETRA4 / B-T SHELL4
+    - k: PIC 方法
+      v: B-Spline MPM · FLIP-PIC · APIC / PolyPIC
     - k: 材料
-      v: 线弹性 / Johnson-Cook（含失效）/ JC-Tanh / 牛顿流体 / Drucker-Prager
+      v: 线弹性 / Johnson-Cook/ Tanh-Johnson-Cook / Newtonian liquid / Drucker-Prager
     - k: 状态方程
-      v: Gruneisen / Monaghan；热材料库支持温度场演化
+      v: Gruneisen / Monaghan
     - k: 接触与界面
-      v: NTS 罚接触；FEM-FEM / FEM-MPM / MPM-MPM 三类热力绑定
+      v: NTS 罚接触 · FEM-FEM / FEM-MPM / MPM-MPM 三类热力绑定及有限滑移接触 · 高温摩擦界面软化 · 库伦摩擦 · 压力相关Tresca摩擦 · 压力相关接触热导
     - k: 边界与载荷
-      v: 位移 / 速度 / 力 / 径向 / MPM 盒与墙边界；重力、初始条件
+      v: 指定位移 / 温度 / 热流 / 速度 / 力 / 转动 / 径向约束 / MPM 盒与墙边界；重力、初始速度条件
     - k: 并行
-      v: OpenMP 多线程（受许可核心数限制）；Linux 版 GPU
+      v: OpenMP 多线程 / GPU 异构计算 (目前仅linux64支持该功能)
     - k: 输出
-      v: VTU 结果文件 + 终端进度 + 自动日志
+      v: VTU 二进制结果文件 + 终端进度 + 自动日志
   # 案例位：按数组顺序排版 —— 第 1 条主展（视频 2/3 + 文案 1/3 两栏），
   #         第 2–3 条半宽并排，第 4 条起三分之一。
   #         video 留空即渲染「待替换」占位；ratio 填视频原生画面比例，
@@ -150,7 +153,7 @@
     open: false
     email: chengzhaolong@mail.dlut.edu.cn
     subject: CUSPER CuttingLab 试用申请
-    lead: 试用面向切削工艺研究与教学，先开放小批量内测名额；开启后按登记顺序发放，并附一份上手指引与示例参数组。
+    lead: 填写以下信息，以便我们在开放试用后及时通知你
     fields:
       - k: 用户名
         hint: 姓名或称呼
@@ -159,11 +162,6 @@
       - k: 物理 MAC 地址
         hint: 如 00-1A-2B-3C-4D-5E
     extra_lines: [材料 / 工件, 切削工况（速度 / 进给 / 切深）, 关注的结果, 可用硬件（CPU / GPU）]
-    note: 许可证按机器码签发，换机器、加卡或延期都要重新申请；虚拟网卡与随机 MAC 无法签发。
-    mac_help:
-      - Windows：命令提示符里 ipconfig /all →「物理地址」
-      - Linux：ip link 或 cat /sys/class/net/*/address
-      - macOS：ifconfig en0 | grep ether
   links:
     - label: 试用即将开启 ↓
       href: '#access'

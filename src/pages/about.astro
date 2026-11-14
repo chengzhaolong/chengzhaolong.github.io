@@ -1,9 +1,24 @@
 ---
 import Base from '../layouts/Base.astro';
-import { getEntry } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 
 const profile = (await getEntry('profile', 'main'))!.data;
 const cv = (await getEntry('cv', 'main'))!.data;
+
+/** 论文与专利：和 /publications 同一份数据，年份倒序、置顶优先，简历里全列 */
+const pubs = (await getCollection('publications')).sort(
+  (a, b) => b.data.year - a.data.year || Number(b.data.highlight) - Number(a.data.highlight)
+);
+
+/** 作者行：本人姓名加粗（先转义再拼 HTML，写法同 PubItem） */
+const me = profile.name_en;
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const authorsHtml = (authors: string[]) =>
+  authors.map((a) => (a.trim() === me ? `<b class="cv-pub__me">${esc(a)}</b>` : esc(a))).join(', ');
+
+/** 期刊用短名（IJNME），专利写成「中国发明专利（CN121031225B）」 */
+const venueOf = (p: (typeof pubs)[number]['data']) =>
+  p.type === 'patent' && p.venue_short ? `${p.venue}（${p.venue_short}）` : (p.venue_short ?? p.venue);
 
 /** 姓名下面第一行：身份 · 单位 · 地点 */
 const meta = [profile.affiliation].filter(Boolean);
@@ -26,7 +41,7 @@ const cuspicLabel = cuspicUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
 <Base
   title="简历"
-  description={`${profile.name}，${profile.title}，${profile.affiliation}。简历：教育背景、项目经历、获奖、技能。`}
+  description={`${profile.name}，${profile.title}，${profile.affiliation}。简历：教育背景、项目经历、论文与专利、技能。`}
 >
   <header class="cv-head">
     <div class="container--cv cv-head__inner">
@@ -123,18 +138,27 @@ const cuspicLabel = cuspicUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '');
       }
 
       {
-        cv.awards.length > 0 && (
+        pubs.length > 0 && (
           <section class="cv-block">
-            <h2 class="cv-block__title">获奖与荣誉</h2>
-            {cv.awards.map((a) => (
-              <div class="cv-row">
-                <p class="cv-row__title">
-                  {a.title}
-                  {a.note && <span class="cv-row__note">{a.note}</span>}
-                </p>
-                <span class="cv-entry__when">{a.period}</span>
-              </div>
-            ))}
+            <h2 class="cv-block__title">论文与专利</h2>
+            <ol class="cv-pubs">
+              {pubs.map((pub) => {
+                const d = pub.data;
+                const isPatent = d.type === 'patent';
+                const venue = venueOf(d);
+                return (
+                  <li>
+                    <span set:html={authorsHtml(d.authors)} />.{' '}
+                    {d.title}.{' '}
+                    {isPatent && <span class="cv-pub__tag">专利</span>}
+                    <span class="cv-pub__venue">
+                      {isPatent ? venue : <em>{venue}</em>}, {d.year}
+                    </span>
+                    {d.status && <span class="cv-pub__note"> · {d.status}</span>}
+                  </li>
+                );
+              })}
+            </ol>
           </section>
         )
       }

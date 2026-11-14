@@ -184,18 +184,7 @@ const cv = defineCollection({
           .strict()
       )
       .default([]),
-    /** 获奖与荣誉 */
-    awards: z
-      .array(
-        z
-          .object({
-            period: z.string(),
-            title: z.string(),
-            note: z.string().optional(),
-          })
-          .strict()
-      )
-      .default([]),
+    /** 获奖与荣誉已从简历移除（2026-11）；要恢复再加回字段与 about.astro 的分节 */
     /** 工具与技能：group 一栏一个标签，items 一行文字 */
     skills: z
       .array(z.object({ group: z.string(), items: z.string() }).strict())

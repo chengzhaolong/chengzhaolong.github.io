@@ -1,6 +1,7 @@
 # ==========================================================
 # 简历 —— 只改这一个文件，/about 页自动渲染
-# 四段：education / projects / awards / skills
+# 三段：education / projects / skills
+# 论文与专利不写在这里：/about 直接读 publications.yml（和 /publications 同一份数据）
 # 每个条目一行（左侧标题 + 右侧日期），要点写在 points 里，一条一行
 # 带 〔 〕 的是要你替换的占位，填完删掉方括号
 # 某段不要就写 [] 或删掉整段

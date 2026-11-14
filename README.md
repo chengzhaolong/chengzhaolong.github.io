@@ -38,8 +38,8 @@
 │  ├─ content/notes/         # 笔记：一篇一个 .mdx（文件名即 URL）
 │  ├─ data/
 │  │  ├─ profile.yml         # 个人信息（姓名/单位/邮箱/照片/简介/关键词）
-│  │  ├─ cv.yml              # 简历（教育 / 项目 / 获奖 / 技能，写法见 4.2）
-│  │  ├─ publications.yml    # 论文列表
+│  │  ├─ cv.yml              # 简历（教育 / 项目 / 技能，写法见 4.2）
+│  │  ├─ publications.yml    # 论文列表（简历的「论文与专利」也读它）
 │  │  └─ software.yml        # 软件条目（cuspic / cuttinglab）
 │  ├─ components/            # Nav / Footer / FigureCard / VideoCard / PubItem …
 │  ├─ layouts/Base.astro     # <head>、SEO、导航、页脚、灯箱、入场动效
@@ -105,7 +105,8 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 
 `/about` 是一页单栏简历，版式照 PDF 简历来：**每条一行（标题在左、日期在右）+ 一行行要点**，不放摘要。
 页面上所有内容（含姓名下方那行联系方式）都来自 `profile.yml` + `cv.yml`，
-`cv.yml` 只有四段：`education` / `projects` / `awards` / `skills`。
+「论文与专利」一节另读 `publications.yml`（见本节末尾）；
+`cv.yml` 只有三段：`education` / `projects` / `skills`。
 每段是一个列表，**写在前面先显示**；某段不需要就写 `[]`（或删掉整段），页面上不会出现空标题。
 
 ```yaml
@@ -127,25 +128,29 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
         - 解决什么问题、你负责哪块
         - 做到什么程度（规模、加速比、能算多大的算例）
 
-  awards:                         # 获奖与荣誉，没有就 []
-    - period: 2022                # 按年份倒序，渲染时靠右
-      title: 本科优秀毕业论文       # 写全称，评委认全称
-      note: 〔校级〕                # 可省略，浅灰字跟在标题后
-
   skills:                         # 工具与技能，一栏一行
     - group: 编程
       items: C++ / CUDA、Python
 ```
 
 字段名是固定的：`period` / `school` / `major` / `degree` / `points`；
-`period` / `name` / `role` / `points`；`period` / `title` / `note`；`group` / `items`。
+`period` / `name` / `role` / `points`；`group` / `items`。
 填错字段名 `npm run check` 会直接报 `projects.0: Unrecognized key: "xxx"`，不会静默丢数据。
 
 三条写法约定，能让简历更像简历：
 
 - **条目标题一行写完**：教育写「学校，专业，学位」，项目写「项目名 —— 一句定位」，日期交给 `period` 靠右；
 - **`points` 每条 15–30 字**，动词开头、给得出数字（「实现 GPU 并行求解，单算例 10 万单元」），少用形容词；
-- **奖项用全称**（「美国大学生数学建模竞赛（MCM/ICM）Finalist」而不是「美赛 F 奖」）；升学结果（保研直博）写进本科那条的 `points`，和 `period` 自然对齐。
+- **升学结果（保研直博）写进本科那条的 `points`**，和 `period` 自然对齐。
+
+**论文与专利不在 `cv.yml` 里**：「论文与专利」一节排在项目之后，直接读 `publications.yml`
+（和 `/publications` 同一份数据，按 `year` 倒序、`highlight` 优先，**全部列出**，不截断）。
+每行依次是「作者（本人姓名加粗）. 题名. 期刊短名或专利号, 年份」，`type: patent` 的行多一个「专利」小标、
+`status` 作尾注（如「已授权」）。所以加一篇论文只改 `publications.yml`，两处同时更新；
+填了 `venue_short` 就用短名（`IJNME`），PDF 里更省行。
+
+> 获奖与荣誉一栏已移除（`cv.yml` 的 `awards` 与页面对应分节一起删掉）。要恢复就加回 schema 字段与
+> `about.astro` 的分节，样式参考 git 历史里的 `.cv-row`。
 
 页首的姓名、`身份 · 单位 · 地点`、邮箱与 ORCID 都取自 `profile.yml`，改那边即可。
 「查看我的个人主页，了解更多我的背景和CUSPIC求解器：…」这行**只在打印出的 PDF 里出现**
@@ -407,7 +412,7 @@ ffmpeg -ss 1 -i OUT.mp4 -frames:v 1 -vf "scale=1280:-2" -q:v 3 OUT.jpg
 占位内容在页面上都有明确标注（「待替换」/〔 〕），按下面顺序替换即可：
 
 - [ ] `profile.yml`：单位、邮箱、`links`（Scholar / ORCID / GitHub / B站）
-- [ ] `cv.yml`：本科学校/专业/起止年月、导师、项目文案、获奖年份，〔 〕全部替换
+- [ ] `cv.yml`：本科学校/专业/起止年月、导师、项目文案，〔 〕全部替换
 - [ ] 简历 PDF → `public/media/docs/cv.pdf`，`profile.yml` 的 `links.cv` 填 `/media/docs/cv.pdf`
 - [ ] 个人照片 → 放到 `public/media/portrait.jpg`（3:4 竖图，长边 1200 px 以内），把 `profile.yml` 的 `photo` 改成 `/media/portrait.jpg`
 - [ ] `publications.yml`：换成真实论文（含 BibTeX）

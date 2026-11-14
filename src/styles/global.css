@@ -2001,24 +2001,47 @@ table.data td.num {
   color: var(--line-strong);
 }
 
-/* 获奖：一项一行，标题左、年份右 */
-.cv-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.1rem 1rem;
-  margin-top: 0.35rem;
+/* 论文与专利：一条一段，编号悬挂缩进，本人姓名加粗 */
+.cv-pubs {
+  margin-top: 0.55rem;
+  padding-left: 1.55rem;
+  list-style: decimal;
 }
 
-.cv-row__title {
-  min-width: 0;
+.cv-pubs li {
+  padding-left: 0.15rem;
   font-size: 0.92rem;
   line-height: 1.55;
+  color: var(--ink-2);
 }
 
-.cv-row__note {
-  margin-left: 0.4rem;
+.cv-pubs li + li {
+  margin-top: 0.22rem;
+}
+
+.cv-pubs li::marker {
+  font-family: var(--f-mono);
+  font-size: 0.78rem;
+  color: var(--ink-3);
+}
+
+.cv-pub__me {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* 期刊名斜体、专利类型与状态用浅灰小字，PDF 里也是这个层次 */
+.cv-pub__venue em {
+  font-style: italic;
+}
+
+.cv-pub__tag {
+  margin-right: 0.3rem;
+  font-size: 0.82rem;
+  color: var(--ink-3);
+}
+
+.cv-pub__note {
   font-size: 0.84rem;
   color: var(--ink-3);
 }
@@ -2057,14 +2080,17 @@ table.data td.num {
 
 /* 窄屏：日期掉到标题下面一行，避免右侧被挤出屏幕 */
 @media (max-width: 560px) {
-  .cv-entry__head,
-  .cv-row {
+  .cv-entry__head {
     display: block;
   }
 
   .cv-entry__when {
     display: block;
     margin-top: 0.1rem;
+  }
+
+  .cv-pubs {
+    padding-left: 1.25rem;
   }
 
   .cv-skills {
@@ -2800,17 +2826,23 @@ button.badge:hover {
     line-height: 1.45;
   }
 
-  .cv-row {
-    margin-top: 0.15rem;
+  .cv-pubs {
+    margin-top: 0.25rem;
+    padding-left: 1.2rem;
   }
 
-  .cv-row__title {
-    font-size: 0.82rem;
+  .cv-pubs li {
+    font-size: 0.8rem;
     line-height: 1.42;
   }
 
-  .cv-row__note {
-    font-size: 0.78rem;
+  .cv-pubs li + li {
+    margin-top: 0.12rem;
+  }
+
+  .cv-pub__tag,
+  .cv-pub__note {
+    font-size: 0.74rem;
   }
 
   .cv-skills {
@@ -2825,7 +2857,7 @@ button.badge:hover {
   }
 
   .cv-entry,
-  .cv-row,
+  .cv-pubs li,
   .cv-skills > * {
     break-inside: avoid;
   }

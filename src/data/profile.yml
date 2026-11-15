@@ -86,4 +86,4 @@
     cv: '/media/docs/cv.pdf'
     # CUSPIC 项目主页：只在简历 PDF 里显示，网页上看不到（见 about.astro 的 .cv-line--home）
     # 站点已发布到根域，CUSPIC 的项目页就在本站 /software/cuspic/
-    cuspic: 'https://chengzhaolong.github.io/software/cuspic/'
+    cuspic: 'https://chengzhaolong.github.io'

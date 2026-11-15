@@ -56,8 +56,6 @@ const contacts = [
 /** 页首「想了解更多」那行：只在打印出的 PDF 里出现，网址去掉 https:// 好排版 */
 const cuspicUrl = profile.links?.cuspic;
 const cuspicLabel = cuspicUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '');
-/** 简历 PDF 的正文是中文，英文页要说一句 */
-const CV_LANG_NOTE = 'The PDF CV is written in Chinese; this page is the English version.';
 ---
 
 <header class="cv-head">
@@ -88,13 +86,6 @@ const CV_LANG_NOTE = 'The PDF CV is written in Chinese; this page is the English
             <a class="cv-home__url" href={cuspicUrl}>
               {cuspicLabel}
             </a>
-          </p>
-        )
-      }
-      {
-        lang === 'en' && (
-          <p class="cv-line muted" style="font-size:var(--fs-xs)">
-            {CV_LANG_NOTE}
           </p>
         )
       }

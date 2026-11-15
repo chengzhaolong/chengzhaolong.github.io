@@ -44,7 +44,7 @@
       role: 独立开发者 · C++ / CUDA
       points:
         - 架构设计：设计大变形非线性多场耦合有限元-无网格方法显式动力学求解器架构，当前求解器核心代码量超4万行
-        - 高性能计算：基于 CUDA 与 OpenMP 实现 CPU-GPU 异构并行，设计高效的数据结构与访存冲突处理算法
+        - 高性能计算：支持GPU异构并行计算，设计高效的数据结构与访存冲突处理算法
         - 核心算法：实现 FEM（Tet4/Hex8/SRI/B-T壳）与多种 PIC 无网格格式；支持多种非线性本构、约束及接触算法
 
     - period: 〔2026.04 — 至今〕
@@ -110,7 +110,7 @@
         role: Sole developer · C++ / CUDA
         points:
           - 'Architecture: designed the explicit dynamics solver for large-deformation, non-linear, multi-field coupled finite element–meshfree problems; the core now exceeds 40,000 lines of code'
-          - 'High-performance computing: CPU–GPU heterogeneous parallelism with CUDA and OpenMP, including efficient data structures and memory-conflict handling'
+          - 'High-performance computing: GPU heterogeneous parallelism with CUDA, including efficient data structures and memory-conflict handling'
           - 'Core algorithms: FEM (Tet4/Hex8/SRI/B-T shell) and several PIC meshfree formulations; multiple non-linear constitutive models, constraints and contact algorithms'
       - period: 2026.04 — present
         name: CUSPER CuttingLab machining process simulation application

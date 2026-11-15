@@ -32,7 +32,7 @@
 │  ├─ og-image.svg / .png    # 社交分享图（改完 svg 后 npm run og 重新生成 png）
 │  └─ media/                 # 视频、截图、云图放这里
 │     ├─ videos/             # 页面实际加载的 mp4（压缩版）+ jpg poster
-│     └─ docs/cv.pdf         # 简历 PDF（换简历就覆盖这个文件，见 4.2）
+│     └─ docs/cv.pdf         # 简历 PDF 中文版（英文版 cv_en.pdf，见 4.2）
 ├─ scripts/make-og.mjs       # svg → png
 ├─ scripts/check-i18n.mjs    # 英文站自检（中文残留 / 站内链接 / hreflang）
 ├─ src/
@@ -176,10 +176,11 @@ npm run og           # 把 public/og-image.svg 转成 1200×630 的 png
 清空它这行就不打印；蓝色强调（`--link`）只给这行的网址和「下载简历（PDF）↓」，
 后者印进 PDF 没意义，打印时隐藏。
 
-简历 PDF 是**预先做好、直接入库**的静态文件：`public/media/docs/cv.pdf`。
-`profile.yml` 的 `links.cv` 已指向它，所以首页联系行、页脚、`/about` 页首、英文页联系条
-都会出现「CV（PDF）↓」；链接带 `download`，点一下直接存盘，不会在浏览器里打开 PDF 预览。
-不想公开就把 `links.cv` 改回 `''`，这几处一起消失。
+简历 PDF 是**预先做好、直接入库**的静态文件：中文版 `public/media/docs/cv.pdf`，
+英文版 `public/media/docs/cv_en.pdf`。`profile.yml` 的 `links.cv` / `links.cv_en` 分别指向它们，
+渲染时英文页（`/en/*`）优先取 `cv_en`、没填才回退 `cv`：首页联系行、页脚、`/about`、
+`/en/about` 页首因此都是「在哪一站就下哪一份」，链接带 `download`，点一下直接存盘，
+不会在浏览器里打开 PDF 预览。两处都清空（`''`）则这几类入口一起消失。
 
 **换简历 = 覆盖同一个文件**（URL 不变，不用改代码）。生成方式就是打印 `/about`，
 `@media print` 里已经写好一页 A4 的版式：正文 13px、页边距 12/14mm、页首带照片、
@@ -192,7 +193,8 @@ npx astro preview --port 4399      # 这个终端保持开着
 
 浏览器打开 `http://localhost:4399/about/` → `Ctrl+P` → 目标选「另存为 PDF」：
 纸张 A4（CSS 的 `@page { size: A4 }` 已锁死）、边距「默认」、缩放 100%、背景图形不用勾；
-预览右下角确认是 `1 / 1` 页，存到 `public/media/docs/cv.pdf` 覆盖。
+预览右下角确认是 `1 / 1` 页，存到 `public/media/docs/cv.pdf` 覆盖。英文版同理：
+打开 `http://localhost:4399/en/about/`，存到 `public/media/docs/cv_en.pdf`。
 
 习惯命令行就用 Edge/Chrome 的 headless 打印（一次成型，不用开浏览器）：
 
@@ -202,10 +204,10 @@ npx astro preview --port 4399      # 这个终端保持开着
   --print-to-pdf="$PWD\public\media\docs\cv.pdf" http://127.0.0.1:4399/about/
 ```
 
-自检一行：`pdfinfo public/media/docs/cv.pdf | findstr Pages` → 应为 `Pages: 1`。
+自检一行：`pdfinfo public/media/docs/cv.pdf | findstr Pages` → 应为 `Pages: 1`（`cv_en.pdf` 同样查一遍）。
 
 `public/_headers` 给 `/media/*` 设了 30 天缓存，所以换完简历老访客可能还拿到旧版；
-想立刻生效就把文件改名（`cv-2026-11.pdf`）并同步 `links.cv`，或者等缓存过期。
+想立刻生效就把文件改名（`cv-2026-11.pdf`）并同步 `links.cv` / `links.cv_en`，或者等缓存过期。
 公开的这份只有邮箱和 ORCID；带手机号的求职版**别放 `public/`**（那目录部署后就是公开 URL），
 扔进已被 `.gitignore` 的 `_private/` 即可。
 
@@ -521,7 +523,7 @@ Framework preset 选 **Astro**，Build command `npm run build`，输出目录 `d
 
 - [ ] `profile.yml`：单位、邮箱、`links`（Scholar / ORCID / GitHub / B站）
 - [ ] `cv.yml`：本科学校/专业/起止年月、导师、项目文案，〔 〕全部替换
-- [ ] 简历 PDF → `public/media/docs/cv.pdf`，`profile.yml` 的 `links.cv` 填 `/media/docs/cv.pdf`
+- [ ] 简历 PDF → `public/media/docs/cv.pdf`（英文版 `cv_en.pdf`），`profile.yml` 的 `links.cv` / `links.cv_en` 分别填这两个路径
 - [ ] 个人照片 → 放到 `public/media/portrait.jpg`（3:4 竖图，长边 1200 px 以内），把 `profile.yml` 的 `photo` 改成 `/media/portrait.jpg`
 - [ ] `publications.yml`：换成真实论文（含 BibTeX）
 - [ ] `profile.yml` 的英文侧：`interests_en` / `site_suffix_en` / `location_en` / `intro_en` 与中文逐句对应

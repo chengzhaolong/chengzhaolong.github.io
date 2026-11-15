@@ -2,7 +2,7 @@
 import { getEntry } from 'astro:content';
 import { counterpartPath, langFromPath, withLang, type Lang } from '../utils/i18n';
 import { ui } from '../i18n/ui';
-import { profileText } from '../utils/localize';
+import { cvHref, profileText } from '../utils/localize';
 
 interface Props {
   /** 语言；不传则按当前路径判断（/en/* 视为英文） */
@@ -17,6 +17,7 @@ const lang: Lang = Astro.props.lang ?? langFromPath(Astro.url.pathname);
 const t = ui[lang];
 const pt = profileText(profile, lang);
 
+const cvLink = cvHref(profile, lang);
 const year = new Date().getFullYear();
 /** 另一个语言：页脚的语言入口显示它的全称（导航里是简写） */
 const other: Lang = lang === 'en' ? 'zh' : 'en';
@@ -71,8 +72,8 @@ const contacts = [
                 </li>
               ))
             }
-            {profile.links?.cv && (
-              <li><a href={profile.links.cv} download>{t.footer.cv}</a></li>
+            {cvLink && (
+              <li><a href={cvLink} download>{t.footer.cv}</a></li>
             )}
           </ul>
         </div>

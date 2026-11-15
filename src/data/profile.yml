@@ -81,9 +81,10 @@
     github: 'https://github.com/chengzhaolong'
     researchgate: ''
     bilibili: ''
-    # 简历 PDF：文件在 public/media/docs/cv.pdf（换简历就覆盖同名文件）
-    # 清空则首页联系行、页脚、/about 页首三处入口一起消失
+    # 简历 PDF：中文版 public/media/docs/cv.pdf，英文版 public/media/docs/cv_en.pdf
+    # 英文页（/en/*）优先用 cv_en，没填才回退 cv；两处都清空则各处下载入口一起消失
     cv: '/media/docs/cv.pdf'
+    cv_en: '/media/docs/cv_en.pdf'
     # CUSPIC 项目主页：只在简历 PDF 里显示，网页上看不到（见 about.astro 的 .cv-line--home）
     # 站点已发布到根域，CUSPIC 的项目页就在本站 /software/cuspic/
     cuspic: 'https://chengzhaolong.github.io'

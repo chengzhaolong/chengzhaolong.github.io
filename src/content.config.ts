@@ -268,6 +268,8 @@ const profile = defineCollection({
         researchgate: z.string().optional(),
         bilibili: z.string().optional(),
         cv: z.string().optional(),
+        /** 英文站简历 PDF：不填则英文页沿用 cv */
+        cv_en: z.string().optional(),
         /** CUSPIC 项目主页：只在简历 PDF 里显示 */
         cuspic: z.string().optional(),
       })

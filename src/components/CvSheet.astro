@@ -6,7 +6,7 @@
 import { getCollection, getEntry } from 'astro:content';
 import { langFromPath, withLang, type Lang } from '../utils/i18n';
 import { ui } from '../i18n/ui';
-import { localizeCv, localizePub, profileText } from '../utils/localize';
+import { cvHref, localizeCv, localizePub, profileText } from '../utils/localize';
 
 interface Props {
   lang?: Lang;
@@ -49,8 +49,8 @@ const contacts = [
   { label: t.cv.scholar, href: profile.links?.scholar, download: false },
   { label: t.cv.github, href: profile.links?.github, download: false },
   { label: t.cv.bilibili, href: profile.links?.bilibili, download: false },
-  // 简历 PDF 走下载而不是浏览器预览（文件在 public/media/docs/cv.pdf）
-  { label: t.cv.download, href: profile.links?.cv, download: true },
+  // 简历 PDF 走下载而不是浏览器预览（中文 cv.pdf / 英文 cv_en.pdf，见 profile.yml）
+  { label: t.cv.download, href: cvHref(profile, lang), download: true },
 ].filter((c) => c.href);
 
 /** 页首「想了解更多」那行：只在打印出的 PDF 里出现，网址去掉 https:// 好排版 */

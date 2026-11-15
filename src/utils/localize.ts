@@ -82,3 +82,12 @@ export const profileText = (p: ProfileData, lang: Lang) => {
     demo: p.demo,
   };
 };
+
+/**
+ * 简历 PDF 链接：中文页用 links.cv，英文页优先 links.cv_en、缺失时回退 cv。
+ * 返回 undefined 表示不显示下载入口 —— 页脚、首页联系行、简历页首三处共用这一个判断。
+ */
+export const cvHref = (p: ProfileData, lang: Lang): string | undefined => {
+  const links = p.links ?? {};
+  return (lang === 'en' ? links.cv_en || links.cv : links.cv) || undefined;
+};

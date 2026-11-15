@@ -9,7 +9,7 @@ import SoftwareCard from './SoftwareCard.astro';
 import PubItem from './PubItem.astro';
 import { langFromPath, withLang, type Lang } from '../utils/i18n';
 import { ui } from '../i18n/ui';
-import { localizePub, localizeSoftware, profileText } from '../utils/localize';
+import { cvHref, localizePub, localizeSoftware, profileText } from '../utils/localize';
 
 interface Props {
   lang?: Lang;
@@ -26,6 +26,7 @@ const pubs = (await getCollection('publications')).sort((a, b) => b.data.year - 
 const featured = [...pubs.filter((p) => p.data.highlight), ...pubs.filter((p) => !p.data.highlight)].slice(0, 3);
 
 const contactHref = `mailto:${profile.email}`;
+const cvLink = cvHref(profile, lang);
 const portrait = profile.photo ?? '/media/portrait.svg';
 ---
 
@@ -158,12 +159,12 @@ const portrait = profile.photo ?? '/media/portrait.svg';
       <span class="contact-strip__label">{t.common.contact}</span>
       <a href={contactHref}>{profile.email}</a>
       {
-        profile.links?.cv && (
+        cvLink && (
           <>
             <span class="contact-strip__sep" aria-hidden="true">
               ·
             </span>
-            <a href={profile.links.cv} download>
+            <a href={cvLink} download>
               {t.home.cv}
             </a>
           </>
